@@ -228,7 +228,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-full bg-gray-100 min-h-0">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar 

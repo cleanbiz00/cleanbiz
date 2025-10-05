@@ -407,7 +407,7 @@ const Financial = ({
   };
 
   return (
-  <div className="p-6">
+    <div className="p-6 pb-24">
     <h2 className="text-2xl font-bold mb-6">Financeiro</h2>
     
       {/* Resumo topo com comparação Receita vs Despesas e Margem */}
@@ -561,9 +561,9 @@ const Financial = ({
                   <div className="mt-2 flex gap-2">
                     <button onClick={() => onEdit(e)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700">Editar</button>
                     <button onClick={() => onDelete(e.id)} className="px-3 py-2 text-sm rounded bg-red-50 text-red-700">Excluir</button>
-                  </div>
+          </div>
                 )}
-              </div>
+          </div>
             ))}
             {filteredExpenses.length === 0 && (
               <div className="text-center text-gray-500 py-6">Nenhuma despesa para o período selecionado.</div>
