@@ -1,4 +1,5 @@
 import React from 'react';
+import { supabase } from '../../utils/supabaseClient';
 import { Home, Users, Calendar, DollarSign } from 'lucide-react';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
@@ -58,6 +59,13 @@ const Sidebar = ({ activeTab, setActiveTab }) => (
        <DollarSign size={20} />
        <span>Financeiro</span>
      </button>
+    
+    <button
+      onClick={async () => { await supabase.auth.signOut(); window.location.href = '/login'; }}
+      className="w-full flex items-center justify-center p-3 rounded-lg transition-colors bg-blue-800 hover:bg-blue-700 mt-6"
+    >
+      Sair
+    </button>
    </nav>
  </div>
 );

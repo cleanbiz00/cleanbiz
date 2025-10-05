@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../../utils/supabaseClient';
 import { DollarSign } from 'lucide-react';
 
 const Dashboard = ({ 
@@ -6,7 +7,36 @@ const Dashboard = ({
   appointments, 
   clients, 
   getClientName 
-}) => (
+}) => {
+  const [monthlyExpenses, setMonthlyExpenses] = useState(0);
+
+  const monthRange = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const toISO = (d) => d.toISOString().slice(0, 10);
+    return { start: toISO(start), end: toISO(end) };
+  }, []);
+
+  useEffect(() => {
+    const loadMonthlyExpenses = async () => {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('amount, date')
+        .gte('date', monthRange.start)
+        .lte('date', monthRange.end);
+      if (!error && data) {
+        const total = data.reduce((s, x) => s + Number(x.amount || 0), 0);
+        setMonthlyExpenses(total);
+      }
+    };
+    loadMonthlyExpenses();
+  }, [monthRange]);
+
+  const revenue = financialData.revenue;
+  const profit = revenue - monthlyExpenses;
+
+  return (
   <div className="p-6">
     <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
     
@@ -15,7 +45,7 @@ const Dashboard = ({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-gray-600">Receita Mensal</p>
-            <p className="text-2xl font-bold text-green-600">${financialData.revenue}</p>
+            <p className="text-2xl font-bold text-green-600">${revenue}</p>
           </div>
           <DollarSign className="h-8 w-8 text-green-600" />
         </div>
@@ -25,7 +55,7 @@ const Dashboard = ({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-gray-600">Despesas</p>
-            <p className="text-2xl font-bold text-red-600">${financialData.expenses}</p>
+            <p className="text-2xl font-bold text-red-600">${monthlyExpenses}</p>
           </div>
           <DollarSign className="h-8 w-8 text-red-600" />
         </div>
@@ -35,7 +65,7 @@ const Dashboard = ({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-gray-600">Lucro Líquido</p>
-            <p className="text-2xl font-bold text-blue-600">${financialData.profit}</p>
+            <p className="text-2xl font-bold text-blue-600">${profit}</p>
           </div>
           <DollarSign className="h-8 w-8 text-blue-600" />
         </div>
@@ -89,5 +119,6 @@ const Dashboard = ({
     </div>
   </div>
 );
+}
 
 export default Dashboard;

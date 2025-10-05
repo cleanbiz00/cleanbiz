@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../../utils/supabaseClient';
 
 const CATEGORIES = [
   'Despesas com Pessoal',
@@ -53,8 +54,10 @@ const Financial = ({
   clients 
 }) => {
   const [expenses, setExpenses] = useState([]);
+  const [periodExpenses, setPeriodExpenses] = useState([]);
   const [recurringTemplates, setRecurringTemplates] = useState([]);
   const [filterPeriod, setFilterPeriod] = useState('mes_atual');
+  const [includeFuture, setIncludeFuture] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     category: CATEGORIES[0],
@@ -65,6 +68,33 @@ const Financial = ({
     frequency: 'Única'
   });
 
+  const reloadExpenses = async () => {
+    const { data } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('date', { ascending: false });
+    if (data) setExpenses(data);
+  };
+
+  // Load expenses and recurring templates from Supabase
+  useEffect(() => {
+    const loadData = async () => {
+      const { data: expData, error: expErr } = await supabase
+        .from('expenses')
+        .select('*')
+        .order('date', { ascending: false });
+      if (!expErr && expData) setExpenses(expData);
+
+      const { data: tmplData, error: tmplErr } = await supabase
+        .from('recurring_expense_templates')
+        .select('*')
+        .eq('active', true)
+        .order('start_date', { ascending: true });
+      if (!tmplErr && tmplData) setRecurringTemplates(tmplData);
+    };
+    loadData();
+  }, []);
+
   // Generate recurring instances for selected period
   const ensureRecurringForPeriod = (list, templates, periodKey) => {
     const { start, end } = getPeriodRange(periodKey);
@@ -73,7 +103,7 @@ const Financial = ({
       if (t.frequency === 'Única') return;
       let cursor = new Date(start);
       // Start from the greater of template start date or period start
-      const tmplStart = new Date(t.date);
+      const tmplStart = new Date(t.start_date || t.date);
       if (tmplStart > cursor) cursor = new Date(tmplStart);
       while (cursor <= end) {
         instances.push({
@@ -113,12 +143,28 @@ const Financial = ({
 
   const filteredExpenses = useMemo(() => {
     const { start, end } = getPeriodRange(filterPeriod);
-    const withRecurring = ensureRecurringForPeriod(expenses, recurringTemplates, filterPeriod);
+    // If including future, extend end to end-of-period
+    let rangeEnd = new Date(end);
+    if (includeFuture) {
+      if (filterPeriod === 'mes_atual') {
+        rangeEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0, 23, 59, 59, 999);
+      } else if (filterPeriod === 'ultimos_3_meses') {
+        const tmp = new Date(start.getFullYear(), start.getMonth() + 3, 0, 23, 59, 59, 999);
+        rangeEnd = tmp;
+      } else if (filterPeriod === 'ano_atual') {
+        rangeEnd = new Date(start.getFullYear(), 12, 0, 23, 59, 59, 999);
+      }
+    }
+    const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const startStr = fmt(start);
+    const endStr = fmt(rangeEnd);
+    const serverFiltered = periodExpenses;
+    const withRecurring = ensureRecurringForPeriod(serverFiltered, recurringTemplates, filterPeriod);
     return withRecurring.filter((e) => {
-      const d = new Date(e.date);
-      return d >= start && d <= end;
+      const d = (e.date || '').slice(0, 10);
+      return d >= startStr && d <= endStr;
     });
-  }, [expenses, recurringTemplates, filterPeriod]);
+  }, [periodExpenses, recurringTemplates, filterPeriod, includeFuture]);
 
   const totalsByCategory = useMemo(() => {
     const map = new Map();
@@ -159,35 +205,115 @@ const Financial = ({
     });
   };
 
-  const onSubmit = (e) => {
+  // Realtime updates for expenses table
+  useEffect(() => {
+    const channel = supabase
+      .channel('expenses-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, async () => {
+        const { data } = await supabase
+          .from('expenses')
+          .select('*')
+          .order('date', { ascending: false });
+        if (data) setExpenses(data);
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Load period-bounded expenses whenever filter changes
+  useEffect(() => {
+    const loadPeriod = async () => {
+      const { start, end } = getPeriodRange(filterPeriod);
+      let rangeEnd = new Date(end);
+      if (includeFuture) {
+        if (filterPeriod === 'mes_atual') {
+          rangeEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0, 23, 59, 59, 999);
+        } else if (filterPeriod === 'ultimos_3_meses') {
+          rangeEnd = new Date(start.getFullYear(), start.getMonth() + 3, 0, 23, 59, 59, 999);
+        } else if (filterPeriod === 'ano_atual') {
+          rangeEnd = new Date(start.getFullYear(), 12, 0, 23, 59, 59, 999);
+        }
+      }
+      const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const startStr = fmt(start);
+      const endStr = fmt(rangeEnd);
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .gte('date', startStr)
+        .lte('date', endStr)
+        .order('date', { ascending: false });
+      if (!error && data) setPeriodExpenses(data);
+    };
+    loadPeriod();
+  }, [filterPeriod, includeFuture]);
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     const payload = {
-      id: editingId || Date.now(),
       category: form.category,
       description: form.description,
       amount: Number(form.amount || 0),
       date: form.date,
       type: form.type,
-      frequency: form.frequency
+      frequency: form.frequency,
+      is_auto: false
     };
     if (editingId) {
-      setExpenses((prev) => prev.map((x) => (x.id === editingId ? payload : x)));
-      setEditingId(null);
+      const { error } = await supabase
+        .from('expenses')
+        .update(payload)
+        .eq('id', editingId);
+      if (!error) {
+        const { data } = await supabase
+          .from('expenses')
+          .select('*')
+          .order('date', { ascending: false });
+        if (data) setExpenses(data);
+        setEditingId(null);
+      }
     } else {
-      setExpenses((prev) => [...prev, payload]);
+      const { error } = await supabase
+        .from('expenses')
+        .insert(payload);
+      if (!error) {
+        const { data } = await supabase
+          .from('expenses')
+          .select('*')
+          .order('date', { ascending: false });
+        if (data) setExpenses(data);
+      }
     }
-    // Manage recurring templates if fixed and not one-time
+    // Manage recurring templates if fixed and not one-time (upsert)
     if (payload.type === 'Fixa' && payload.frequency !== 'Única') {
-      setRecurringTemplates((prev) => {
-        const exists = prev.find(
-          (t) => t.category === payload.category && t.description === payload.description && t.frequency === payload.frequency && t.type === payload.type
-        );
-        if (exists) return prev;
-        return [
-          ...prev,
-          { id: Date.now(), category: payload.category, description: payload.description, amount: payload.amount, date: payload.date, type: payload.type, frequency: payload.frequency }
-        ];
-      });
+      const { data: existing } = await supabase
+        .from('recurring_expense_templates')
+        .select('id')
+        .eq('category', payload.category)
+        .eq('description', payload.description)
+        .eq('frequency', payload.frequency)
+        .eq('type', payload.type)
+        .limit(1)
+        .maybeSingle();
+      if (!existing) {
+        await supabase.from('recurring_expense_templates').insert({
+          category: payload.category,
+          description: payload.description,
+          amount: payload.amount,
+          start_date: payload.date,
+          type: payload.type,
+          frequency: payload.frequency,
+          active: true
+        });
+        const { data: tmplData } = await supabase
+          .from('recurring_expense_templates')
+          .select('*')
+          .eq('active', true)
+          .order('start_date', { ascending: true });
+        if (tmplData) setRecurringTemplates(tmplData);
+      }
     }
     resetForm();
   };
@@ -204,8 +330,13 @@ const Financial = ({
     });
   };
 
-  const onDelete = (id) => {
-    setExpenses((prev) => prev.filter((x) => x.id !== id));
+  const onDelete = async (id) => {
+    await supabase.from('expenses').delete().eq('id', id);
+    const { data } = await supabase
+      .from('expenses')
+      .select('*')
+      .order('date', { ascending: false });
+    if (data) setExpenses(data);
   };
 
   // Simple Pie Chart (SVG)
@@ -276,9 +407,9 @@ const Financial = ({
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Financeiro</h2>
-
+  <div className="p-6">
+    <h2 className="text-2xl font-bold mb-6">Financeiro</h2>
+    
       {/* Resumo topo com comparação Receita vs Despesas e Margem */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -289,7 +420,7 @@ const Financial = ({
           <h3 className="text-lg font-semibold mb-4">Despesas (período)</h3>
           <div className="text-2xl font-bold text-red-600">{formatCurrency(totalExpenses)}</div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold mb-1">Lucro Real</h3>
           <div className="text-2xl font-bold text-blue-700">{formatCurrency(realProfit)}</div>
           <div className="text-sm text-gray-600">Margem: {margin.toFixed(1)}%</div>
@@ -364,7 +495,12 @@ const Financial = ({
                 <option value="ultimos_3_meses">Últimos 3 meses</option>
                 <option value="ano_atual">Ano atual</option>
               </select>
-            </div>
+              <label className="ml-2 text-sm text-gray-700 flex items-center gap-1">
+                <input type="checkbox" checked={includeFuture} onChange={(e) => setIncludeFuture(e.target.checked)} />
+                Incluir futuras
+              </label>
+              <button onClick={reloadExpenses} className="ml-2 px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200 border">Recarregar</button>
+          </div>
           </div>
           <div className="overflow-auto border rounded">
             <table className="min-w-full text-sm">
@@ -419,7 +555,7 @@ const Financial = ({
             <p className="text-gray-500 text-sm">Cadastre despesas para visualizar o gráfico.</p>
           )}
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold mb-2">Evolução mensal</h3>
           <LineChart labels={monthlyLabels} values={monthlyTotals} />
         </div>
@@ -438,10 +574,10 @@ const Financial = ({
               <span className="text-green-600 font-bold">${client.price}</span>
             </div>
           ))}
-        </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Financial;

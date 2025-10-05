@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../utils/supabaseClient';
 import Sidebar from '../components/Sidebar/Sidebar';
 import Dashboard from '../components/Dashboard/Dashboard';
 import Clients from '../components/Clients/Clients';
@@ -11,6 +12,7 @@ import Modal from '../components/Modal/Modal';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [checkingAuth, setCheckingAuth] = useState(true);
   
   // Estados dos dados
   const [clients, setClients] = useState([
@@ -82,6 +84,19 @@ export default function Home() {
     profit: 4190,
     monthlyGrowth: 12.5
   });
+
+  // Proteção de rota simples: redireciona para /login se não autenticado
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = '/login';
+        return;
+      }
+      setCheckingAuth(false);
+    };
+    checkSession();
+  }, []);
 
   // Estados do modal
   const [showModal, setShowModal] = useState(false);
@@ -203,6 +218,12 @@ export default function Home() {
         );
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-white text-gray-700">Carregando...</div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
