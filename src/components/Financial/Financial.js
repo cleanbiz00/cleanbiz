@@ -407,7 +407,7 @@ const Financial = ({
   };
 
   return (
-    <div className="p-6 pb-24">
+    <div className="p-6 pb-28 min-h-screen">
     <h2 className="text-2xl font-bold mb-6">Financeiro</h2>
     
       {/* Resumo topo com comparação Receita vs Despesas e Margem */}
