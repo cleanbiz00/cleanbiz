@@ -17,68 +17,11 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Estados dos dados
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      name: 'Maria Johnson',
-      email: 'maria.johnson@email.com',
-      phone: '(555) 123-4567',
-      address: '123 Oak Street, Austin, TX',
-      serviceType: 'Limpeza Residencial',
-      price: 120,
-      frequency: 'Semanal'
-    },
-    {
-      id: 2,
-      name: 'Robert Smith',
-      email: 'robert.smith@email.com',
-      phone: '(555) 987-6543',
-      address: '456 Pine Avenue, Austin, TX',
-      serviceType: 'Limpeza Comercial',
-      price: 200,
-      frequency: 'Quinzenal'
-    }
-  ]);
+  const [clients, setClients] = useState([]);
 
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: 'Ana Silva',
-      email: 'ana.silva@email.com',
-      phone: '(555) 111-2222',
-      role: 'Supervisora'
-    },
-    {
-      id: 2,
-      name: 'Carlos Santos',
-      email: 'carlos.santos@email.com',
-      phone: '(555) 333-4444',
-      role: 'Faxineiro'
-    }
-  ]);
+  const [employees, setEmployees] = useState([]);
 
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      clientId: 1,
-      employeeId: 1,
-      date: '2024-08-18',
-      time: '09:00',
-      status: 'Agendado',
-      service: 'Limpeza Completa',
-      price: 120
-    },
-    {
-      id: 2,
-      clientId: 2,
-      employeeId: 2,
-      date: '2024-08-19',
-      time: '14:00',
-      status: 'Confirmado',
-      service: 'Limpeza Escritório',
-      price: 200
-    }
-  ]);
+  const [appointments, setAppointments] = useState([]);
 
   const [financialData] = useState({
     revenue: 5420,

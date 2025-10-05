@@ -9,6 +9,7 @@ const Dashboard = ({
   getClientName 
 }) => {
   const [monthlyExpenses, setMonthlyExpenses] = useState(0);
+  const [userId, setUserId] = useState(null);
 
   const monthRange = useMemo(() => {
     const now = new Date();
@@ -19,10 +20,20 @@ const Dashboard = ({
   }, []);
 
   useEffect(() => {
+    const loadUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUserId(data.session?.user?.id || null);
+    };
+    loadUser();
+  }, []);
+
+  useEffect(() => {
     const loadMonthlyExpenses = async () => {
+      if (!userId) return;
       const { data, error } = await supabase
         .from('expenses')
         .select('amount, date')
+        .eq('user_id', userId)
         .gte('date', monthRange.start)
         .lte('date', monthRange.end);
       if (!error && data) {
@@ -31,7 +42,7 @@ const Dashboard = ({
       }
     };
     loadMonthlyExpenses();
-  }, [monthRange]);
+  }, [monthRange, userId]);
 
   const revenue = financialData.revenue;
   const profit = revenue - monthlyExpenses;

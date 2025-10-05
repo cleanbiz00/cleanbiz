@@ -53,6 +53,7 @@ const Financial = ({
   financialData, 
   clients 
 }) => {
+  const [userId, setUserId] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [periodExpenses, setPeriodExpenses] = useState([]);
   const [recurringTemplates, setRecurringTemplates] = useState([]);
@@ -69,31 +70,45 @@ const Financial = ({
   });
 
   const reloadExpenses = async () => {
+    if (!userId) return;
     const { data } = await supabase
       .from('expenses')
       .select('*')
+      .eq('user_id', userId)
       .order('date', { ascending: false });
     if (data) setExpenses(data);
   };
 
+  // Load current user id
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUserId(data.session?.user?.id || null);
+    };
+    getUser();
+  }, []);
+
   // Load expenses and recurring templates from Supabase
   useEffect(() => {
     const loadData = async () => {
+      if (!userId) return;
       const { data: expData, error: expErr } = await supabase
         .from('expenses')
         .select('*')
+        .eq('user_id', userId)
         .order('date', { ascending: false });
       if (!expErr && expData) setExpenses(expData);
 
       const { data: tmplData, error: tmplErr } = await supabase
         .from('recurring_expense_templates')
         .select('*')
+        .eq('user_id', userId)
         .eq('active', true)
         .order('start_date', { ascending: true });
       if (!tmplErr && tmplData) setRecurringTemplates(tmplData);
     };
     loadData();
-  }, []);
+  }, [userId]);
 
   // Generate recurring instances for selected period
   const ensureRecurringForPeriod = (list, templates, periodKey) => {
@@ -210,9 +225,11 @@ const Financial = ({
     const channel = supabase
       .channel('expenses-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, async () => {
+        if (!userId) return;
         const { data } = await supabase
           .from('expenses')
           .select('*')
+          .eq('user_id', userId)
           .order('date', { ascending: false });
         if (data) setExpenses(data);
       })
@@ -220,11 +237,12 @@ const Financial = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [userId]);
 
   // Load period-bounded expenses whenever filter changes
   useEffect(() => {
     const loadPeriod = async () => {
+      if (!userId) return;
       const { start, end } = getPeriodRange(filterPeriod);
       let rangeEnd = new Date(end);
       if (includeFuture) {
@@ -242,16 +260,18 @@ const Financial = ({
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
+        .eq('user_id', userId)
         .gte('date', startStr)
         .lte('date', endStr)
         .order('date', { ascending: false });
       if (!error && data) setPeriodExpenses(data);
     };
     loadPeriod();
-  }, [filterPeriod, includeFuture]);
+  }, [filterPeriod, includeFuture, userId]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!userId) return;
     const payload = {
       category: form.category,
       description: form.description,
@@ -259,17 +279,20 @@ const Financial = ({
       date: form.date,
       type: form.type,
       frequency: form.frequency,
-      is_auto: false
+      is_auto: false,
+      user_id: userId
     };
     if (editingId) {
       const { error } = await supabase
         .from('expenses')
         .update(payload)
-        .eq('id', editingId);
+        .eq('id', editingId)
+        .eq('user_id', userId);
       if (!error) {
         const { data } = await supabase
           .from('expenses')
           .select('*')
+          .eq('user_id', userId)
           .order('date', { ascending: false });
         if (data) setExpenses(data);
         setEditingId(null);
@@ -282,6 +305,7 @@ const Financial = ({
         const { data } = await supabase
           .from('expenses')
           .select('*')
+          .eq('user_id', userId)
           .order('date', { ascending: false });
         if (data) setExpenses(data);
       }
@@ -291,6 +315,7 @@ const Financial = ({
       const { data: existing } = await supabase
         .from('recurring_expense_templates')
         .select('id')
+        .eq('user_id', userId)
         .eq('category', payload.category)
         .eq('description', payload.description)
         .eq('frequency', payload.frequency)
@@ -305,11 +330,13 @@ const Financial = ({
           start_date: payload.date,
           type: payload.type,
           frequency: payload.frequency,
-          active: true
+          active: true,
+          user_id: userId
         });
         const { data: tmplData } = await supabase
           .from('recurring_expense_templates')
           .select('*')
+          .eq('user_id', userId)
           .eq('active', true)
           .order('start_date', { ascending: true });
         if (tmplData) setRecurringTemplates(tmplData);
@@ -331,10 +358,11 @@ const Financial = ({
   };
 
   const onDelete = async (id) => {
-    await supabase.from('expenses').delete().eq('id', id);
+    await supabase.from('expenses').delete().eq('id', id).eq('user_id', userId);
     const { data } = await supabase
       .from('expenses')
       .select('*')
+      .eq('user_id', userId)
       .order('date', { ascending: false });
     if (data) setExpenses(data);
   };
