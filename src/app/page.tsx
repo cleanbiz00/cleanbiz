@@ -250,7 +250,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {/* Top bar (mobile) */}
         <div className="lg:hidden sticky top-0 z-30 bg-white border-b p-3 flex items-center justify-between">
           <button aria-label="Abrir menu" onClick={() => setIsSidebarOpen(true)} className="p-2 rounded hover:bg-gray-100 active:bg-gray-200">

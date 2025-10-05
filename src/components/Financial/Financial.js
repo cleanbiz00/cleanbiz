@@ -488,7 +488,7 @@ const Financial = ({
         <div className="bg-white p-6 rounded-lg shadow-lg lg:col-span-2">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3">
             <h3 className="text-lg font-semibold">Despesas cadastradas</h3>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <label className="text-sm text-gray-700">Período</label>
               <select className="border rounded p-2" value={filterPeriod} onChange={(e) => setFilterPeriod(e.target.value)}>
                 <option value="mes_atual">Mês atual</option>
