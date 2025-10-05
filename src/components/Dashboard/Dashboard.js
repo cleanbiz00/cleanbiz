@@ -1,0 +1,93 @@
+import React from 'react';
+import { DollarSign } from 'lucide-react';
+
+const Dashboard = ({ 
+  financialData, 
+  appointments, 
+  clients, 
+  getClientName 
+}) => (
+  <div className="p-6">
+    <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+    
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-600">Receita Mensal</p>
+            <p className="text-2xl font-bold text-green-600">${financialData.revenue}</p>
+          </div>
+          <DollarSign className="h-8 w-8 text-green-600" />
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-600">Despesas</p>
+            <p className="text-2xl font-bold text-red-600">${financialData.expenses}</p>
+          </div>
+          <DollarSign className="h-8 w-8 text-red-600" />
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-600">Lucro Líquido</p>
+            <p className="text-2xl font-bold text-blue-600">${financialData.profit}</p>
+          </div>
+          <DollarSign className="h-8 w-8 text-blue-600" />
+        </div>
+      </div>
+      
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-600">Crescimento</p>
+            <p className="text-2xl font-bold text-purple-600">+{financialData.monthlyGrowth}%</p>
+          </div>
+          <DollarSign className="h-8 w-8 text-purple-600" />
+        </div>
+      </div>
+    </div>
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">Próximos Agendamentos</h3>
+        <div className="space-y-3">
+          {appointments.slice(0, 3).map(appointment => (
+            <div key={appointment.id} className="flex justify-between items-center p-3 border rounded-lg">
+              <div>
+                <p className="font-medium">{getClientName(appointment.clientId)}</p>
+                <p className="text-sm text-gray-600">{appointment.date} - {appointment.time}</p>
+              </div>
+              <span className={`px-2 py-1 rounded-full text-xs ${
+                appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {appointment.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">Clientes Ativos</h3>
+        <div className="space-y-3">
+          {clients.slice(0, 3).map(client => (
+            <div key={client.id} className="flex justify-between items-center p-3 border rounded-lg">
+              <div>
+                <p className="font-medium">{client.name}</p>
+                <p className="text-sm text-gray-600">{client.serviceType}</p>
+              </div>
+              <p className="font-semibold text-green-600">${client.price}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default Dashboard;
