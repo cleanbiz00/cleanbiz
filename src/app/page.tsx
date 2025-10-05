@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar/Sidebar';
 import Dashboard from '../components/Dashboard/Dashboard';
 import Clients from '../components/Clients/Clients';
@@ -13,6 +14,7 @@ import Modal from '../components/Modal/Modal';
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Estados dos dados
   const [clients, setClients] = useState([
@@ -227,13 +229,40 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-      />
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar 
+          activeTab={activeTab} 
+          setActiveTab={(tab: string) => { setActiveTab(tab); setIsSidebarOpen(false); }} 
+        />
+      </div>
+
+      {/* Mobile drawer */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setIsSidebarOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-64">
+            <Sidebar 
+              activeTab={activeTab} 
+              setActiveTab={(tab: string) => { setActiveTab(tab); setIsSidebarOpen(false); }} 
+            />
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-auto">
+        {/* Top bar (mobile) */}
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b p-3 flex items-center justify-between">
+          <button aria-label="Abrir menu" onClick={() => setIsSidebarOpen(true)} className="p-2 rounded hover:bg-gray-100 active:bg-gray-200">
+            <Menu size={22} />
+          </button>
+          <span className="font-semibold">CleanBizz</span>
+          <span className="w-6" />
+        </div>
+
         {renderContent()}
       </div>
+
       <Modal 
         showModal={showModal}
         modalType={modalType}

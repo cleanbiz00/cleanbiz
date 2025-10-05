@@ -364,7 +364,7 @@ const Financial = ({
     });
     return (
       <div className="flex items-center">
-        <svg width="120" height="120" viewBox="0 0 120 120" className="mr-4">{arcs}</svg>
+        <svg viewBox="0 0 120 120" className="mr-4 w-28 h-28 sm:w-32 sm:h-32">{arcs}</svg>
         <div className="space-y-1 text-sm">
           {entries.map(([label, value], idx) => (
             <div key={label} className="flex items-center space-x-2">
@@ -390,7 +390,7 @@ const Financial = ({
       return `${x},${y}`;
     }).join(' ');
     return (
-      <svg width={width} height={height} className="w-full">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-44">
         <polyline fill="none" stroke="#3b82f6" strokeWidth="2" points={points} />
         {/* Axes */}
         <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#94a3b8" />
@@ -502,7 +502,8 @@ const Financial = ({
               <button onClick={reloadExpenses} className="ml-2 px-3 py-2 text-sm rounded bg-gray-100 hover:bg-gray-200 border">Recarregar</button>
           </div>
           </div>
-          <div className="overflow-auto border rounded">
+          {/* Desktop table */}
+          <div className="overflow-auto border rounded hidden lg:block">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
@@ -526,10 +527,10 @@ const Financial = ({
                     <td className="p-2">{e.frequency}</td>
                     <td className="p-2 text-right space-x-2">
                       {!e.isAuto && (
-                        <button onClick={() => onEdit(e)} className="text-blue-600 hover:underline">Editar</button>
+                        <button onClick={() => onEdit(e)} className="text-blue-600 hover:underline px-2 py-1">Editar</button>
                       )}
                       {!e.isAuto && (
-                        <button onClick={() => onDelete(e.id)} className="text-red-600 hover:underline">Excluir</button>
+                        <button onClick={() => onDelete(e.id)} className="text-red-600 hover:underline px-2 py-1">Excluir</button>
                       )}
                     </td>
                   </tr>
@@ -541,6 +542,32 @@ const Financial = ({
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="lg:hidden space-y-3">
+            {filteredExpenses.map((e) => (
+              <div key={e.id} className="border rounded p-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-sm text-gray-600">{e.date}</div>
+                    <div className="font-semibold">{e.category}</div>
+                  </div>
+                  <div className="font-bold">{formatCurrency(e.amount)}</div>
+                </div>
+                <div className="text-sm text-gray-700 mt-1">{e.description}</div>
+                <div className="text-xs text-gray-500 mt-1">{e.type} • {e.frequency}</div>
+                {!e.isAuto && (
+                  <div className="mt-2 flex gap-2">
+                    <button onClick={() => onEdit(e)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700">Editar</button>
+                    <button onClick={() => onDelete(e.id)} className="px-3 py-2 text-sm rounded bg-red-50 text-red-700">Excluir</button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {filteredExpenses.length === 0 && (
+              <div className="text-center text-gray-500 py-6">Nenhuma despesa para o período selecionado.</div>
+            )}
           </div>
         </div>
       </div>

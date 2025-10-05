@@ -18,7 +18,7 @@ const Clients = ({
       </button>
     </div>
     
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
       <table className="min-w-full">
         <thead className="bg-gray-50">
           <tr>
@@ -82,6 +82,40 @@ const Clients = ({
           ))}
         </tbody>
       </table>
+    </div>
+
+    {/* Mobile cards */}
+    <div className="lg:hidden space-y-3">
+      {clients.map(client => (
+        <div key={client.id} className="bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="font-medium">{client.name}</p>
+              <p className="text-sm text-gray-600 flex items-center">
+                <MapPin size={14} className="mr-1" />
+                {client.address}
+              </p>
+              <p className="text-sm flex items-center mt-1">
+                <Phone size={14} className="mr-1" /> {client.phone}
+              </p>
+              <p className="text-sm text-gray-600 flex items-center">
+                <Mail size={14} className="mr-1" /> {client.email}
+              </p>
+            </div>
+            <span className="text-green-600 font-semibold">${client.price}</span>
+          </div>
+          <div className="text-sm text-gray-700 mt-2">{client.serviceType}</div>
+          <div className="text-xs text-gray-500">{client.frequency}</div>
+          <div className="mt-3 flex gap-2">
+            <button onClick={() => openModal('client', client)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700 flex items-center gap-1">
+              <Edit3 size={14} /> Editar
+            </button>
+            <button onClick={() => deleteItem('client', client.id)} className="px-3 py-2 text-sm rounded bg-red-50 text-red-700 flex items-center gap-1">
+              <Trash2 size={14} /> Excluir
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 );

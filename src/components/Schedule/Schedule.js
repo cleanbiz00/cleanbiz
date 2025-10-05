@@ -20,7 +20,7 @@ const Schedule = ({
       </button>
     </div>
     
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
       <table className="min-w-full">
         <thead className="bg-gray-50">
           <tr>
@@ -81,6 +81,37 @@ const Schedule = ({
           ))}
         </tbody>
       </table>
+    </div>
+
+    {/* Mobile cards */}
+    <div className="lg:hidden space-y-3">
+      {appointments.map(appointment => (
+        <div key={appointment.id} className="bg-white rounded-lg shadow p-4">
+          <div className="flex justify-between">
+            <div>
+              <div className="text-sm text-gray-600">{appointment.date} • {appointment.time}</div>
+              <div className="font-medium">{getClientName(appointment.clientId)}</div>
+              <div className="text-sm text-gray-600">{getEmployeeName(appointment.employeeId)}</div>
+            </div>
+            <div className="text-green-600 font-semibold">${appointment.price}</div>
+          </div>
+          <div className="mt-1 text-xs">
+            <span className={`px-2 py-1 rounded-full ${
+              appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 
+              appointment.status === 'Agendado' ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>{appointment.status}</span>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button onClick={() => openModal('appointment', appointment)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700 flex items-center gap-1">
+              <Edit3 size={14} /> Editar
+            </button>
+            <button onClick={() => deleteItem('appointment', appointment.id)} className="px-3 py-2 text-sm rounded bg-red-50 text-red-700 flex items-center gap-1">
+              <Trash2 size={14} /> Excluir
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 );
