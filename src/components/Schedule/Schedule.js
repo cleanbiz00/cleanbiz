@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit3, Trash2, Clock, Calendar, Mail } from 'lucide-react';
-import googleCalendarService from '../../services/googleCalendar';
-import emailService from '../../services/emailService';
 import { supabase } from '../../utils/supabaseClient';
 
 const Schedule = ({ 
@@ -14,6 +12,73 @@ const Schedule = ({
   const [userId, setUserId] = useState(null);
   const [googleConnected, setGoogleConnected] = useState(false);
   const [emailConfigured, setEmailConfigured] = useState(false);
+  const [googleAccessToken, setGoogleAccessToken] = useState(null);
+
+  // Debug: Log appointments
+  useEffect(() => {
+    console.log('Schedule received appointments:', appointments);
+  }, [appointments]);
+
+  // Check for Google OAuth token on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleToken = urlParams.get('google_token');
+    const refreshToken = urlParams.get('refresh_token');
+    const error = urlParams.get('error');
+
+    if (error) {
+      console.error('Google OAuth error:', error);
+      alert('Erro na autenticação do Google: ' + error);
+    } else if (googleToken) {
+      console.log('Google token received:', googleToken);
+      setGoogleAccessToken(googleToken);
+      setGoogleConnected(true);
+      
+      // Store tokens in localStorage
+      localStorage.setItem('google_access_token', googleToken);
+      if (refreshToken) {
+        localStorage.setItem('google_refresh_token', refreshToken);
+      }
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+      // Check localStorage for existing token
+      const storedToken = localStorage.getItem('google_access_token');
+      if (storedToken) {
+        setGoogleAccessToken(storedToken);
+        setGoogleConnected(true);
+      } else {
+        setGoogleConnected(false);
+      }
+    }
+  }, []);
+
+  // Handle Google OAuth authentication
+  const handleGoogleAuth = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '62407212309-ecsjb31ajmhsm00lig6krhaauvff0bf8.apps.googleusercontent.com';
+    const redirectUri = `${window.location.origin}/api/google-calendar/auth`;
+    const scope = 'https://www.googleapis.com/auth/calendar';
+    
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=${encodeURIComponent(scope)}&` +
+      `access_type=offline&` +
+      `prompt=consent`;
+    
+    window.location.href = authUrl;
+  };
+
+  // Handle Google disconnect
+  const handleGoogleDisconnect = () => {
+    localStorage.removeItem('google_access_token');
+    localStorage.removeItem('google_refresh_token');
+    setGoogleAccessToken(null);
+    setGoogleConnected(false);
+    console.log('Google Calendar disconnected');
+  };
 
   // Load current user
   useEffect(() => {
@@ -24,32 +89,28 @@ const Schedule = ({
     loadUser();
   }, []);
 
-  // Check if Google Calendar is configured
+  // Check if Google Calendar is configured and connected
   useEffect(() => {
-    const checkGoogleConfig = () => {
-      const hasGoogleConfig = !!(
-        process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-        process.env.GOOGLE_CLIENT_SECRET &&
-        process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-      );
-      setGoogleConnected(hasGoogleConfig);
+    const checkConfig = async () => {
+      try {
+        const response = await fetch('/api/check-config');
+        const result = await response.json();
+        
+        if (result.success) {
+          setEmailConfigured(result.config.email);
+          
+          // Check if user has a valid Google token
+          const storedToken = localStorage.getItem('google_access_token');
+          setGoogleConnected(!!storedToken);
+        }
+      } catch (error) {
+        console.error('Error checking config:', error);
+      }
     };
-    checkGoogleConfig();
+    checkConfig();
   }, []);
 
-  // Check if email service is configured
-  useEffect(() => {
-    const checkEmailConfig = () => {
-      const hasEmailConfig = !!(
-        process.env.SENDGRID_API_KEY &&
-        process.env.SENDGRID_FROM_EMAIL
-      );
-      setEmailConfigured(hasEmailConfig);
-    };
-    checkEmailConfig();
-  }, []);
-
-  // Create Google Calendar event
+  // Create Google Calendar event via API
   const createGoogleCalendarEvent = async (appointment, clientEmail) => {
     if (!googleConnected || !userId) return null;
 
@@ -63,9 +124,6 @@ const Schedule = ({
         return null;
       }
 
-      // Initialize Google Calendar service
-      googleCalendarService.initialize(accessToken);
-
       // Prepare event details
       const startDateTime = new Date(`${appointment.date}T${appointment.time}:00`);
       const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
@@ -78,7 +136,18 @@ const Schedule = ({
         attendees: clientEmail ? [{ email: clientEmail }] : []
       };
 
-      const result = await googleCalendarService.createEvent(eventDetails);
+      const response = await fetch('/api/google-calendar/create-event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventDetails,
+          accessToken
+        }),
+      });
+
+      const result = await response.json();
       
       if (result.success) {
         console.log('Google Calendar event created:', result.eventId);
@@ -93,11 +162,16 @@ const Schedule = ({
     }
   };
 
-  // Send email notification
+  // Send email notification via API
   const sendEmailNotification = async (appointment, clientEmail, type = 'confirmation') => {
-    if (!emailConfigured || !clientEmail) return false;
+    if (!emailConfigured || !clientEmail) {
+      console.log('Email not configured or no client email:', { emailConfigured, clientEmail });
+      return false;
+    }
 
     try {
+      console.log('Attempting to send email:', { appointment, clientEmail, type });
+      
       const appointmentData = {
         service: appointment.service,
         date: appointment.date,
@@ -108,21 +182,26 @@ const Schedule = ({
         employeeName: getEmployeeName(appointment.employeeId)
       };
 
-      let result;
-      switch (type) {
-        case 'confirmation':
-          result = await emailService.sendAppointmentConfirmation(appointmentData, clientEmail);
-          break;
-        case 'reminder':
-          result = await emailService.sendAppointmentReminder(appointmentData, clientEmail);
-          break;
-        case 'cancellation':
-          result = await emailService.sendAppointmentCancellation(appointmentData, clientEmail);
-          break;
-        default:
-          result = await emailService.sendAppointmentConfirmation(appointmentData, clientEmail);
-      }
+      const endpoint = type === 'confirmation' ? '/api/email/send-confirmation' :
+                      type === 'reminder' ? '/api/email/send-reminder' :
+                      '/api/email/send-cancellation';
 
+      console.log('Sending request to:', endpoint, appointmentData);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          appointmentData,
+          clientEmail
+        }),
+      });
+
+      const result = await response.json();
+      console.log('Email API response:', result);
+      
       if (result.success) {
         console.log('Email sent successfully:', result.messageId);
         return true;
@@ -171,8 +250,6 @@ const Schedule = ({
         const accessToken = session?.session?.provider_token;
 
         if (accessToken) {
-          googleCalendarService.initialize(accessToken);
-          
           const startDateTime = new Date(`${appointment.date}T${appointment.time}:00`);
           const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000);
 
@@ -184,7 +261,19 @@ const Schedule = ({
             attendees: clientEmail ? [{ email: clientEmail }] : []
           };
 
-          const result = await googleCalendarService.updateEvent(googleEventId, eventDetails);
+          const response = await fetch('/api/google-calendar/update-event', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              eventId: googleEventId,
+              eventDetails,
+              accessToken
+            }),
+          });
+
+          const result = await response.json();
           results.googleCalendar = result.success;
         }
       } catch (error) {
@@ -214,8 +303,14 @@ const Schedule = ({
         const accessToken = session?.session?.provider_token;
 
         if (accessToken) {
-          googleCalendarService.initialize(accessToken);
-          const result = await googleCalendarService.deleteEvent(googleEventId);
+          const response = await fetch(`/api/google-calendar/delete-event?eventId=${googleEventId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          });
+
+          const result = await response.json();
           results.googleCalendar = result.success;
         }
       } catch (error) {
@@ -233,17 +328,17 @@ const Schedule = ({
 
   return (
     <div className="p-6 pb-28 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Agenda</h2>
-        <button
-          onClick={() => openModal('appointment')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
-        >
-          <Plus size={20} />
-          <span>Novo Agendamento</span>
-        </button>
-      </div>
-
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold">Agenda</h2>
+      <button
+        onClick={() => openModal('appointment')}
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+      >
+        <Plus size={20} />
+        <span>Novo Agendamento</span>
+      </button>
+    </div>
+    
       {/* Integration Status */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-semibold mb-2">Status das Integrações:</h3>
@@ -253,6 +348,21 @@ const Schedule = ({
             <span className={googleConnected ? 'text-green-600' : 'text-gray-500'}>
               Google Calendar {googleConnected ? 'Configurado' : 'Não configurado'}
             </span>
+            {!googleConnected ? (
+              <button
+                onClick={handleGoogleAuth}
+                className="ml-2 px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+              >
+                Conectar
+              </button>
+            ) : (
+              <button
+                onClick={handleGoogleDisconnect}
+                className="ml-2 px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+              >
+                Desconectar
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Mail size={16} className={emailConfigured ? 'text-green-600' : 'text-gray-400'} />
@@ -263,73 +373,73 @@ const Schedule = ({
         </div>
         {(!googleConnected || !emailConfigured) && (
           <p className="text-xs text-gray-500 mt-2">
-            Configure as variáveis de ambiente para ativar as integrações.
+            {!googleConnected ? 'Clique em "Conectar" para sincronizar com seu Google Calendar.' : 'Configure as variáveis de ambiente para ativar as integrações.'}
           </p>
         )}
       </div>
       
       <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data/Hora</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Funcionário</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {appointments.map(appointment => (
-              <tr key={appointment.id}>
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <Clock size={16} className="mr-2 text-gray-400" />
-                    <div>
-                      <p className="font-medium">{appointment.date}</p>
-                      <p className="text-sm text-gray-600">{appointment.time}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4">{getClientName(appointment.clientId)}</td>
-                <td className="px-6 py-4">{getEmployeeName(appointment.employeeId)}</td>
-                <td className="px-6 py-4">
+      <table className="min-w-full">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data/Hora</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Funcionário</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {appointments.map(appointment => (
+            <tr key={appointment.id}>
+              <td className="px-6 py-4">
+                <div className="flex items-center">
+                  <Clock size={16} className="mr-2 text-gray-400" />
                   <div>
-                    <p>{appointment.service}</p>
-                    <p className="text-sm text-green-600 font-semibold">${appointment.price}</p>
+                    <p className="font-medium">{appointment.date}</p>
+                    <p className="text-sm text-gray-600">{appointment.time}</p>
                   </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 
-                    appointment.status === 'Agendado' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {appointment.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => openModal('appointment', appointment)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit3 size={16} />
-                    </button>
-                    <button
-                      onClick={() => deleteItem('appointment', appointment.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">{getClientName(appointment.clientId)}</td>
+              <td className="px-6 py-4">{getEmployeeName(appointment.employeeId)}</td>
+              <td className="px-6 py-4">
+                <div>
+                  <p>{appointment.service}</p>
+                  <p className="text-sm text-green-600 font-semibold">${appointment.price}</p>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 
+                  appointment.status === 'Agendado' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {appointment.status}
+                </span>
+              </td>
+              <td className="px-6 py-4">
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => openModal('appointment', appointment)}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit3 size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteItem('appointment', appointment.id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
       {/* Mobile cards */}
       <div className="lg:hidden space-y-3">
@@ -360,9 +470,9 @@ const Schedule = ({
             </div>
           </div>
         ))}
-      </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Schedule;

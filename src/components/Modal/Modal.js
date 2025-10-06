@@ -128,7 +128,7 @@ const Modal = ({
         <div>
           <select
             value={formData.clientId || ''}
-            onChange={(e) => setFormData({...formData, clientId: parseInt(e.target.value)})}
+            onChange={(e) => setFormData({...formData, clientId: e.target.value ? parseInt(e.target.value) : ''})}
             className="w-full p-3 border rounded-lg mb-4"
           >
             <option value="">Selecione o cliente</option>
@@ -138,7 +138,7 @@ const Modal = ({
           </select>
           <select
             value={formData.employeeId || ''}
-            onChange={(e) => setFormData({...formData, employeeId: parseInt(e.target.value)})}
+            onChange={(e) => setFormData({...formData, employeeId: e.target.value ? parseInt(e.target.value) : ''})}
             className="w-full p-3 border rounded-lg mb-4"
           >
             <option value="">Selecione o funcionário</option>
@@ -183,6 +183,13 @@ const Modal = ({
             <option value="Concluído">Concluído</option>
             <option value="Cancelado">Cancelado</option>
           </select>
+          <input
+            type="email"
+            placeholder="Email do cliente (para notificações)"
+            value={formData.clientEmail || ''}
+            onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+            className="w-full p-3 border rounded-lg mb-4"
+          />
         </div>
       );
     }

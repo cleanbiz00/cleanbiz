@@ -17,11 +17,68 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Estados dos dados
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([
+    {
+      id: 1,
+      name: 'Maria Johnson',
+      email: 'maria.johnson@email.com',
+      phone: '(555) 123-4567',
+      address: '123 Oak Street, Austin, TX',
+      serviceType: 'Limpeza Residencial',
+      price: 120,
+      frequency: 'Semanal'
+    },
+    {
+      id: 2,
+      name: 'Robert Smith',
+      email: 'robert.smith@email.com',
+      phone: '(555) 987-6543',
+      address: '456 Pine Avenue, Austin, TX',
+      serviceType: 'Limpeza Comercial',
+      price: 200,
+      frequency: 'Quinzenal'
+    }
+  ]);
 
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState([
+    {
+      id: 1,
+      name: 'Ana Silva',
+      email: 'ana.silva@email.com',
+      phone: '(555) 111-2222',
+      role: 'Supervisora'
+    },
+    {
+      id: 2,
+      name: 'Carlos Santos',
+      email: 'carlos.santos@email.com',
+      phone: '(555) 333-4444',
+      role: 'Faxineiro'
+    }
+  ]);
 
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState([
+    {
+      id: 1,
+      clientId: 1,
+      employeeId: 1,
+      date: '2024-08-18',
+      time: '09:00',
+      status: 'Agendado',
+      service: 'Limpeza Completa',
+      price: 120
+    },
+    {
+      id: 2,
+      clientId: 2,
+      employeeId: 2,
+      date: '2024-08-19',
+      time: '14:00',
+      status: 'Confirmado',
+      service: 'Limpeza Escritório',
+      price: 200
+    }
+  ]);
 
   const [financialData] = useState({
     revenue: 5420,
@@ -63,7 +120,7 @@ export default function Home() {
     setEditingItem(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (modalType === 'client') {
       if (editingItem) {
         setClients(clients.map(c => c.id === editingItem.id ? { ...formData, id: editingItem.id } : c));
@@ -77,10 +134,99 @@ export default function Home() {
         setEmployees([...employees, { ...formData, id: Date.now() }]);
       }
     } else if (modalType === 'appointment') {
+      // Validate required fields
+      if (!formData.clientId || !formData.employeeId || !formData.date || !formData.time || !formData.service || !formData.price) {
+        alert('Por favor, preencha todos os campos obrigatórios');
+        return;
+      }
+      
+      const newAppointment = { ...formData, id: Date.now() };
+      
+      console.log('Creating appointment with data:', formData);
+      console.log('New appointment:', newAppointment);
+      
       if (editingItem) {
         setAppointments(appointments.map(a => a.id === editingItem.id ? { ...formData, id: editingItem.id } : a));
+        console.log('Updated appointment:', editingItem.id);
       } else {
-        setAppointments([...appointments, { ...formData, id: Date.now() }]);
+        const updatedAppointments = [...appointments, newAppointment];
+        setAppointments(updatedAppointments);
+        console.log('Added new appointment. Total appointments:', updatedAppointments.length);
+        
+        // Send email notification for new appointments
+        if (formData.clientEmail) {
+          try {
+            const response = await fetch('/api/email/send-confirmation', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                appointmentData: {
+                  service: formData.service,
+                  date: formData.date,
+                  time: formData.time,
+                  price: formData.price,
+                  status: formData.status,
+                  clientName: getClientName(formData.clientId),
+                  employeeName: getEmployeeName(formData.employeeId)
+                },
+                clientEmail: formData.clientEmail
+              }),
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+              console.log('Email sent successfully:', result.messageId);
+            } else {
+              console.error('Failed to send email:', result.error);
+            }
+          } catch (error) {
+            console.error('Error sending email:', error);
+          }
+        }
+
+        // Create Google Calendar event
+        try {
+          const googleAccessToken = localStorage.getItem('google_access_token');
+          if (googleAccessToken) {
+            const calendarResponse = await fetch('/api/google-calendar/create-event', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${googleAccessToken}`,
+              },
+              body: JSON.stringify({
+                appointmentData: {
+                  service: formData.service,
+                  date: formData.date,
+                  time: formData.time,
+                  price: formData.price,
+                  status: formData.status,
+                  clientId: formData.clientId,
+                  employeeId: formData.employeeId,
+                  clientName: getClientName(formData.clientId),
+                  employeeName: getEmployeeName(formData.employeeId)
+                },
+                clientEmail: formData.clientEmail
+              }),
+            });
+          
+            const calendarResult = await calendarResponse.json();
+            if (calendarResult.success) {
+              console.log('Google Calendar event created:', calendarResult.eventId);
+              alert(`Evento criado no Google Calendar! Link: ${calendarResult.eventUrl}`);
+            } else {
+              console.log('Google Calendar not connected or failed:', calendarResult.error);
+              alert('Erro ao criar evento no Google Calendar: ' + calendarResult.error);
+            }
+          } else {
+            console.log('Google access token not found');
+          }
+        } catch (error) {
+          console.error('Error creating Google Calendar event:', error);
+          alert('Erro ao criar evento no Google Calendar: ' + error.message);
+        }
       }
     }
     closeModal();
