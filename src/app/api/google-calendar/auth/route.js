@@ -55,7 +55,8 @@ export async function GET(request) {
     const expiresAt = new Date(Date.now() + expiresIn * 1000);
 
     // Save tokens to Supabase using auth_user_id
-    let { error: dbError, count } = await supabase
+    // Try update first (will update if record exists with matching auth_user_id OR id)
+    let { error: dbError, data: updateData } = await supabase
       .from('app_users')
       .update({
         google_access_token: tokenData.access_token,
@@ -63,30 +64,24 @@ export async function GET(request) {
         google_token_expires_at: expiresAt.toISOString(),
         google_connected_at: new Date().toISOString(),
       })
-      .eq('auth_user_id', state)
+      .or(`auth_user_id.eq.${state},id.eq.${state}`)
       .select();
 
-    console.log('📊 Update result:', { count, dbError, userId: state });
+    console.log('📊 Update result:', { 
+      rowsUpdated: updateData?.length || 0, 
+      dbError, 
+      userId: state 
+    });
 
-    // If no rows were updated (user doesn't exist in app_users), insert new record
-    if (!dbError && (count === 0 || count === null)) {
-      console.log('📝 No existing record, inserting new user...');
+    // If no rows were updated (user doesn't exist in app_users), try insert
+    if (!dbError && (!updateData || updateData.length === 0)) {
+      console.log('📝 No existing record, trying insert with id and auth_user_id...');
       
-      let email = null;
-      try {
-        if (supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
-          const { data: authUser } = await supabase.auth.admin.getUserById(state);
-          email = authUser?.user?.email || null;
-          console.log('📧 Email from auth:', email);
-        }
-      } catch (err) {
-        console.log('⚠️ Could not fetch email from auth:', err.message);
-      }
-
       const { error: insertErr } = await supabase
         .from('app_users')
         .insert([
           {
+            id: state,
             auth_user_id: state,
             google_access_token: tokenData.access_token,
             google_refresh_token: tokenData.refresh_token || null,
@@ -101,6 +96,8 @@ export async function GET(request) {
       } else {
         console.log('✅ New user record created');
       }
+    } else if (updateData && updateData.length > 0) {
+      console.log('✅ Existing record updated successfully');
     }
 
     if (dbError) {
