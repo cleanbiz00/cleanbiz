@@ -109,37 +109,36 @@ export default function AgendaPage() {
     checkConfig()
   }, [])
 
-  const handleGoogleAuth = () => {
+  const handleGoogleAuth = async () => {
     // Force usar o subdomínio correto
     const baseUrl = 'https://app.cleanbiz360.com'
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     const redirectUri = `${baseUrl}/api/google-calendar/auth`
     const scope = 'https://www.googleapis.com/auth/calendar'
-    
-    console.log('=== DEBUG GOOGLE AUTH ===')
-    console.log('Base URL:', baseUrl)
-    console.log('Client ID:', clientId)
-    console.log('Redirect URI:', redirectUri)
-    console.log('ENV NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL)
-    
+
     if (!clientId) {
       alert('Erro: Client ID do Google não configurado. Verifique as variáveis de ambiente.')
       return
     }
-    
-    // Show alert with redirect URI for debugging
-    if (confirm(`Redirect URI será: ${redirectUri}\n\nEsta URL está no Google Console?\n\nClique OK para continuar ou Cancel para cancelar.`)) {
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${clientId}&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `response_type=code&` +
-        `scope=${encodeURIComponent(scope)}&` +
-        `access_type=offline&` +
-        `prompt=consent`
-      
-      console.log('Auth URL completa:', authUrl)
-      window.location.href = authUrl
+
+    // Obter userId atual para enviar como state
+    const { data } = await supabase.auth.getSession()
+    const currentUserId = data.session?.user?.id
+    if (!currentUserId) {
+      alert('Erro: Usuário não identificado. Faça login novamente.')
+      return
     }
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+      `response_type=code&` +
+      `scope=${encodeURIComponent(scope)}&` +
+      `access_type=offline&` +
+      `prompt=consent&` +
+      `state=${encodeURIComponent(currentUserId)}`
+
+    window.location.href = authUrl
   }
 
   const handleGoogleDisconnect = () => {
