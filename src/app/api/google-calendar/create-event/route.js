@@ -24,10 +24,32 @@ export async function POST(request) {
     // Get the user's Google access token from database (support id or user_id schemas)
     let { data: userData, error: userError } = await supabase
       .from('app_users')
-      .select('id, user_id, auth_user_id, google_access_token, google_refresh_token, google_token_expires_at')
+      .select('id, user_id, auth_user_id, email, google_access_token, google_refresh_token, google_token_expires_at')
       .or(`id.eq.${userId},user_id.eq.${userId},auth_user_id.eq.${userId}`)
       .limit(1)
       .single();
+
+    // Fallback: try finding by email from auth if nothing found
+    if ((!userData || userError) && supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
+      try {
+        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+        const email = authUser?.user?.email;
+        if (email) {
+          const byEmail = await supabase
+            .from('app_users')
+            .select('id, user_id, auth_user_id, email, google_access_token, google_refresh_token, google_token_expires_at')
+            .ilike('email', email)
+            .limit(1)
+            .maybeSingle();
+          if (byEmail.data) {
+            userData = byEmail.data;
+            userError = null;
+          }
+        }
+      } catch (e) {
+        // ignore, keep original error handling
+      }
+    }
 
     if (userError || !userData) {
       console.error('Failed to get user data:', { userError, userId });
