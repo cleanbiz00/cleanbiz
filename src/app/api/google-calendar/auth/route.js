@@ -54,9 +54,8 @@ export async function GET(request) {
     const expiresIn = tokenData.expires_in || 3600;
     const expiresAt = new Date(Date.now() + expiresIn * 1000);
 
-    // Save tokens to Supabase
-    // Try update by id; if 0 rows, try by user_id
-    let { error: dbError, data: updateResult } = await supabase
+    // Save tokens to Supabase using auth_user_id
+    let { error: dbError, count } = await supabase
       .from('app_users')
       .update({
         google_access_token: tokenData.access_token,
@@ -64,47 +63,44 @@ export async function GET(request) {
         google_token_expires_at: expiresAt.toISOString(),
         google_connected_at: new Date().toISOString(),
       })
-      .eq('id', state);
+      .eq('auth_user_id', state)
+      .select();
 
-    if ((updateResult?.length ?? 0) === 0 || dbError) {
-      // Fallback: update by user_id
-      const { error: dbError2 } = await supabase
-        .from('app_users')
-        .update({
-          google_access_token: tokenData.access_token,
-          google_refresh_token: tokenData.refresh_token || null,
-          google_token_expires_at: expiresAt.toISOString(),
-          google_connected_at: new Date().toISOString(),
-        })
-        .or(`user_id.eq.${state},auth_user_id.eq.${state}`);
-      dbError = dbError2;
-    }
+    console.log('📊 Update result:', { count, dbError, userId: state });
 
-    // If no rows were updated (no record exists), insert one
-    if (!dbError && (updateResult?.length ?? 0) === 0) {
+    // If no rows were updated (user doesn't exist in app_users), insert new record
+    if (!dbError && (count === 0 || count === null)) {
+      console.log('📝 No existing record, inserting new user...');
+      
       let email = null;
       try {
         if (supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
           const { data: authUser } = await supabase.auth.admin.getUserById(state);
           email = authUser?.user?.email || null;
+          console.log('📧 Email from auth:', email);
         }
-      } catch (_) {}
+      } catch (err) {
+        console.log('⚠️ Could not fetch email from auth:', err.message);
+      }
 
       const { error: insertErr } = await supabase
         .from('app_users')
         .insert([
           {
-            id: state, // if your PK is different, it will ignore
-            user_id: state,
             auth_user_id: state,
-            email,
             google_access_token: tokenData.access_token,
             google_refresh_token: tokenData.refresh_token || null,
             google_token_expires_at: expiresAt.toISOString(),
             google_connected_at: new Date().toISOString(),
           },
         ]);
-      if (insertErr) dbError = insertErr;
+      
+      if (insertErr) {
+        console.error('❌ Insert error:', insertErr);
+        dbError = insertErr;
+      } else {
+        console.log('✅ New user record created');
+      }
     }
 
     if (dbError) {

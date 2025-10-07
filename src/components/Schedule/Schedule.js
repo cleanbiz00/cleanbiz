@@ -53,9 +53,9 @@ const Schedule = ({
 
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('app_users')
         .select('google_access_token, google_refresh_token, google_token_expires_at')
-        .eq('id', userId)
+        .eq('auth_user_id', userId)
         .single();
 
       if (error) {
@@ -117,13 +117,13 @@ const Schedule = ({
     try {
       // Remove tokens from database
       const { error } = await supabase
-        .from('users')
+        .from('app_users')
         .update({
           google_access_token: null,
           google_refresh_token: null,
           google_token_expires_at: null,
         })
-        .eq('id', userId);
+        .eq('auth_user_id', userId);
 
       if (error) {
         console.error('Erro ao desconectar Google Calendar:', error);

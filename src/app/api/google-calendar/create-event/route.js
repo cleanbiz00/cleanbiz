@@ -21,36 +21,22 @@ export async function POST(request) {
     console.log('Creating Google Calendar event for appointment:', appointmentData);
     console.log('User ID:', userId);
 
-    // Get the user's Google access token from database (support id or user_id schemas)
+    // Get the user's Google access token from database using auth_user_id
     let { data: userData, error: userError } = await supabase
       .from('app_users')
-      .select('id, user_id, auth_user_id, email, google_access_token, google_refresh_token, google_token_expires_at')
-      .or(`id.eq.${userId},user_id.eq.${userId},auth_user_id.eq.${userId}`)
+      .select('id, auth_user_id, google_access_token, google_refresh_token, google_token_expires_at')
+      .eq('auth_user_id', userId)
       .limit(1)
       .single();
 
-    console.log('Database query result:', { userData, userError });
+    console.log('📊 Database query result:', { userData, userError, userId });
 
-    // Fallback: try finding by email from auth if nothing found
-    if ((!userData || userError) && supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
-      try {
-        const { data: authUser } = await supabase.auth.admin.getUserById(userId);
-        const email = authUser?.user?.email;
-        if (email) {
-          const byEmail = await supabase
-            .from('app_users')
-            .select('id, user_id, auth_user_id, email, google_access_token, google_refresh_token, google_token_expires_at')
-            .ilike('email', email)
-            .limit(1)
-            .maybeSingle();
-          if (byEmail.data) {
-            userData = byEmail.data;
-            userError = null;
-          }
-        }
-      } catch (e) {
-        // ignore, keep original error handling
-      }
+    // If user not found, they need to connect Google Calendar first
+    if (userError && userError.code === 'PGRST116') {
+      console.log('⚠️ User not found in app_users, needs to connect Google Calendar');
+      return NextResponse.json({ 
+        error: 'Google Calendar not connected. Please connect your Google Calendar first.' 
+      }, { status: 401 });
     }
 
     if (userError || !userData) {
