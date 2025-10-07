@@ -7,12 +7,12 @@ export async function GET(request) {
 
   if (error) {
     console.error('Google OAuth error:', error);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}?error=oauth_error`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}?error=oauth_error`);
   }
 
   if (!code) {
     console.error('No authorization code received');
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}?error=no_code`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}?error=no_code`);
   }
 
   try {
@@ -27,7 +27,7 @@ export async function GET(request) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}/api/google-calendar/auth`,
+        redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/api/google-calendar/auth`,
       }),
     });
 
@@ -35,16 +35,16 @@ export async function GET(request) {
 
     if (!tokenResponse.ok) {
       console.error('Token exchange failed:', tokenData);
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}?error=token_failed`);
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}?error=token_failed`);
     }
 
     // Store the access token (in a real app, you'd store this in a database)
     // For now, we'll store it in localStorage via a redirect with the token
-    const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}?google_token=${encodeURIComponent(tokenData.access_token)}&refresh_token=${encodeURIComponent(tokenData.refresh_token || '')}`;
+    const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}?google_token=${encodeURIComponent(tokenData.access_token)}&refresh_token=${encodeURIComponent(tokenData.refresh_token || '')}`;
     
     return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error('OAuth flow error:', error);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://cleanbiz360.com'}?error=oauth_error`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}?error=oauth_error`);
   }
 }

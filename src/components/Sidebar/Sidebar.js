@@ -4,10 +4,10 @@ import { Home, Users, Calendar, DollarSign } from 'lucide-react';
 
 const Sidebar = ({ activeTab, setActiveTab }) => (
  <div className="w-64 bg-blue-900 text-white h-full p-4">
-   <div className="mb-8">
-     <h1 className="text-xl font-bold">CleanBizz</h1>
-     <p className="text-blue-200 text-sm">Gestão de Limpeza</p>
-   </div>
+  <div className="mb-8">
+    <h1 className="text-xl font-bold">CleanBizz</h1>
+    <p className="text-blue-200 text-sm">Gestão de Limpeza</p>
+  </div>
    
    <nav className="space-y-2">
      <button

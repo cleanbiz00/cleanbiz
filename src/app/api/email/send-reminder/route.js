@@ -12,7 +12,7 @@ export async function POST(request) {
 
     const msg = {
       to: clientEmail,
-      from: process.env.SENDGRID_FROM_EMAIL || 'noreply@cleanbiz.com',
+      from: process.env.SENDGRID_FROM_EMAIL || 'noreply@cleanbiz360.com',
       subject: `Lembrete - Agendamento ${appointmentData.service}`,
       html: getAppointmentReminderTemplate(appointmentData),
       text: getAppointmentReminderText(appointmentData),
@@ -85,7 +85,7 @@ function getAppointmentReminderTemplate(data) {
         
         <div class="footer">
           <p>CleanBiz - Serviços de Limpeza Profissional</p>
-          <p>Email: contato@cleanbiz.com | Telefone: (555) 123-4567</p>
+          <p>Email: contato@cleanbiz360.com | Telefone: (555) 123-4567</p>
         </div>
       </div>
     </body>
@@ -110,6 +110,6 @@ Por favor, confirme se ainda deseja manter este agendamento.
 Se precisar reagendar ou cancelar, entre em contato conosco.
 
 CleanBiz - Serviços de Limpeza Profissional
-Email: contato@cleanbiz.com | Telefone: (555) 123-4567
+Email: contato@cleanbiz360.com | Telefone: (555) 123-4567
   `;
 }

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AppLayout from "../components/AppLayout";
 
 export const metadata: Metadata = {
-  title: "CleanPro - Sistema de Gerenciamento",
+  title: "CleanBiz - Sistema de Gerenciamento",
   description: "Sistema de gerenciamento para empresas de limpeza",
 };
 
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="antialiased min-h-screen bg-white">
-        {children}
+        <AppLayout>
+          {children}
+        </AppLayout>
       </body>
     </html>
   );

@@ -39,7 +39,7 @@ Copy the Client ID and Client Secret
 
 ### Step 3: Verify Sender
 1. Go to "Settings" > "Sender Authentication"
-2. Verify a single sender email (e.g., noreply@cleanbiz.com)
+2. Verify a single sender email (e.g., noreply@cleanbiz360.com)
 
 ## 3. Environment Variables
 
@@ -53,7 +53,7 @@ NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/google-calendar/auth
 
 # SendGrid Email
 SENDGRID_API_KEY=your_sendgrid_api_key_here
-SENDGRID_FROM_EMAIL=noreply@cleanbiz.com
+SENDGRID_FROM_EMAIL=noreply@cleanbiz360.com
 ```
 
 ## 4. Vercel Environment Variables
