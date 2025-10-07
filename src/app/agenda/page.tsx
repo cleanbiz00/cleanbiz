@@ -76,7 +76,7 @@ export default function AgendaPage() {
         const { data: row, error: qerr } = await supabase
           .from('app_users')
           .select('google_access_token')
-          .or(`id.eq.${uid},user_id.eq.${uid},auth_user_id.eq.${uid}`)
+          .or(`id.eq.${uid},auth_user_id.eq.${uid}`)
           .limit(1)
           .maybeSingle()
 
