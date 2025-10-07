@@ -1,35 +1,62 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Edit3, Trash2, Phone, Mail, MapPin } from 'lucide-react'
+import { supabase } from '../../utils/supabaseClient'
 
 export default function ClientesPage() {
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      name: 'Maria Johnson',
-      email: 'maria.johnson@email.com',
-      phone: '(555) 123-4567',
-      address: '123 Oak Street, Austin, TX',
-      serviceType: 'Limpeza Residencial',
-      price: 120,
-      frequency: 'Semanal'
-    },
-    {
-      id: 2,
-      name: 'Robert Smith',
-      email: 'robert.smith@email.com',
-      phone: '(555) 987-6543',
-      address: '456 Pine Avenue, Austin, TX',
-      serviceType: 'Limpeza Comercial',
-      price: 200,
-      frequency: 'Quinzenal'
-    }
-  ])
-
+  const [clients, setClients] = useState([])
+  const [userId, setUserId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
+
+  // Load user
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data } = await supabase.auth.getSession()
+      setUserId(data.session?.user?.id || null)
+    }
+    loadUser()
+  }, [])
+
+  // Load clients from database
+  useEffect(() => {
+    const loadClients = async () => {
+      if (!userId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true })
+
+        if (error) {
+          console.error('Erro ao carregar clientes:', error)
+          return
+        }
+
+        if (data) {
+          const formattedClients = data.map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            address: c.address,
+            serviceType: c.service_type,
+            price: c.price,
+            frequency: c.frequency
+          }))
+          setClients(formattedClients)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar clientes:', error)
+      }
+    }
+
+    loadClients()
+  }, [userId])
 
   const openModal = (item: any = null) => {
     setEditingItem(item)
@@ -43,16 +70,92 @@ export default function ClientesPage() {
     setEditingItem(null)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!userId) {
+      alert('Erro: Usuário não identificado. Faça login novamente.')
+      return
+    }
+
     if (editingItem) {
+      // Update existing client
+      const { error } = await supabase
+        .from('clients')
+        .update({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          service_type: formData.serviceType,
+          price: formData.price,
+          frequency: formData.frequency,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingItem.id)
+        .eq('user_id', userId)
+
+      if (error) {
+        console.error('Erro ao atualizar cliente:', error)
+        alert('Erro ao atualizar cliente')
+        return
+      }
+
       setClients(clients.map(c => c.id === editingItem.id ? { ...formData, id: editingItem.id } as any : c))
     } else {
-      setClients([...clients, { ...formData, id: Date.now() } as any])
+      // Create new client
+      const { data: newClient, error } = await supabase
+        .from('clients')
+        .insert([
+          {
+            user_id: userId,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            service_type: formData.serviceType,
+            price: formData.price,
+            frequency: formData.frequency
+          }
+        ])
+        .select()
+
+      if (error) {
+        console.error('Erro ao criar cliente:', error)
+        alert('Erro ao criar cliente')
+        return
+      }
+
+      if (newClient && newClient.length > 0) {
+        const formatted = {
+          id: newClient[0].id,
+          name: newClient[0].name,
+          email: newClient[0].email,
+          phone: newClient[0].phone,
+          address: newClient[0].address,
+          serviceType: newClient[0].service_type,
+          price: newClient[0].price,
+          frequency: newClient[0].frequency
+        }
+        setClients([...clients, formatted])
+      }
     }
     closeModal()
   }
 
-  const deleteItem = (id: number) => {
+  const deleteItem = async (id: number) => {
+    if (!userId) return
+
+    const { error } = await supabase
+      .from('clients')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Erro ao deletar cliente:', error)
+      alert('Erro ao deletar cliente')
+      return
+    }
+
     setClients(clients.filter(c => c.id !== id))
   }
 

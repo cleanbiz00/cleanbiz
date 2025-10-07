@@ -1,29 +1,52 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Edit3, Trash2, Phone, Mail } from 'lucide-react'
+import { supabase } from '../../utils/supabaseClient'
 
 export default function FuncionariosPage() {
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: 'Ana Silva',
-      email: 'ana.silva@email.com',
-      phone: '(555) 111-2222',
-      role: 'Supervisora'
-    },
-    {
-      id: 2,
-      name: 'Carlos Santos',
-      email: 'carlos.santos@email.com',
-      phone: '(555) 333-4444',
-      role: 'Faxineiro'
-    }
-  ])
-
+  const [employees, setEmployees] = useState([])
+  const [userId, setUserId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
+
+  // Load user
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data } = await supabase.auth.getSession()
+      setUserId(data.session?.user?.id || null)
+    }
+    loadUser()
+  }, [])
+
+  // Load employees from database
+  useEffect(() => {
+    const loadEmployees = async () => {
+      if (!userId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true })
+
+        if (error) {
+          console.error('Erro ao carregar funcionários:', error)
+          return
+        }
+
+        if (data) {
+          setEmployees(data)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar funcionários:', error)
+      }
+    }
+
+    loadEmployees()
+  }, [userId])
 
   const openModal = (item: any = null) => {
     setEditingItem(item)
@@ -37,16 +60,76 @@ export default function FuncionariosPage() {
     setEditingItem(null)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!userId) {
+      alert('Erro: Usuário não identificado. Faça login novamente.')
+      return
+    }
+
     if (editingItem) {
+      // Update existing employee
+      const { error } = await supabase
+        .from('employees')
+        .update({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          role: formData.role,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingItem.id)
+        .eq('user_id', userId)
+
+      if (error) {
+        console.error('Erro ao atualizar funcionário:', error)
+        alert('Erro ao atualizar funcionário')
+        return
+      }
+
       setEmployees(employees.map(e => e.id === editingItem.id ? { ...formData, id: editingItem.id } as any : e))
     } else {
-      setEmployees([...employees, { ...formData, id: Date.now() } as any])
+      // Create new employee
+      const { data: newEmployee, error } = await supabase
+        .from('employees')
+        .insert([
+          {
+            user_id: userId,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            role: formData.role
+          }
+        ])
+        .select()
+
+      if (error) {
+        console.error('Erro ao criar funcionário:', error)
+        alert('Erro ao criar funcionário')
+        return
+      }
+
+      if (newEmployee && newEmployee.length > 0) {
+        setEmployees([...employees, newEmployee[0]])
+      }
     }
     closeModal()
   }
 
-  const deleteItem = (id: number) => {
+  const deleteItem = async (id: number) => {
+    if (!userId) return
+
+    const { error } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Erro ao deletar funcionário:', error)
+      alert('Erro ao deletar funcionário')
+      return
+    }
+
     setEmployees(employees.filter(e => e.id !== id))
   }
 
