@@ -6,28 +6,7 @@ import { supabase } from '../../utils/supabaseClient'
 import CalendarView from '../../components/Schedule/CalendarView'
 
 export default function AgendaPage() {
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      clientId: 1,
-      employeeId: 1,
-      date: '2024-08-18',
-      time: '09:00',
-      status: 'Agendado',
-      service: 'Limpeza Completa',
-      price: 120
-    },
-    {
-      id: 2,
-      clientId: 2,
-      employeeId: 2,
-      date: '2024-08-19',
-      time: '14:00',
-      status: 'Confirmado',
-      service: 'Limpeza Escritório',
-      price: 200
-    }
-  ])
+  const [appointments, setAppointments] = useState([])
 
   const [userId, setUserId] = useState<string | null>(null)
   const [googleConnected, setGoogleConnected] = useState(false)
@@ -108,6 +87,48 @@ export default function AgendaPage() {
     loadUser()
   }, [])
 
+  // Load appointments from database when userId changes
+  useEffect(() => {
+    const loadAppointments = async () => {
+      if (!userId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: true })
+
+        if (error) {
+          console.error('Erro ao carregar agendamentos:', error)
+          return
+        }
+
+        if (data) {
+          // Convert database format to app format
+          const formattedAppointments = data.map(apt => ({
+            id: apt.id,
+            clientId: apt.client_id,
+            employeeId: apt.employee_id,
+            date: apt.date,
+            time: apt.time,
+            status: apt.status,
+            service: apt.service,
+            price: apt.price,
+            clientEmail: apt.client_email,
+            googleEventId: apt.google_event_id
+          }))
+          setAppointments(formattedAppointments)
+          console.log('✅ Agendamentos carregados:', formattedAppointments.length)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar agendamentos:', error)
+      }
+    }
+
+    loadAppointments()
+  }, [userId])
+
   // Check only email integration flag
   useEffect(() => {
     const checkEmail = async () => {
@@ -185,11 +206,39 @@ export default function AgendaPage() {
   }
 
   const handleSave = async () => {
+    if (!userId) {
+      alert('Erro: Usuário não identificado. Faça login novamente.')
+      return
+    }
+
     if (editingItem) {
+      // Update existing appointment in database
+      const { error } = await supabase
+        .from('appointments')
+        .update({
+          client_id: formData.clientId,
+          employee_id: formData.employeeId,
+          date: formData.date,
+          time: formData.time,
+          status: formData.status,
+          service: formData.service,
+          price: formData.price,
+          client_email: formData.clientEmail,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingItem.id)
+        .eq('user_id', userId)
+
+      if (error) {
+        console.error('Erro ao atualizar agendamento:', error)
+        alert('Erro ao atualizar agendamento')
+        return
+      }
+
+      // Update local state
       setAppointments(appointments.map(a => a.id === editingItem.id ? { ...formData, id: editingItem.id } as any : a))
     } else {
-      const newAppointment = { ...formData, id: Date.now() } as any
-      setAppointments([...appointments, newAppointment])
+      let googleEventId = null
       
       // Send email notification for new appointments
       if (formData.clientEmail) {
@@ -227,54 +276,104 @@ export default function AgendaPage() {
 
       // Create Google Calendar event
       try {
-        // Get current user ID
-        const { data } = await supabase.auth.getSession()
-        const currentUserId = data.session?.user?.id
-        
-        if (currentUserId) {
-          const calendarResponse = await fetch('/api/google-calendar/create-event', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+        const calendarResponse = await fetch('/api/google-calendar/create-event', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: userId,
+            appointmentData: {
+              service: formData.service,
+              date: formData.date,
+              time: formData.time,
+              price: formData.price,
+              status: formData.status,
+              clientId: formData.clientId,
+              employeeId: formData.employeeId,
+              clientName: getClientName(formData.clientId),
+              employeeName: getEmployeeName(formData.employeeId)
             },
-            body: JSON.stringify({
-              userId: currentUserId,
-              appointmentData: {
-                service: formData.service,
-                date: formData.date,
-                time: formData.time,
-                price: formData.price,
-                status: formData.status,
-                clientId: formData.clientId,
-                employeeId: formData.employeeId,
-                clientName: getClientName(formData.clientId),
-                employeeName: getEmployeeName(formData.employeeId)
-              },
-              clientEmail: formData.clientEmail
-            }),
-          })
-        
-          const calendarResult = await calendarResponse.json()
-          if (calendarResult.success) {
-            console.log('Google Calendar event created:', calendarResult.eventId)
-            alert(`Evento criado no Google Calendar! Link: ${calendarResult.eventUrl}`)
-          } else {
-            console.log('Google Calendar not connected or failed:', calendarResult.error)
-            alert('Erro ao criar evento no Google Calendar: ' + calendarResult.error)
-          }
+            clientEmail: formData.clientEmail
+          }),
+        })
+      
+        const calendarResult = await calendarResponse.json()
+        if (calendarResult.success) {
+          console.log('Google Calendar event created:', calendarResult.eventId)
+          googleEventId = calendarResult.eventId
         } else {
-          console.log('Google access token not found')
+          console.log('Google Calendar not connected or failed:', calendarResult.error)
         }
       } catch (error) {
         console.error('Error creating Google Calendar event:', error)
-        alert('Erro ao criar evento no Google Calendar: ' + (error instanceof Error ? error.message : String(error)))
+      }
+
+      // Save appointment to database
+      const { data: newApt, error } = await supabase
+        .from('appointments')
+        .insert([
+          {
+            user_id: userId,
+            client_id: formData.clientId,
+            employee_id: formData.employeeId,
+            date: formData.date,
+            time: formData.time,
+            status: formData.status || 'Agendado',
+            service: formData.service,
+            price: formData.price,
+            client_email: formData.clientEmail,
+            google_event_id: googleEventId
+          }
+        ])
+        .select()
+
+      if (error) {
+        console.error('Erro ao salvar agendamento:', error)
+        alert('Erro ao salvar agendamento no banco de dados')
+        return
+      }
+
+      if (newApt && newApt.length > 0) {
+        // Add to local state
+        const formattedApt = {
+          id: newApt[0].id,
+          clientId: newApt[0].client_id,
+          employeeId: newApt[0].employee_id,
+          date: newApt[0].date,
+          time: newApt[0].time,
+          status: newApt[0].status,
+          service: newApt[0].service,
+          price: newApt[0].price,
+          clientEmail: newApt[0].client_email,
+          googleEventId: newApt[0].google_event_id
+        }
+        setAppointments([...appointments, formattedApt])
+        alert('✅ Agendamento criado com sucesso!')
       }
     }
     closeModal()
   }
 
-  const deleteItem = (id: number) => {
+  const deleteItem = async (id: string) => {
+    if (!userId) return
+
+    // Delete from database
+    const { error } = await supabase
+      .from('appointments')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Erro ao deletar agendamento:', error)
+      alert('Erro ao deletar agendamento')
+      return
+    }
+
+    // Remove from local state
     setAppointments(appointments.filter(a => a.id !== id))
+    console.log('✅ Agendamento deletado')
   }
 
   return (
