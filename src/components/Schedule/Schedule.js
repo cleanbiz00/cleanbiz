@@ -23,34 +23,52 @@ const Schedule = ({
 
   // Check for Google OAuth token on page load
   useEffect(() => {
+    console.log('🟢 Verificando token do Google...');
+    console.log('URL completa:', window.location.href);
+    
     const urlParams = new URLSearchParams(window.location.search);
     const googleToken = urlParams.get('google_token');
     const refreshToken = urlParams.get('refresh_token');
     const error = urlParams.get('error');
 
+    console.log('Parâmetros da URL:', {
+      googleToken: googleToken ? 'RECEBIDO' : 'NÃO RECEBIDO',
+      refreshToken: refreshToken ? 'RECEBIDO' : 'NÃO RECEBIDO',
+      error: error || 'NENHUM'
+    });
+
     if (error) {
-      console.error('Google OAuth error:', error);
+      console.error('❌ Google OAuth error:', error);
       alert('Erro na autenticação do Google: ' + error);
     } else if (googleToken) {
-      console.log('Google token received:', googleToken);
+      console.log('✅ Google token recebido! Salvando...');
       setGoogleAccessToken(googleToken);
       setGoogleConnected(true);
       
       // Store tokens in localStorage
       localStorage.setItem('google_access_token', googleToken);
+      console.log('✅ Token salvo no localStorage');
+      
       if (refreshToken) {
         localStorage.setItem('google_refresh_token', refreshToken);
+        console.log('✅ Refresh token salvo no localStorage');
       }
       
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      console.log('✅ URL limpa');
+      
+      alert('Google Calendar conectado com sucesso! ✅');
     } else {
+      console.log('🔍 Verificando localStorage...');
       // Check localStorage for existing token
       const storedToken = localStorage.getItem('google_access_token');
       if (storedToken) {
+        console.log('✅ Token encontrado no localStorage');
         setGoogleAccessToken(storedToken);
         setGoogleConnected(true);
       } else {
+        console.log('❌ Nenhum token encontrado');
         setGoogleConnected(false);
       }
     }
@@ -62,6 +80,10 @@ const Schedule = ({
     const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/api/google-calendar/auth`;
     const scope = 'https://www.googleapis.com/auth/calendar';
     
+    console.log('🔵 Iniciando autenticação Google...');
+    console.log('Client ID:', clientId);
+    console.log('Redirect URI:', redirectUri);
+    
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${clientId}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
@@ -70,6 +92,7 @@ const Schedule = ({
       `access_type=offline&` +
       `prompt=consent`;
     
+    console.log('🔵 Redirecionando para:', authUrl);
     window.location.href = authUrl;
   };
 
