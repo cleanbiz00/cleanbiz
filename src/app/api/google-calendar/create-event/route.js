@@ -24,13 +24,13 @@ export async function POST(request) {
     // Get the user's Google access token from database (support id or user_id schemas)
     let { data: userData, error: userError } = await supabase
       .from('app_users')
-      .select('id, user_id, google_access_token, google_refresh_token, google_token_expires_at')
-      .or(`id.eq.${userId},user_id.eq.${userId}`)
+      .select('id, user_id, auth_user_id, google_access_token, google_refresh_token, google_token_expires_at')
+      .or(`id.eq.${userId},user_id.eq.${userId},auth_user_id.eq.${userId}`)
       .limit(1)
       .single();
 
     if (userError || !userData) {
-      console.error('Failed to get user data:', userError);
+      console.error('Failed to get user data:', { userError, userId });
       return NextResponse.json({ 
         error: 'Failed to get user data' 
       }, { status: 500 });

@@ -76,7 +76,7 @@ export async function GET(request) {
           google_token_expires_at: expiresAt.toISOString(),
           google_connected_at: new Date().toISOString(),
         })
-        .eq('user_id', state);
+        .or(`user_id.eq.${state},auth_user_id.eq.${state}`);
       dbError = dbError2;
     }
 
