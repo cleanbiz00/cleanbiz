@@ -56,7 +56,7 @@ export async function GET(request) {
 
     // Save tokens to Supabase
     const { error: dbError } = await supabase
-      .from('users')
+      .from('app_users')
       .update({
         google_access_token: tokenData.access_token,
         google_refresh_token: tokenData.refresh_token || null,

@@ -23,7 +23,7 @@ export async function POST(request) {
 
     // Get the user's Google access token from database
     const { data: userData, error: userError } = await supabase
-      .from('users')
+      .from('app_users')
       .select('google_access_token, google_refresh_token, google_token_expires_at')
       .eq('id', userId)
       .single();
