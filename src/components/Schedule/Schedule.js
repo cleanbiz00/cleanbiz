@@ -57,7 +57,7 @@ const Schedule = ({
   // Handle Google OAuth authentication
   const handleGoogleAuth = () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '62407212309-ecsjb31ajmhsm00lig6krhaauvff0bf8.apps.googleusercontent.com';
-    const redirectUri = `${window.location.origin}/api/google-calendar/auth`;
+    const redirectUri = `https://cleanbiz360.com/api/google-calendar/auth`;
     const scope = 'https://www.googleapis.com/auth/calendar';
     
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
