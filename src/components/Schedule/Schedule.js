@@ -21,66 +21,76 @@ const Schedule = ({
     console.log('Schedule received appointments:', appointments);
   }, [appointments]);
 
-  // Check for Google OAuth token on page load
+  // Check for Google OAuth connection status on page load
   useEffect(() => {
-    console.log('🟢 Verificando token do Google...');
-    console.log('URL completa:', window.location.href);
+    console.log('🟢 Verificando conexão do Google Calendar...');
     
     const urlParams = new URLSearchParams(window.location.search);
-    const googleToken = urlParams.get('google_token');
-    const refreshToken = urlParams.get('refresh_token');
+    const googleConnectedStatus = urlParams.get('google_connected');
     const error = urlParams.get('error');
-
-    console.log('Parâmetros da URL:', {
-      googleToken: googleToken ? 'RECEBIDO' : 'NÃO RECEBIDO',
-      refreshToken: refreshToken ? 'RECEBIDO' : 'NÃO RECEBIDO',
-      error: error || 'NENHUM'
-    });
 
     if (error) {
       console.error('❌ Google OAuth error:', error);
       alert('Erro na autenticação do Google: ' + error);
-    } else if (googleToken) {
-      console.log('✅ Google token recebido! Salvando...');
-      setGoogleAccessToken(googleToken);
-      setGoogleConnected(true);
-      
-      // Store tokens in localStorage
-      localStorage.setItem('google_access_token', googleToken);
-      console.log('✅ Token salvo no localStorage');
-      
-      if (refreshToken) {
-        localStorage.setItem('google_refresh_token', refreshToken);
-        console.log('✅ Refresh token salvo no localStorage');
-      }
+    } else if (googleConnectedStatus === 'success') {
+      console.log('✅ Google Calendar conectado com sucesso!');
+      alert('Google Calendar conectado com sucesso! ✅');
       
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
-      console.log('✅ URL limpa');
       
-      alert('Google Calendar conectado com sucesso! ✅');
+      // Reload to fetch updated user data with tokens
+      window.location.reload();
     } else {
-      console.log('🔍 Verificando localStorage...');
-      // Check localStorage for existing token
-      const storedToken = localStorage.getItem('google_access_token');
-      if (storedToken) {
-        console.log('✅ Token encontrado no localStorage');
-        setGoogleAccessToken(storedToken);
-        setGoogleConnected(true);
-      } else {
-        console.log('❌ Nenhum token encontrado');
-        setGoogleConnected(false);
-      }
+      // Check if user has Google token in database
+      checkGoogleConnection();
     }
   }, []);
 
+  // Check if user has Google Calendar connected
+  const checkGoogleConnection = async () => {
+    if (!userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('google_access_token, google_refresh_token, google_token_expires_at')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar dados do Google:', error);
+        setGoogleConnected(false);
+        return;
+      }
+
+      if (data && data.google_access_token) {
+        console.log('✅ Google Calendar está conectado');
+        setGoogleAccessToken(data.google_access_token);
+        setGoogleConnected(true);
+      } else {
+        console.log('❌ Google Calendar não está conectado');
+        setGoogleConnected(false);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar conexão do Google:', error);
+      setGoogleConnected(false);
+    }
+  };
+
   // Handle Google OAuth authentication
   const handleGoogleAuth = () => {
+    if (!userId) {
+      alert('Erro: Usuário não identificado. Por favor, faça login novamente.');
+      return;
+    }
+
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '62407212309-ecsjb31ajmhsm00lig6krhaauvff0bf8.apps.googleusercontent.com';
     const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/api/google-calendar/auth`;
     const scope = 'https://www.googleapis.com/auth/calendar';
     
     console.log('🔵 Iniciando autenticação Google...');
+    console.log('User ID:', userId);
     console.log('Client ID:', clientId);
     console.log('Redirect URI:', redirectUri);
     
@@ -90,19 +100,45 @@ const Schedule = ({
       `response_type=code&` +
       `scope=${encodeURIComponent(scope)}&` +
       `access_type=offline&` +
-      `prompt=consent`;
+      `prompt=consent&` +
+      `state=${encodeURIComponent(userId)}`; // Pass user_id as state
     
-    console.log('🔵 Redirecionando para:', authUrl);
+    console.log('🔵 Redirecionando para Google OAuth...');
     window.location.href = authUrl;
   };
 
   // Handle Google disconnect
-  const handleGoogleDisconnect = () => {
-    localStorage.removeItem('google_access_token');
-    localStorage.removeItem('google_refresh_token');
-    setGoogleAccessToken(null);
-    setGoogleConnected(false);
-    console.log('Google Calendar disconnected');
+  const handleGoogleDisconnect = async () => {
+    if (!userId) {
+      alert('Erro: Usuário não identificado.');
+      return;
+    }
+
+    try {
+      // Remove tokens from database
+      const { error } = await supabase
+        .from('users')
+        .update({
+          google_access_token: null,
+          google_refresh_token: null,
+          google_token_expires_at: null,
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Erro ao desconectar Google Calendar:', error);
+        alert('Erro ao desconectar Google Calendar. Tente novamente.');
+        return;
+      }
+
+      setGoogleAccessToken(null);
+      setGoogleConnected(false);
+      console.log('✅ Google Calendar desconectado com sucesso');
+      alert('Google Calendar desconectado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao desconectar Google Calendar:', error);
+      alert('Erro ao desconectar Google Calendar. Tente novamente.');
+    }
   };
 
   // Load current user
@@ -137,52 +173,45 @@ const Schedule = ({
 
   // Create Google Calendar event via API
   const createGoogleCalendarEvent = async (appointment, clientEmail) => {
-    if (!googleConnected || !userId) return null;
+    if (!googleConnected || !userId) {
+      console.log('Google Calendar not connected or no user ID');
+      return null;
+    }
 
     try {
-      // Get user's Google access token (this would come from OAuth flow)
-      const { data: session } = await supabase.auth.getSession();
-      const accessToken = session?.session?.provider_token; // This would be set during Google OAuth
-
-      if (!accessToken) {
-        console.log('No Google access token available');
-        return null;
-      }
-
-      // Prepare event details
-      const startDateTime = new Date(`${appointment.date}T${appointment.time}:00`);
-      const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
-
-      const eventDetails = {
-        title: `${appointment.service} - ${getClientName(appointment.clientId)}`,
-        description: `Serviço: ${appointment.service}\nCliente: ${getClientName(appointment.clientId)}\nFuncionário: ${getEmployeeName(appointment.employeeId)}\nValor: $${appointment.price}`,
-        startDateTime: startDateTime.toISOString(),
-        endDateTime: endDateTime.toISOString(),
-        attendees: clientEmail ? [{ email: clientEmail }] : []
-      };
-
       const response = await fetch('/api/google-calendar/create-event', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          eventDetails,
-          accessToken
+          userId: userId,
+          appointmentData: {
+            service: appointment.service,
+            date: appointment.date,
+            time: appointment.time,
+            price: appointment.price,
+            status: appointment.status,
+            clientId: appointment.clientId,
+            employeeId: appointment.employeeId,
+            clientName: getClientName(appointment.clientId),
+            employeeName: getEmployeeName(appointment.employeeId)
+          },
+          clientEmail: clientEmail
         }),
       });
 
       const result = await response.json();
       
       if (result.success) {
-        console.log('Google Calendar event created:', result.eventId);
+        console.log('✅ Google Calendar event created:', result.eventId);
         return result.eventId;
       } else {
-        console.error('Failed to create Google Calendar event:', result.error);
+        console.error('❌ Failed to create Google Calendar event:', result.error);
         return null;
       }
     } catch (error) {
-      console.error('Error creating Google Calendar event:', error);
+      console.error('❌ Error creating Google Calendar event:', error);
       return null;
     }
   };

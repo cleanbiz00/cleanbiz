@@ -1,23 +1,47 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request) {
   try {
-    const { appointmentData, clientEmail } = await request.json();
+    const { appointmentData, clientEmail, userId } = await request.json();
 
     if (!appointmentData) {
       return NextResponse.json({ error: 'Appointment data is required' }, { status: 400 });
     }
 
-    console.log('Creating Google Calendar event for appointment:', appointmentData);
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
 
-    // Get the access token from the request headers or from stored tokens
-    const accessToken = request.headers.get('authorization')?.replace('Bearer ', '');
-    
-    if (!accessToken) {
+    console.log('Creating Google Calendar event for appointment:', appointmentData);
+    console.log('User ID:', userId);
+
+    // Get the user's Google access token from database
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('google_access_token, google_refresh_token, google_token_expires_at')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !userData) {
+      console.error('Failed to get user data:', userError);
       return NextResponse.json({ 
-        error: 'Google access token is required' 
+        error: 'Failed to get user data' 
+      }, { status: 500 });
+    }
+
+    if (!userData.google_access_token) {
+      return NextResponse.json({ 
+        error: 'Google Calendar not connected. Please connect your Google Calendar first.' 
       }, { status: 401 });
     }
+
+    const accessToken = userData.google_access_token;
 
     // Calculate end time (1 hour duration)
     const [hours, minutes] = appointmentData.time.split(':');

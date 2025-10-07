@@ -215,15 +215,18 @@ export default function AgendaPage() {
 
       // Create Google Calendar event
       try {
-        const googleAccessToken = localStorage.getItem('google_access_token')
-        if (googleAccessToken) {
+        // Get current user ID
+        const { data } = await supabase.auth.getSession()
+        const currentUserId = data.session?.user?.id
+        
+        if (currentUserId) {
           const calendarResponse = await fetch('/api/google-calendar/create-event', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${googleAccessToken}`,
             },
             body: JSON.stringify({
+              userId: currentUserId,
               appointmentData: {
                 service: formData.service,
                 date: formData.date,
