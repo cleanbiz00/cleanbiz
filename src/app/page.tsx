@@ -225,7 +225,7 @@ export default function Home() {
           }
         } catch (error) {
           console.error('Error creating Google Calendar event:', error);
-          alert('Erro ao criar evento no Google Calendar: ' + error.message);
+          alert('Erro ao criar evento no Google Calendar: ' + (error instanceof Error ? error.message : String(error)));
         }
       }
     }
