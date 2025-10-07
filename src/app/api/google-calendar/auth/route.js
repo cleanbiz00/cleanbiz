@@ -80,6 +80,33 @@ export async function GET(request) {
       dbError = dbError2;
     }
 
+    // If no rows were updated (no record exists), insert one
+    if (!dbError && (updateResult?.length ?? 0) === 0) {
+      let email = null;
+      try {
+        if (supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
+          const { data: authUser } = await supabase.auth.admin.getUserById(state);
+          email = authUser?.user?.email || null;
+        }
+      } catch (_) {}
+
+      const { error: insertErr } = await supabase
+        .from('app_users')
+        .insert([
+          {
+            id: state, // if your PK is different, it will ignore
+            user_id: state,
+            auth_user_id: state,
+            email,
+            google_access_token: tokenData.access_token,
+            google_refresh_token: tokenData.refresh_token || null,
+            google_token_expires_at: expiresAt.toISOString(),
+            google_connected_at: new Date().toISOString(),
+          },
+        ]);
+      if (insertErr) dbError = insertErr;
+    }
+
     if (dbError) {
       console.error('Failed to save tokens to database:', dbError);
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=db_error`);
