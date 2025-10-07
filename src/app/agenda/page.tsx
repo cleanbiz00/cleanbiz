@@ -48,36 +48,55 @@ export default function AgendaPage() {
     { id: 2, name: 'Carlos Santos' }
   ]
 
-  // Check for Google OAuth token on page load
+  // Check Google connection on load (via Supabase) and handle OAuth return
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const googleToken = urlParams.get('google_token')
-    const refreshToken = urlParams.get('refresh_token')
-    const error = urlParams.get('error')
+    const check = async () => {
+      const params = new URLSearchParams(window.location.search)
+      const oauthOk = params.get('google_connected') === 'success'
+      const err = params.get('error')
 
-    if (error) {
-      console.error('Google OAuth error:', error)
-      alert('Erro na autenticação do Google: ' + error)
-    } else if (googleToken) {
-      console.log('Google token received:', googleToken)
-      setGoogleAccessToken(googleToken)
-      setGoogleConnected(true)
-      
-      localStorage.setItem('google_access_token', googleToken)
-      if (refreshToken) {
-        localStorage.setItem('google_refresh_token', refreshToken)
+      if (err) {
+        console.error('Google OAuth error:', err)
+        alert('Erro na autenticação do Google: ' + err)
+        window.history.replaceState({}, document.title, window.location.pathname)
       }
-      
-      window.history.replaceState({}, document.title, window.location.pathname)
-    } else {
-      const storedToken = localStorage.getItem('google_access_token')
-      if (storedToken) {
-        setGoogleAccessToken(storedToken)
-        setGoogleConnected(true)
-      } else {
+
+      // Ensure we have user
+      const { data } = await supabase.auth.getSession()
+      const uid = data.session?.user?.id || null
+      setUserId(uid)
+
+      if (!uid) {
+        setGoogleConnected(false)
+        return
+      }
+
+      // Query app_users for token
+      try {
+        const { data: row, error: qerr } = await supabase
+          .from('app_users')
+          .select('google_access_token')
+          .or(`id.eq.${uid},user_id.eq.${uid},auth_user_id.eq.${uid}`)
+          .limit(1)
+          .maybeSingle()
+
+        if (qerr) {
+          console.error('Erro ao consultar conexão do Google:', qerr)
+          setGoogleConnected(false)
+        } else {
+          const connected = !!row?.google_access_token
+          setGoogleConnected(connected)
+          if (oauthOk) {
+            if (connected) alert('Google Calendar conectado com sucesso! ✅')
+            window.history.replaceState({}, document.title, window.location.pathname)
+          }
+        }
+      } catch (e) {
+        console.error('Erro inesperado ao verificar conexão Google:', e)
         setGoogleConnected(false)
       }
     }
+    check()
   }, [])
 
   // Load current user
@@ -89,24 +108,18 @@ export default function AgendaPage() {
     loadUser()
   }, [])
 
-  // Check if Google Calendar is configured and connected
+  // Check only email integration flag
   useEffect(() => {
-    const checkConfig = async () => {
+    const checkEmail = async () => {
       try {
         const response = await fetch('/api/check-config')
         const result = await response.json()
-        
-        if (result.success) {
-          setEmailConfigured(result.config.email)
-          
-          const storedToken = localStorage.getItem('google_access_token')
-          setGoogleConnected(!!storedToken)
-        }
+        if (result.success) setEmailConfigured(result.config.email)
       } catch (error) {
         console.error('Error checking config:', error)
       }
     }
-    checkConfig()
+    checkEmail()
   }, [])
 
   const handleGoogleAuth = async () => {
