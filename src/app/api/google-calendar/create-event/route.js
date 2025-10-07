@@ -29,6 +29,8 @@ export async function POST(request) {
       .limit(1)
       .single();
 
+    console.log('Database query result:', { userData, userError });
+
     // Fallback: try finding by email from auth if nothing found
     if ((!userData || userError) && supabase.auth?.admin && typeof supabase.auth.admin.getUserById === 'function') {
       try {

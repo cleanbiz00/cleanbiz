@@ -1,10 +1,12 @@
 // app/api/email/send-confirmation/route.js
+import { NextResponse } from 'next/server';
+
 export async function POST(request) {
   try {
     const { appointmentData, clientEmail } = await request.json();
 
     if (!appointmentData || !clientEmail) {
-      return Response.json({ error: 'Appointment data and client email are required' }, { status: 400 });
+      return NextResponse.json({ error: 'Appointment data and client email are required' }, { status: 400 });
     }
 
     // Check if SendGrid is configured
@@ -13,7 +15,7 @@ export async function POST(request) {
       console.log('Would send email to:', clientEmail);
       console.log('Appointment data:', appointmentData);
       
-      return Response.json({ 
+      return NextResponse.json({ 
         success: true, 
         messageId: 'simulated-' + Date.now(),
         message: 'Email simulation successful (SendGrid not configured)'
@@ -33,14 +35,14 @@ export async function POST(request) {
 
     const response = await sgMail.send(msg);
     
-    return Response.json({ 
+    return NextResponse.json({ 
       success: true, 
       messageId: response[0].headers['x-message-id'],
       message: 'Confirmation email sent successfully'
     });
   } catch (error) {
     console.error('Email sending error:', error);
-    return Response.json({ 
+    return NextResponse.json({ 
       success: false, 
       error: error.message 
     }, { status: 500 });
