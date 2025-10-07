@@ -108,7 +108,12 @@ export async function GET(request) {
     }
 
     if (dbError) {
-      console.error('Failed to save tokens to database:', dbError);
+      console.error('Failed to save tokens to database:', {
+        error: dbError,
+        userId: state,
+        supabaseUrl: supabaseUrl,
+        hasServiceKey: !!supabaseServiceKey
+      });
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=db_error`);
     }
 
