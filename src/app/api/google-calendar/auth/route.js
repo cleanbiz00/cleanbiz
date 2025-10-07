@@ -55,7 +55,8 @@ export async function GET(request) {
     const expiresAt = new Date(Date.now() + expiresIn * 1000);
 
     // Save tokens to Supabase
-    const { error: dbError } = await supabase
+    // Try update by id; if 0 rows, try by user_id
+    let { error: dbError, data: updateResult } = await supabase
       .from('app_users')
       .update({
         google_access_token: tokenData.access_token,
@@ -64,6 +65,20 @@ export async function GET(request) {
         google_connected_at: new Date().toISOString(),
       })
       .eq('id', state);
+
+    if ((updateResult?.length ?? 0) === 0 || dbError) {
+      // Fallback: update by user_id
+      const { error: dbError2 } = await supabase
+        .from('app_users')
+        .update({
+          google_access_token: tokenData.access_token,
+          google_refresh_token: tokenData.refresh_token || null,
+          google_token_expires_at: expiresAt.toISOString(),
+          google_connected_at: new Date().toISOString(),
+        })
+        .eq('user_id', state);
+      dbError = dbError2;
+    }
 
     if (dbError) {
       console.error('Failed to save tokens to database:', dbError);

@@ -21,11 +21,12 @@ export async function POST(request) {
     console.log('Creating Google Calendar event for appointment:', appointmentData);
     console.log('User ID:', userId);
 
-    // Get the user's Google access token from database
-    const { data: userData, error: userError } = await supabase
+    // Get the user's Google access token from database (support id or user_id schemas)
+    let { data: userData, error: userError } = await supabase
       .from('app_users')
-      .select('google_access_token, google_refresh_token, google_token_expires_at')
-      .eq('id', userId)
+      .select('id, user_id, google_access_token, google_refresh_token, google_token_expires_at')
+      .or(`id.eq.${userId},user_id.eq.${userId}`)
+      .limit(1)
       .single();
 
     if (userError || !userData) {
