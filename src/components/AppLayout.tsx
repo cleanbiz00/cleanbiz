@@ -14,11 +14,12 @@ export default function AppLayout({
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const isLoginPage = pathname === '/login'
 
   // Verificar autenticação
   useEffect(() => {
     // Se estiver na página de login, não verificar auth
-    if (pathname === '/login') {
+    if (isLoginPage) {
       setCheckingAuth(false)
       return
     }
@@ -37,32 +38,26 @@ export default function AppLayout({
       }
     }
     checkSession()
-  }, [router, pathname])
+  }, [router, isLoginPage])
 
   // Fechar sidebar em mobile quando navegar
   useEffect(() => {
     setIsSidebarOpen(false)
   }, [pathname])
 
-  // Se estiver na página de login, não aplicar o layout
-  if (pathname === '/login') {
-    return <>{children}</>
-  }
-
   const handleLogout = async () => {
     try {
-      setCheckingAuth(true)
       await supabase.auth.signOut()
       // Limpar qualquer dado em cache
       if (typeof window !== 'undefined') {
         localStorage.clear()
         sessionStorage.clear()
       }
-      router.replace('/login')
+      router.push('/login')
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
       // Mesmo com erro, redirecionar para login
-      router.replace('/login')
+      router.push('/login')
     }
   }
 
@@ -74,6 +69,12 @@ export default function AppLayout({
     { path: '/financeiro', label: 'Financeiro', icon: DollarSign },
   ]
 
+  // Se for página de login, renderizar apenas os children sem layout
+  if (isLoginPage) {
+    return <>{children}</>
+  }
+
+  // Se estiver verificando autenticação, mostrar loading
   if (checkingAuth) {
     return (
       <div className="flex h-screen items-center justify-center bg-white text-gray-700">
@@ -85,6 +86,7 @@ export default function AppLayout({
     )
   }
 
+  // Renderizar layout completo com sidebar
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Desktop Sidebar */}
