@@ -7,7 +7,8 @@ import CalendarView from '../../components/Schedule/CalendarView'
 
 export default function AgendaPage() {
   const [appointments, setAppointments] = useState([])
-
+  const [clients, setClients] = useState([])
+  const [employees, setEmployees] = useState([])
   const [userId, setUserId] = useState<string | null>(null)
   const [googleConnected, setGoogleConnected] = useState(false)
   const [emailConfigured, setEmailConfigured] = useState(false)
@@ -16,16 +17,6 @@ export default function AgendaPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
-
-  const clients = [
-    { id: 1, name: 'Maria Johnson', email: 'maria.johnson@email.com' },
-    { id: 2, name: 'Robert Smith', email: 'robert.smith@email.com' }
-  ]
-
-  const employees = [
-    { id: 1, name: 'Ana Silva' },
-    { id: 2, name: 'Carlos Santos' }
-  ]
 
   // Check Google connection on load (via Supabase) and handle OAuth return
   useEffect(() => {
@@ -86,6 +77,73 @@ export default function AgendaPage() {
     }
     loadUser()
   }, [])
+
+  // Load clients from database
+  useEffect(() => {
+    const loadClients = async () => {
+      if (!userId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true })
+
+        if (error) {
+          console.error('Erro ao carregar clientes:', error)
+          return
+        }
+
+        if (data) {
+          const formattedClients = data.map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email
+          }))
+          setClients(formattedClients)
+          console.log('✅ Clientes carregados:', formattedClients.length)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar clientes:', error)
+      }
+    }
+
+    loadClients()
+  }, [userId])
+
+  // Load employees from database
+  useEffect(() => {
+    const loadEmployees = async () => {
+      if (!userId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true })
+
+        if (error) {
+          console.error('Erro ao carregar funcionários:', error)
+          return
+        }
+
+        if (data) {
+          const formattedEmployees = data.map(e => ({
+            id: e.id,
+            name: e.name
+          }))
+          setEmployees(formattedEmployees)
+          console.log('✅ Funcionários carregados:', formattedEmployees.length)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar funcionários:', error)
+      }
+    }
+
+    loadEmployees()
+  }, [userId])
 
   // Load appointments from database when userId changes
   useEffect(() => {
@@ -573,20 +631,33 @@ export default function AgendaPage() {
             </h3>
             
             <div className="space-y-4">
+              {clients.length === 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+                  ⚠️ Você ainda não cadastrou nenhum cliente. Vá em <strong>Clientes</strong> para adicionar.
+                </div>
+              )}
               <select
                 value={formData.clientId || ''}
                 onChange={(e) => setFormData({...formData, clientId: e.target.value ? parseInt(e.target.value) : ''})}
                 className="w-full p-3 border rounded-lg"
+                disabled={clients.length === 0}
               >
                 <option value="">Selecione o cliente</option>
                 {clients.map(client => (
                   <option key={client.id} value={client.id}>{client.name}</option>
                 ))}
               </select>
+              
+              {employees.length === 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+                  ⚠️ Você ainda não cadastrou nenhum funcionário. Vá em <strong>Funcionários</strong> para adicionar.
+                </div>
+              )}
               <select
                 value={formData.employeeId || ''}
                 onChange={(e) => setFormData({...formData, employeeId: e.target.value ? parseInt(e.target.value) : ''})}
                 className="w-full p-3 border rounded-lg"
+                disabled={employees.length === 0}
               >
                 <option value="">Selecione o funcionário</option>
                 {employees.map(employee => (

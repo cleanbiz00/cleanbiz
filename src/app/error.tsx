@@ -20,12 +20,24 @@ export default function Error({
           <p className="text-sm text-gray-500 mb-4">
             Ocorreu um erro inesperado. Tente novamente.
           </p>
-          <button
-            onClick={reset}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Tentar novamente
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={reset}
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Tentar novamente
+            </button>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/dashboard'
+                }
+              }}
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Voltar ao Dashboard
+            </button>
+          </div>
         </div>
       </div>
     </div>

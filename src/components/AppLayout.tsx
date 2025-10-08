@@ -15,32 +15,55 @@ export default function AppLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
 
-  // Se estiver na página de login, não aplicar o layout
-  if (pathname === '/login') {
-    return <>{children}</>
-  }
-
   // Verificar autenticação
   useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (!data.session) {
-        router.replace('/login')
-        return
-      }
+    // Se estiver na página de login, não verificar auth
+    if (pathname === '/login') {
       setCheckingAuth(false)
+      return
+    }
+
+    const checkSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!data.session) {
+          router.replace('/login')
+          return
+        }
+        setCheckingAuth(false)
+      } catch (error) {
+        console.error('Erro ao verificar sessão:', error)
+        router.replace('/login')
+      }
     }
     checkSession()
-  }, [router])
+  }, [router, pathname])
 
   // Fechar sidebar em mobile quando navegar
   useEffect(() => {
     setIsSidebarOpen(false)
   }, [pathname])
 
+  // Se estiver na página de login, não aplicar o layout
+  if (pathname === '/login') {
+    return <>{children}</>
+  }
+
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.replace('/login')
+    try {
+      setCheckingAuth(true)
+      await supabase.auth.signOut()
+      // Limpar qualquer dado em cache
+      if (typeof window !== 'undefined') {
+        localStorage.clear()
+        sessionStorage.clear()
+      }
+      router.replace('/login')
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error)
+      // Mesmo com erro, redirecionar para login
+      router.replace('/login')
+    }
   }
 
   const menuItems = [
