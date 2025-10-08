@@ -269,32 +269,61 @@ export default function AgendaPage() {
       return
     }
 
+    // Validação básica
+    if (!formData.clientId || !formData.employeeId || !formData.date || !formData.time || !formData.service) {
+      alert('Por favor, preencha todos os campos obrigatórios.')
+      return
+    }
+
     if (editingItem) {
       // Update existing appointment in database
+      const updateData = {
+        client_id: Number(formData.clientId),
+        employee_id: Number(formData.employeeId),
+        date: formData.date,
+        time: formData.time,
+        status: formData.status || 'Agendado',
+        service: formData.service,
+        price: Number(formData.price) || 0,
+        client_email: formData.clientEmail || null,
+        updated_at: new Date().toISOString()
+      }
+
       const { error } = await supabase
         .from('appointments')
-        .update({
-          client_id: formData.clientId,
-          employee_id: formData.employeeId,
-          date: formData.date,
-          time: formData.time,
-          status: formData.status,
-          service: formData.service,
-          price: formData.price,
-          client_email: formData.clientEmail,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', editingItem.id)
         .eq('user_id', userId)
 
       if (error) {
         console.error('Erro ao atualizar agendamento:', error)
-        alert('Erro ao atualizar agendamento')
+        alert(`Erro ao atualizar agendamento: ${error.message}`)
         return
       }
 
-      // Update local state
-      setAppointments(appointments.map(a => a.id === editingItem.id ? { ...formData, id: editingItem.id } as any : a))
+      // Reload appointments from database
+      const { data: updatedAppointments } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: true })
+      
+      if (updatedAppointments) {
+        setAppointments(updatedAppointments.map((a: any) => ({
+          id: a.id,
+          clientId: a.client_id,
+          employeeId: a.employee_id,
+          date: a.date,
+          time: a.time,
+          status: a.status,
+          service: a.service,
+          price: a.price,
+          clientEmail: a.client_email,
+          googleEventId: a.google_event_id
+        })))
+      }
+
+      alert('✅ Agendamento atualizado com sucesso!')
     } else {
       let googleEventId = null
       
@@ -638,7 +667,10 @@ export default function AgendaPage() {
               )}
               <select
                 value={formData.clientId || ''}
-                onChange={(e) => setFormData({...formData, clientId: e.target.value ? parseInt(e.target.value) : ''})}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setFormData({...formData, clientId: value ? Number(value) : null})
+                }}
                 className="w-full p-3 border rounded-lg"
                 disabled={clients.length === 0}
               >
@@ -655,7 +687,10 @@ export default function AgendaPage() {
               )}
               <select
                 value={formData.employeeId || ''}
-                onChange={(e) => setFormData({...formData, employeeId: e.target.value ? parseInt(e.target.value) : ''})}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setFormData({...formData, employeeId: value ? Number(value) : null})
+                }}
                 className="w-full p-3 border rounded-lg"
                 disabled={employees.length === 0}
               >
