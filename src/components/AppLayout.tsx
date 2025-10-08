@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../utils/supabaseClient'
 import { Menu, Home, Users, Calendar, DollarSign, LogOut } from 'lucide-react'
 
+// Layout principal da aplicação - v2.0
 export default function AppLayout({
   children,
 }: {
