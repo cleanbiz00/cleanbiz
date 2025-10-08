@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "Sistema de gerenciamento para empresas de limpeza",
 };
 
+// Force rebuild - v3.0
+
 export default function RootLayout({
   children,
 }: Readonly<{
