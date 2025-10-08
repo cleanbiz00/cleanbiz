@@ -7,8 +7,8 @@ import { DollarSign } from 'lucide-react'
 export default function DashboardPage() {
   const [monthlyExpenses, setMonthlyExpenses] = useState(0)
   const [userId, setUserId] = useState<string | null>(null)
-  const [clients, setClients] = useState([])
-  const [appointments, setAppointments] = useState([])
+  const [clients, setClients] = useState<any[]>([])
+  const [appointments, setAppointments] = useState<any[]>([])
 
   const monthRange = useMemo(() => {
     const now = new Date()
@@ -43,62 +43,92 @@ export default function DashboardPage() {
     loadMonthlyExpenses()
   }, [monthRange, userId])
 
-  // Dados mockados por enquanto
+  // Carregar clientes do banco
+  useEffect(() => {
+    const loadClients = async () => {
+      if (!userId) return
+      try {
+        const { data, error } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('user_id', userId)
+          .order('name', { ascending: true })
+          .limit(3)
+        
+        if (!error && data) {
+          setClients(data.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            address: c.address,
+            serviceType: c.service_type,
+            price: c.price,
+            frequency: c.frequency
+          })))
+        }
+      } catch (error) {
+        console.error('Erro ao carregar clientes:', error)
+      }
+    }
+    loadClients()
+  }, [userId])
+
+  // Carregar agendamentos do banco
+  useEffect(() => {
+    const loadAppointments = async () => {
+      if (!userId) return
+      try {
+        const today = new Date().toISOString().slice(0, 10)
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('user_id', userId)
+          .gte('date', today)
+          .order('date', { ascending: true })
+          .order('time', { ascending: true })
+          .limit(3)
+        
+        if (!error && data) {
+          setAppointments(data.map((a: any) => ({
+            id: a.id,
+            clientId: a.client_id,
+            employeeId: a.employee_id,
+            date: a.date,
+            time: a.time,
+            status: a.status,
+            service: a.service,
+            price: a.price
+          })))
+        }
+      } catch (error) {
+        console.error('Erro ao carregar agendamentos:', error)
+      }
+    }
+    loadAppointments()
+  }, [userId])
+
+  // Calcular receita mensal baseado nos clientes
+  const monthlyRevenue = useMemo(() => {
+    return clients.reduce((total, client) => {
+      const price = Number(client.price || 0)
+      // Multiplicar pela frequência aproximada no mês
+      if (client.frequency === 'Semanal') return total + (price * 4)
+      if (client.frequency === 'Quinzenal') return total + (price * 2)
+      if (client.frequency === 'Mensal') return total + price
+      return total + price
+    }, 0)
+  }, [clients])
+
   const financialData = {
-    revenue: 5420,
+    revenue: monthlyRevenue,
     expenses: monthlyExpenses,
-    profit: 5420 - monthlyExpenses,
-    monthlyGrowth: 12.5
+    profit: monthlyRevenue - monthlyExpenses,
+    monthlyGrowth: 0 // Pode ser calculado comparando com mês anterior
   }
 
-  const mockClients = [
-    {
-      id: 1,
-      name: 'Maria Johnson',
-      email: 'maria.johnson@email.com',
-      phone: '(555) 123-4567',
-      address: '123 Oak Street, Austin, TX',
-      serviceType: 'Limpeza Residencial',
-      price: 120,
-      frequency: 'Semanal'
-    },
-    {
-      id: 2,
-      name: 'Robert Smith',
-      email: 'robert.smith@email.com',
-      phone: '(555) 987-6543',
-      address: '456 Pine Avenue, Austin, TX',
-      serviceType: 'Limpeza Comercial',
-      price: 200,
-      frequency: 'Quinzenal'
-    }
-  ]
-
-  const mockAppointments = [
-    {
-      id: 1,
-      clientId: 1,
-      employeeId: 1,
-      date: '2024-08-18',
-      time: '09:00',
-      status: 'Agendado',
-      service: 'Limpeza Completa',
-      price: 120
-    },
-    {
-      id: 2,
-      clientId: 2,
-      employeeId: 2,
-      date: '2024-08-19',
-      time: '14:00',
-      status: 'Confirmado',
-      service: 'Limpeza Escritório',
-      price: 200
-    }
-  ]
-
   const getClientName = (clientId: number) => {
-    const client = mockClients.find(c => c.id === clientId)
+    const client = clients.find(c => c.id === clientId)
     return client ? client.name : 'Cliente não encontrado'
   }
 
@@ -152,34 +182,42 @@ export default function DashboardPage() {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold mb-4">Próximos Agendamentos</h3>
           <div className="space-y-3">
-            {mockAppointments.slice(0, 3).map(appointment => (
-              <div key={appointment.id} className="flex justify-between items-center p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium">{getClientName(appointment.clientId)}</p>
-                  <p className="text-sm text-gray-600">{appointment.date} - {appointment.time}</p>
+            {appointments.length > 0 ? (
+              appointments.map(appointment => (
+                <div key={appointment.id} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{getClientName(appointment.clientId)}</p>
+                    <p className="text-sm text-gray-600">{appointment.date} - {appointment.time}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {appointment.status}
+                  </span>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  appointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {appointment.status}
-                </span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-gray-500 text-center py-4">Nenhum agendamento futuro</p>
+            )}
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold mb-4">Clientes Ativos</h3>
           <div className="space-y-3">
-            {mockClients.slice(0, 3).map(client => (
-              <div key={client.id} className="flex justify-between items-center p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium">{client.name}</p>
-                  <p className="text-sm text-gray-600">{client.serviceType}</p>
+            {clients.length > 0 ? (
+              clients.map(client => (
+                <div key={client.id} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{client.name}</p>
+                    <p className="text-sm text-gray-600">{client.serviceType}</p>
+                  </div>
+                  <p className="font-semibold text-green-600">${client.price}</p>
                 </div>
-                <p className="font-semibold text-green-600">${client.price}</p>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-gray-500 text-center py-4">Nenhum cliente cadastrado</p>
+            )}
           </div>
         </div>
       </div>
