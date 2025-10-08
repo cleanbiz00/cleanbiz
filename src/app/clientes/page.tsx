@@ -5,7 +5,7 @@ import { Plus, Edit3, Trash2, Phone, Mail, MapPin } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function ClientesPage() {
-  const [clients, setClients] = useState([])
+  const [clients, setClients] = useState<any[]>([])
   const [userId, setUserId] = useState<string | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
