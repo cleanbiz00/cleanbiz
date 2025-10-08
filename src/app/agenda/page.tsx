@@ -6,9 +6,9 @@ import { supabase } from '../../utils/supabaseClient'
 import CalendarView from '../../components/Schedule/CalendarView'
 
 export default function AgendaPage() {
-  const [appointments, setAppointments] = useState([])
-  const [clients, setClients] = useState([])
-  const [employees, setEmployees] = useState([])
+  const [appointments, setAppointments] = useState<any[]>([])
+  const [clients, setClients] = useState<any[]>([])
+  const [employees, setEmployees] = useState<any[]>([])
   const [userId, setUserId] = useState<string | null>(null)
   const [googleConnected, setGoogleConnected] = useState(false)
   const [emailConfigured, setEmailConfigured] = useState(false)
