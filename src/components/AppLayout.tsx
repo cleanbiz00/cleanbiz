@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../utils/supabaseClient'
 import { Menu, Home, Users, Calendar, DollarSign, LogOut } from 'lucide-react'
 
-// Layout principal da aplicação - v2.0
 export default function AppLayout({
   children,
 }: {
@@ -14,34 +13,34 @@ export default function AppLayout({
   const router = useRouter()
   const pathname = usePathname()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [checkingAuth, setCheckingAuth] = useState(true)
-  const isLoginPage = pathname === '/login'
+  const [isReady, setIsReady] = useState(false)
 
-  // Verificar autenticação
+  // Verificar autenticação apenas uma vez ao montar
   useEffect(() => {
-    // Se estiver na página de login, não verificar auth
-    if (isLoginPage) {
-      setCheckingAuth(false)
-      return
-    }
+    const checkAuth = async () => {
+      // Se for página de login, apenas renderizar
+      if (pathname === '/login') {
+        setIsReady(true)
+        return
+      }
 
-    const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession()
         if (!data.session) {
           router.replace('/login')
-          return
+        } else {
+          setIsReady(true)
         }
-        setCheckingAuth(false)
       } catch (error) {
         console.error('Erro ao verificar sessão:', error)
         router.replace('/login')
       }
     }
-    checkSession()
-  }, [router, isLoginPage])
+    
+    checkAuth()
+  }, [pathname, router])
 
-  // Fechar sidebar em mobile quando navegar
+  // Fechar sidebar ao navegar
   useEffect(() => {
     setIsSidebarOpen(false)
   }, [pathname])
@@ -49,16 +48,12 @@ export default function AppLayout({
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut()
-      // Limpar qualquer dado em cache
-      if (typeof window !== 'undefined') {
-        localStorage.clear()
-        sessionStorage.clear()
-      }
-      router.push('/login')
+      localStorage.clear()
+      sessionStorage.clear()
+      window.location.href = '/login'
     } catch (error) {
       console.error('Erro ao fazer logout:', error)
-      // Mesmo com erro, redirecionar para login
-      router.push('/login')
+      window.location.href = '/login'
     }
   }
 
@@ -70,13 +65,13 @@ export default function AppLayout({
     { path: '/financeiro', label: 'Financeiro', icon: DollarSign },
   ]
 
-  // Se for página de login, renderizar apenas os children sem layout
-  if (isLoginPage) {
+  // Se for página de login, renderizar sem layout
+  if (pathname === '/login') {
     return <>{children}</>
   }
 
-  // Se estiver verificando autenticação, mostrar loading
-  if (checkingAuth) {
+  // Se ainda não verificou a autenticação, mostrar loading
+  if (!isReady) {
     return (
       <div className="flex h-screen items-center justify-center bg-white text-gray-700">
         <div className="text-center">
@@ -87,7 +82,7 @@ export default function AppLayout({
     )
   }
 
-  // Renderizar layout completo com sidebar
+  // Renderizar layout completo
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Desktop Sidebar */}
