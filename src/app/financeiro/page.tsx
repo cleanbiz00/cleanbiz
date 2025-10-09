@@ -5,8 +5,11 @@ import { supabase } from '../../utils/supabaseClient'
 import { Plus, Edit3, Trash2, DollarSign } from 'lucide-react'
 
 const CATEGORIES = [
-  'Equipamentos', 'Produtos de Limpeza', 'Transporte', 'Salários',
-  'Marketing', 'Manutenção', 'Seguros', 'Outros'
+  'Despesas com Pessoal',
+  'Materiais e Suprimentos',
+  'Transporte/Veículos',
+  'Despesas Administrativas',
+  'Seguros e Licenças'
 ]
 
 // Componente de Gráfico de Pizza
