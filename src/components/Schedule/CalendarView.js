@@ -13,7 +13,8 @@ const CalendarView = ({
   openModal, 
   deleteItem,
   getClientName,
-  getEmployeeName 
+  getEmployeeName,
+  clients = []
 }) => {
   const [view, setView] = useState('month');
   const [date, setDate] = useState(new Date());
@@ -50,6 +51,10 @@ const CalendarView = ({
       const startDate = new Date(`${appointment.date}T${appointment.time}:00`);
       const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // 4 hours duration
       
+      // Buscar endereço do cliente
+      const client = clients.find(c => c.id === appointment.clientId);
+      const address = client?.address || '';
+      
       return {
         id: appointment.id,
         title: `${appointment.service} - ${getClientName(appointment.clientId)}`,
@@ -60,10 +65,11 @@ const CalendarView = ({
         client: getClientName(appointment.clientId),
         employee: getEmployeeName(appointment.employeeId),
         employeeId: appointment.employeeId,
+        address: address,
         price: appointment.price
       };
     });
-  }, [appointments, getClientName, getEmployeeName]);
+  }, [appointments, getClientName, getEmployeeName, clients]);
 
   // Event style getter - define cor de fundo por funcionário
   const eventStyleGetter = (event) => {
@@ -88,7 +94,9 @@ const CalendarView = ({
     return (
       <div className="cursor-pointer">
         <div className="font-medium truncate">{event.title}</div>
-        <div className="text-xs opacity-90">{event.employee} • ${event.price}</div>
+        <div className="text-xs opacity-90">{event.employee}</div>
+        {event.address && <div className="text-xs opacity-80 truncate">📍 {event.address}</div>}
+        <div className="text-xs opacity-90 font-semibold">${event.price}</div>
       </div>
     );
   };

@@ -16,6 +16,8 @@ export default function AgendaPage() {
   const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState('calendar')
   const [showModal, setShowModal] = useState(false)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
 
@@ -250,8 +252,12 @@ export default function AgendaPage() {
   }
 
   const openModal = (item: any = null) => {
-    if (item) {
-      // Se está editando, garantir que os dados estão corretos e detectar AM/PM
+    if (item && item.id) {
+      // Se tem ID, é um agendamento existente - abrir modal de detalhes
+      setSelectedAppointment(item)
+      setShowDetailsModal(true)
+    } else if (item) {
+      // Se tem item mas sem ID, preencher dados para edição
       const hour24 = item.time ? parseInt(item.time.split(':')[0]) : 9
       const timePeriod = hour24 >= 12 ? 'PM' : 'AM'
       
@@ -267,12 +273,26 @@ export default function AgendaPage() {
         clientEmail: item.clientEmail || ''
       }
       setFormData(formattedItem)
+      setEditingItem(item)
+      setShowModal(true)
     } else {
+      // Novo agendamento
       setFormData({timePeriod: 'AM'})
+      setEditingItem(null)
+      setShowModal(true)
     }
-    
-    setEditingItem(item)
-    setShowModal(true)
+  }
+
+  const openEditFromDetails = () => {
+    if (selectedAppointment) {
+      setShowDetailsModal(false)
+      openModal(selectedAppointment)
+    }
+  }
+
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false)
+    setSelectedAppointment(null)
   }
 
   const closeModal = () => {
@@ -612,6 +632,7 @@ export default function AgendaPage() {
           deleteItem={deleteItem}
           getClientName={getClientName}
           getEmployeeName={getEmployeeName}
+          clients={clients}
         />
       )}
 
@@ -713,6 +734,120 @@ export default function AgendaPage() {
             ))}
           </div>
         </>
+      )}
+
+      {/* Details Modal - Ao clicar em um agendamento */}
+      {showDetailsModal && selectedAppointment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-2xl font-bold">Detalhes do Agendamento</h3>
+              <button onClick={closeDetailsModal} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Informações do Agendamento */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-blue-600 mb-3">📅 Agendamento</h4>
+                
+                <div>
+                  <p className="text-sm text-gray-600">Serviço</p>
+                  <p className="font-medium text-lg">{selectedAppointment.service}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-600">Data e Hora</p>
+                  <p className="font-medium">{selectedAppointment.date} às {to12Hour(selectedAppointment.time)}</p>
+                  <p className="text-xs text-gray-500">Duração: 4 horas</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-600">Status</p>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                    selectedAppointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 
+                    selectedAppointment.status === 'Agendado' ? 'bg-yellow-100 text-yellow-800' :
+                    selectedAppointment.status === 'Concluído' ? 'bg-blue-100 text-blue-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {selectedAppointment.status}
+                  </span>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-600">Valor</p>
+                  <p className="font-bold text-2xl text-green-600">${selectedAppointment.price}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm text-gray-600">Funcionário Responsável</p>
+                  <p className="font-medium">{getEmployeeName(selectedAppointment.employeeId)}</p>
+                </div>
+              </div>
+              
+              {/* Informações do Cliente */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-blue-600 mb-3">👤 Cliente</h4>
+                
+                {(() => {
+                  const client = clients.find(c => c.id === selectedAppointment.clientId)
+                  if (!client) return <p className="text-gray-500">Cliente não encontrado</p>
+                  
+                  return (
+                    <>
+                      <div>
+                        <p className="text-sm text-gray-600">Nome</p>
+                        <p className="font-medium text-lg">{client.name}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600">Endereço</p>
+                        <p className="font-medium">📍 {client.address}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600">Telefone</p>
+                        <p className="font-medium">📞 {client.phone}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600">Email</p>
+                        <p className="font-medium">📧 {client.email}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-600">Tipo de Serviço</p>
+                        <p className="font-medium">{client.serviceType}</p>
+                      </div>
+                    </>
+                  )
+                })()}
+              </div>
+            </div>
+            
+            {/* Actions */}
+            <div className="flex gap-3 mt-6 pt-4 border-t">
+              <button
+                onClick={openEditFromDetails}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+              >
+                <Edit3 size={18} />
+                Editar Agendamento
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Tem certeza que deseja excluir este agendamento?')) {
+                    deleteItem(selectedAppointment.id)
+                    closeDetailsModal()
+                  }
+                }}
+                className="flex-1 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 flex items-center justify-center gap-2"
+              >
+                <Trash2 size={18} />
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Modal */}
