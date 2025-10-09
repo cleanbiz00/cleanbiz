@@ -382,63 +382,6 @@ export default function FinanceiroPage() {
         </div>
       </div>
 
-      {/* Expenses List */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold">Despesas Registradas</h3>
-        </div>
-        
-        {expenses.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <DollarSign size={48} className="mx-auto mb-4 text-gray-300" />
-            <p>Nenhuma despesa registrada ainda.</p>
-            <p className="text-sm">Clique em "Nova Despesa" para começar.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {expenses.map(expense => (
-              <div key={expense.id} className="p-6 hover:bg-gray-50">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                        {expense.category}
-                      </span>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        expense.type === 'Fixa' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {expense.type}
-                      </span>
-                    </div>
-                    <h4 className="text-lg font-medium mt-2">{expense.description}</h4>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {new Date(expense.date).toLocaleDateString('pt-BR')} • {expense.frequency}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-red-600">${parseFloat(expense.amount).toFixed(2)}</p>
-                    <div className="flex space-x-2 mt-2">
-                      <button
-                        onClick={() => openModal(expense)}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button
-                        onClick={() => deleteItem(expense.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Financial Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Despesas por Categoria - GRÁFICO DE PIZZA */}
@@ -513,6 +456,63 @@ export default function FinanceiroPage() {
             label={chartMetric === 'lucro' ? 'Lucro' : 'Despesas'}
           />
         </div>
+      </div>
+
+      {/* Expenses List */}
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h3 className="text-lg font-semibold">Despesas Registradas</h3>
+        </div>
+        
+        {expenses.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <DollarSign size={48} className="mx-auto mb-4 text-gray-300" />
+            <p>Nenhuma despesa registrada ainda.</p>
+            <p className="text-sm">Clique em "Nova Despesa" para começar.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {expenses.map(expense => (
+              <div key={expense.id} className="p-6 hover:bg-gray-50">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        {expense.category}
+                      </span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        expense.type === 'Fixa' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {expense.type}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-medium mt-2">{expense.description}</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {new Date(expense.date).toLocaleDateString('pt-BR')} • {expense.frequency}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-bold text-red-600">${parseFloat(expense.amount).toFixed(2)}</p>
+                    <div className="flex space-x-2 mt-2">
+                      <button
+                        onClick={() => openModal(expense)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <Edit3 size={16} />
+                      </button>
+                      <button
+                        onClick={() => deleteItem(expense.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
