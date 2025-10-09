@@ -18,6 +18,32 @@ const CalendarView = ({
   const [view, setView] = useState('month');
   const [date, setDate] = useState(new Date());
 
+  // Cores fixas para funcionários (cada funcionário sempre terá a mesma cor)
+  const employeeColors = [
+    '#3b82f6', // blue
+    '#ef4444', // red
+    '#10b981', // green
+    '#f59e0b', // amber
+    '#8b5cf6', // purple
+    '#ec4899', // pink
+    '#14b8a6', // teal
+    '#f97316', // orange
+    '#06b6d4', // cyan
+    '#6366f1', // indigo
+  ];
+
+  // Função para obter cor consistente por funcionário
+  const getEmployeeColor = (employeeId) => {
+    if (!employeeId) return employeeColors[0];
+    
+    // Gerar hash do employeeId para sempre ter a mesma cor
+    const hash = employeeId.toString().split('').reduce((acc, char) => {
+      return acc + char.charCodeAt(0);
+    }, 0);
+    
+    return employeeColors[hash % employeeColors.length];
+  };
+
   // Convert appointments to calendar events
   const events = useMemo(() => {
     return appointments.map(appointment => {
@@ -33,27 +59,26 @@ const CalendarView = ({
         status: appointment.status,
         client: getClientName(appointment.clientId),
         employee: getEmployeeName(appointment.employeeId),
+        employeeId: appointment.employeeId,
         price: appointment.price
       };
     });
   }, [appointments, getClientName, getEmployeeName]);
 
-  // Custom event component
+  // Custom event component - cor baseada no funcionário
   const EventComponent = ({ event }) => {
-    const getStatusColor = (status) => {
-      switch (status) {
-        case 'Confirmado': return 'bg-green-500';
-        case 'Agendado': return 'bg-yellow-500';
-        case 'Cancelado': return 'bg-red-500';
-        case 'Concluído': return 'bg-blue-500';
-        default: return 'bg-gray-500';
-      }
-    };
+    const employeeColor = getEmployeeColor(event.employeeId);
+    
+    // Escurecer a cor se for cancelado
+    const opacity = event.status === 'Cancelado' ? 'opacity-50' : 'opacity-100';
 
     return (
-      <div className={`${getStatusColor(event.status)} text-white p-1 rounded text-xs cursor-pointer hover:opacity-80`}>
+      <div 
+        className={`text-white p-1 rounded text-xs cursor-pointer hover:brightness-110 ${opacity}`}
+        style={{ backgroundColor: employeeColor }}
+      >
         <div className="font-medium truncate">{event.title}</div>
-        <div className="text-xs opacity-90">${event.price}</div>
+        <div className="text-xs opacity-90">{event.employee} • ${event.price}</div>
       </div>
     );
   };

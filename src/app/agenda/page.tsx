@@ -579,6 +579,31 @@ export default function AgendaPage() {
         )}
       </div>
       
+      {/* Employee Color Legend */}
+      {viewMode === 'calendar' && employees.length > 0 && (
+        <div className="mb-4 p-4 bg-white rounded-lg shadow-lg">
+          <h3 className="text-sm font-semibold mb-2">Legenda de Funcionários:</h3>
+          <div className="flex flex-wrap gap-3">
+            {employees.map(employee => {
+              // Mesma lógica de hash do CalendarView
+              const hash = employee.id.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+              const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#6366f1']
+              const color = colors[hash % colors.length]
+              
+              return (
+                <div key={employee.id} className="flex items-center gap-2">
+                  <div 
+                    className="w-4 h-4 rounded" 
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="text-sm text-gray-700">{employee.name}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+      
       {/* Calendar View */}
       {viewMode === 'calendar' && (
         <CalendarView
