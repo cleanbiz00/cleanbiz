@@ -65,18 +65,28 @@ const CalendarView = ({
     });
   }, [appointments, getClientName, getEmployeeName]);
 
-  // Custom event component - cor baseada no funcionário
-  const EventComponent = ({ event }) => {
+  // Event style getter - define cor de fundo por funcionário
+  const eventStyleGetter = (event) => {
     const employeeColor = getEmployeeColor(event.employeeId);
+    const opacity = event.status === 'Cancelado' ? 0.5 : 1;
     
-    // Escurecer a cor se for cancelado
-    const opacity = event.status === 'Cancelado' ? 'opacity-50' : 'opacity-100';
+    return {
+      style: {
+        backgroundColor: employeeColor,
+        opacity: opacity,
+        border: 'none',
+        borderRadius: '4px',
+        color: 'white',
+        fontSize: '0.75rem',
+        padding: '2px 4px'
+      }
+    };
+  };
 
+  // Custom event component
+  const EventComponent = ({ event }) => {
     return (
-      <div 
-        className={`text-white p-1 rounded text-xs cursor-pointer hover:brightness-110 ${opacity}`}
-        style={{ backgroundColor: employeeColor }}
-      >
+      <div className="cursor-pointer">
         <div className="font-medium truncate">{event.title}</div>
         <div className="text-xs opacity-90">{event.employee} • ${event.price}</div>
       </div>
@@ -189,23 +199,8 @@ const CalendarView = ({
     );
   };
 
-  // Custom styles for the calendar
+  // Custom styles for today
   const customStyles = {
-    event: (event) => ({
-      backgroundColor: event.status === 'Confirmado' ? '#10b981' : 
-                     event.status === 'Agendado' ? '#f59e0b' :
-                     event.status === 'Cancelado' ? '#ef4444' :
-                     event.status === 'Concluído' ? '#3b82f6' : '#6b7280',
-      borderRadius: '4px',
-      border: 'none',
-      color: 'white',
-      padding: '2px 6px',
-      fontSize: '12px',
-      fontWeight: '500'
-    }),
-    day: {
-      borderLeft: '1px solid #e5e7eb'
-    },
     today: {
       backgroundColor: '#fef3c7',
       color: '#92400e'
@@ -247,33 +242,11 @@ const CalendarView = ({
           noEventsInRange: 'Nenhum agendamento neste período',
           showMore: total => `+${total} mais`
         }}
-        eventPropGetter={(event) => ({
-          style: customStyles.event(event)
-        })}
+        eventPropGetter={eventStyleGetter}
         dayPropGetter={(date) => ({
           style: date.toDateString() === new Date().toDateString() ? customStyles.today : {}
         })}
       />
-      
-      {/* Legend */}
-      <div className="mt-6 flex flex-wrap gap-4 text-sm">
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-green-500 rounded"></div>
-          <span>Confirmado</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-          <span>Agendado</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-red-500 rounded"></div>
-          <span>Cancelado</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-3 h-3 bg-blue-500 rounded"></div>
-          <span>Concluído</span>
-        </div>
-      </div>
     </div>
   );
 };
