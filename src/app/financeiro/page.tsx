@@ -109,7 +109,7 @@ const LineChart = ({ data, label }: { data: { label: string, value: number }[], 
 export default function FinanceiroPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [expenses, setExpenses] = useState<any[]>([])
-  const [appointments, setAppointments] = useState<any[]>([])
+  const [allAppointments, setAllAppointments] = useState<any[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [chartPeriod, setChartPeriod] = useState('mes_atual') // mes_atual, ultimos_3_meses, ano
@@ -155,10 +155,11 @@ export default function FinanceiroPage() {
         .select('*')
         .eq('user_id', userId)
         .order('date', { ascending: false })
-      if (!error && data) setAppointments(data)
+      if (!error && data) setAllAppointments(data)
     }
     loadAppointments()
   }, [userId])
+
 
   const openModal = (item: any = null) => {
     setEditingItem(item)
@@ -236,12 +237,12 @@ export default function FinanceiroPage() {
   }
 
   // Calcular receita (agendamentos excluindo cancelados)
-  const totalRevenue = appointments
+  const totalRevenue = allAppointments
     .filter(apt => apt.status !== 'Cancelado')
     .reduce((sum, apt) => sum + parseFloat(apt.price || 0), 0)
 
   // Calcular receita deste mês
-  const monthlyRevenue = appointments
+  const monthlyRevenue = allAppointments
     .filter(apt => {
       if (apt.status === 'Cancelado') return false
       const aptDate = new Date(apt.date)
@@ -284,7 +285,7 @@ export default function FinanceiroPage() {
             <div>
               <p className="text-gray-600 text-sm">Receita (Mês)</p>
               <p className="text-2xl font-bold text-green-600">${monthlyRevenue.toFixed(2)}</p>
-              <p className="text-xs text-gray-500 mt-1">{appointments.filter(a => {
+              <p className="text-xs text-gray-500 mt-1">{allAppointments.filter(a => {
                 const d = new Date(a.date)
                 const now = new Date()
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== 'Cancelado'
