@@ -282,9 +282,19 @@ export default function AgendaPage() {
       return
     }
 
-    // Validação básica
-    if (!formData.clientId || !formData.employeeId || !formData.date || !formData.time || !formData.service) {
-      alert('Por favor, preencha todos os campos obrigatórios.')
+    // Validação detalhada
+    const missing = []
+    if (!formData.clientId || formData.clientId === 'undefined') missing.push('Cliente')
+    if (!formData.employeeId || formData.employeeId === 'undefined') missing.push('Funcionário')
+    if (!formData.date) missing.push('Data')
+    if (!formData.time) missing.push('Hora')
+    if (!formData.service) missing.push('Serviço')
+    if (!formData.status) missing.push('Status')
+    
+    if (missing.length > 0) {
+      alert(`Por favor, preencha os campos obrigatórios: ${missing.join(', ')}`)
+      console.error('Campos faltando:', missing)
+      console.error('FormData atual:', formData)
       return
     }
 
@@ -419,22 +429,24 @@ export default function AgendaPage() {
       }
 
       // Save appointment to database
+      const insertData = {
+        user_id: userId,
+        client_id: formData.clientId,
+        employee_id: formData.employeeId,
+        date: formData.date,
+        time: formData.time,
+        status: formData.status || 'Agendado',
+        service: formData.service,
+        price: Number(formData.price) || 0,
+        client_email: formData.clientEmail || null,
+        google_event_id: googleEventId || null
+      }
+      
+      console.log('📝 Salvando agendamento:', insertData)
+      
       const { data: newApt, error } = await supabase
         .from('appointments')
-        .insert([
-          {
-            user_id: userId,
-            client_id: formData.clientId,
-            employee_id: formData.employeeId,
-            date: formData.date,
-            time: formData.time,
-            status: formData.status || 'Agendado',
-            service: formData.service,
-            price: formData.price,
-            client_email: formData.clientEmail,
-            google_event_id: googleEventId
-          }
-        ])
+        .insert([insertData])
         .select()
 
       if (error) {
