@@ -25,34 +25,43 @@ const PieChart = ({ data }: { data: { label: string, value: number, color: strin
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
       <svg width="200" height="200" viewBox="0 0 200 200">
-        {data.map((item, index) => {
-          const percentage = (item.value / total) * 100
-          const angle = (percentage / 100) * 360
-          const startAngle = currentAngle
-          const endAngle = currentAngle + angle
-          
-          const x1 = centerX + radius * Math.cos((startAngle - 90) * Math.PI / 180)
-          const y1 = centerY + radius * Math.sin((startAngle - 90) * Math.PI / 180)
-          const x2 = centerX + radius * Math.cos((endAngle - 90) * Math.PI / 180)
-          const y2 = centerY + radius * Math.sin((endAngle - 90) * Math.PI / 180)
-          
-          const largeArc = angle > 180 ? 1 : 0
-          const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
-          
-          currentAngle += angle
-          
-          return <path key={index} d={pathData} fill={item.color} />
-        })}
+        {data.length === 1 ? (
+          // Se há apenas uma categoria, desenhar círculo completo
+          <circle cx={centerX} cy={centerY} r={radius} fill={data[0].color} />
+        ) : (
+          // Se há múltiplas categorias, desenhar fatias
+          data.map((item, index) => {
+            const percentage = (item.value / total) * 100
+            const angle = (percentage / 100) * 360
+            const startAngle = currentAngle
+            const endAngle = currentAngle + angle
+            
+            const x1 = centerX + radius * Math.cos((startAngle - 90) * Math.PI / 180)
+            const y1 = centerY + radius * Math.sin((startAngle - 90) * Math.PI / 180)
+            const x2 = centerX + radius * Math.cos((endAngle - 90) * Math.PI / 180)
+            const y2 = centerY + radius * Math.sin((endAngle - 90) * Math.PI / 180)
+            
+            const largeArc = angle > 180 ? 1 : 0
+            const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+            
+            currentAngle += angle
+            
+            return <path key={index} d={pathData} fill={item.color} />
+          })
+        )}
       </svg>
       
       <div className="space-y-2">
-        {data.map((item, index) => (
-          <div key={index} className="flex items-center gap-2 text-sm">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
-            <span className="text-gray-700">{item.label}</span>
-            <span className="font-semibold ml-auto">${item.value.toFixed(2)}</span>
-          </div>
-        ))}
+        {data.map((item, index) => {
+          const percentage = (item.value / total) * 100
+          return (
+            <div key={index} className="flex items-center gap-2 text-sm">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
+              <span className="text-gray-700">{item.label}</span>
+              <span className="font-semibold ml-auto">${item.value.toFixed(2)} ({percentage.toFixed(1)}%)</span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -115,7 +124,6 @@ export default function FinanceiroPage() {
   const [allAppointments, setAllAppointments] = useState<any[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
-  const [chartPeriod, setChartPeriod] = useState('mes_atual') // mes_atual, ultimos_3_meses, ano
   const [chartMetric, setChartMetric] = useState('lucro') // lucro, despesas
   const [formData, setFormData] = useState<any>({
     category: CATEGORIES[0],
@@ -453,135 +461,54 @@ export default function FinanceiroPage() {
           />
         </div>
 
-        {/* Evolução Temporal - GRÁFICO DE LINHA */}
+        {/* Evolução Anual - GRÁFICO DE LINHA */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <h3 className="text-lg font-semibold">Evolução no Tempo</h3>
-            <div className="flex gap-2 flex-wrap">
-              <select 
-                value={chartPeriod}
-                onChange={(e) => setChartPeriod(e.target.value)}
-                className="text-sm border rounded px-3 py-1"
-              >
-                <option value="mes_atual">Mês Atual</option>
-                <option value="ultimos_3_meses">Últimos 3 Meses</option>
-                <option value="ano">Ano Atual</option>
-              </select>
-              
-              <select
-                value={chartMetric}
-                onChange={(e) => setChartMetric(e.target.value)}
-                className="text-sm border rounded px-3 py-1"
-              >
-                <option value="lucro">Lucro</option>
-                <option value="despesas">Despesas</option>
-              </select>
-            </div>
+            <h3 className="text-lg font-semibold">Evolução Anual</h3>
+            <select
+              value={chartMetric}
+              onChange={(e) => setChartMetric(e.target.value)}
+              className="text-sm border rounded px-3 py-1"
+            >
+              <option value="lucro">Lucro Total</option>
+              <option value="despesas">Despesas</option>
+            </select>
           </div>
           
           <LineChart 
             data={(() => {
               const now = new Date()
-              let months: string[] = []
+              const months: string[] = []
               
-              if (chartPeriod === 'mes_atual') {
-                // Mês atual - por dia
-                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-                const days = []
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                  const dayDate = new Date(now.getFullYear(), now.getMonth(), day)
-                  const nextDay = new Date(now.getFullYear(), now.getMonth(), day + 1)
-                  
-                  const dayRevenue = allAppointments
-                    .filter(a => {
-                      const d = new Date(a.date)
-                      return a.status !== 'Cancelado' && d >= dayDate && d < nextDay
-                    })
-                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
-                  
-                  const dayExpenses = expenses
-                    .filter(e => {
-                      const d = new Date(e.date)
-                      return d >= dayDate && d < nextDay
-                    })
-                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
-                  
-                  days.push({
-                    label: String(day),
-                    value: chartMetric === 'lucro' ? (dayRevenue - dayExpenses) : dayExpenses
-                  })
-                }
-                
-                return days
-              } else if (chartPeriod === 'ultimos_3_meses') {
-                // Últimos 3 meses - por dia (últimos 90 dias)
-                const days = []
-                
-                for (let i = 89; i >= 0; i--) {
-                  const dayDate = new Date(now)
-                  dayDate.setDate(now.getDate() - i)
-                  dayDate.setHours(0, 0, 0, 0)
-                  
-                  const nextDay = new Date(dayDate)
-                  nextDay.setDate(dayDate.getDate() + 1)
-                  
-                  const dayRevenue = allAppointments
-                    .filter(a => {
-                      const d = new Date(a.date)
-                      return a.status !== 'Cancelado' && d >= dayDate && d < nextDay
-                    })
-                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
-                  
-                  const dayExpenses = expenses
-                    .filter(e => {
-                      const d = new Date(e.date)
-                      return d >= dayDate && d < nextDay
-                    })
-                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
-                  
-                  // Mostrar apenas alguns labels para não ficar muito poluído
-                  const label = (i % 7 === 0) ? `${dayDate.getDate()}/${dayDate.getMonth() + 1}` : ''
-                  
-                  days.push({
-                    label,
-                    value: chartMetric === 'lucro' ? (dayRevenue - dayExpenses) : dayExpenses
-                  })
-                }
-                
-                return days
-              } else {
-                // Ano - 12 meses
-                months = []
-                for (let i = 11; i >= 0; i--) {
-                  const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-                  months.push(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''))
-                }
-                
-                return months.map((month, index) => {
-                  const monthDate = new Date(now.getFullYear(), now.getMonth() - (11 - index), 1)
-                  const nextMonth = new Date(now.getFullYear(), now.getMonth() - (11 - index) + 1, 1)
-                  
-                  const monthRevenue = allAppointments
-                    .filter(a => {
-                      const d = new Date(a.date)
-                      return a.status !== 'Cancelado' && d >= monthDate && d < nextMonth
-                    })
-                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
-                  
-                  const monthExpenses = expenses
-                    .filter(e => {
-                      const d = new Date(e.date)
-                      return d >= monthDate && d < nextMonth
-                    })
-                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
-                  
-                  return {
-                    label: month,
-                    value: chartMetric === 'lucro' ? (monthRevenue - monthExpenses) : monthExpenses
-                  }
-                })
+              // Últimos 12 meses
+              for (let i = 11; i >= 0; i--) {
+                const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+                months.push(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''))
               }
+              
+              return months.map((month, index) => {
+                const monthDate = new Date(now.getFullYear(), now.getMonth() - (11 - index), 1)
+                const nextMonth = new Date(now.getFullYear(), now.getMonth() - (11 - index) + 1, 1)
+                
+                const monthRevenue = allAppointments
+                  .filter(a => {
+                    const d = new Date(a.date)
+                    return a.status !== 'Cancelado' && d >= monthDate && d < nextMonth
+                  })
+                  .reduce((sum, a) => sum + Number(a.price || 0), 0)
+                
+                const monthExpenses = expenses
+                  .filter(e => {
+                    const d = new Date(e.date)
+                    return d >= monthDate && d < nextMonth
+                  })
+                  .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+                
+                return {
+                  label: month,
+                  value: chartMetric === 'lucro' ? (monthRevenue - monthExpenses) : monthExpenses
+                }
+              })
             })()}
             label={chartMetric === 'lucro' ? 'Lucro' : 'Despesas'}
           />
