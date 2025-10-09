@@ -606,7 +606,7 @@ export default function AgendaPage() {
           <div className="flex flex-wrap gap-3">
             {employees.map(employee => {
               // Mesma lógica de hash do CalendarView
-              const hash = employee.id.toString().split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+              const hash = employee.id.toString().split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
               const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#6366f1']
               const color = colors[hash % colors.length]
               
