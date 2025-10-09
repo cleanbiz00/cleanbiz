@@ -102,7 +102,6 @@ export default function AgendaPage() {
             email: c.email
           }))
           setClients(formattedClients)
-          console.log('✅ Clientes carregados:', formattedClients.length)
         }
       } catch (error) {
         console.error('Erro ao carregar clientes:', error)
@@ -135,7 +134,6 @@ export default function AgendaPage() {
             name: e.name
           }))
           setEmployees(formattedEmployees)
-          console.log('✅ Funcionários carregados:', formattedEmployees.length)
         }
       } catch (error) {
         console.error('Erro ao carregar funcionários:', error)
@@ -177,7 +175,6 @@ export default function AgendaPage() {
             googleEventId: apt.google_event_id
           }))
           setAppointments(formattedAppointments)
-          console.log('✅ Agendamentos carregados:', formattedAppointments.length)
         }
       } catch (error) {
         console.error('Erro ao carregar agendamentos:', error)
@@ -252,8 +249,24 @@ export default function AgendaPage() {
   }
 
   const openModal = (item: any = null) => {
+    if (item) {
+      // Se está editando, garantir que os dados estão corretos
+      const formattedItem = {
+        clientId: item.clientId,
+        employeeId: item.employeeId,
+        date: item.date,
+        time: item.time,
+        status: item.status,
+        service: item.service,
+        price: item.price,
+        clientEmail: item.clientEmail || ''
+      }
+      setFormData(formattedItem)
+    } else {
+      setFormData({})
+    }
+    
     setEditingItem(item)
-    setFormData(item || {})
     setShowModal(true)
   }
 
@@ -277,16 +290,25 @@ export default function AgendaPage() {
 
     if (editingItem) {
       // Update existing appointment in database
-      const updateData = {
-        client_id: Number(formData.clientId),
-        employee_id: Number(formData.employeeId),
+      // Só inclui campos que têm valores válidos
+      const updateData: any = {
         date: formData.date,
         time: formData.time,
         status: formData.status || 'Agendado',
         service: formData.service,
         price: Number(formData.price) || 0,
-        client_email: formData.clientEmail || null,
         updated_at: new Date().toISOString()
+      }
+      
+      // Adiciona IDs apenas se forem válidos (não undefined, não null, não string vazia)
+      if (formData.clientId && formData.clientId !== 'undefined') {
+        updateData.client_id = formData.clientId
+      }
+      if (formData.employeeId && formData.employeeId !== 'undefined') {
+        updateData.employee_id = formData.employeeId
+      }
+      if (formData.clientEmail) {
+        updateData.client_email = formData.clientEmail
       }
 
       const { error } = await supabase
@@ -417,7 +439,7 @@ export default function AgendaPage() {
 
       if (error) {
         console.error('Erro ao salvar agendamento:', error)
-        alert('Erro ao salvar agendamento no banco de dados')
+        alert(`Erro ao salvar agendamento: ${error.message}`)
         return
       }
 
@@ -669,7 +691,7 @@ export default function AgendaPage() {
                 value={formData.clientId || ''}
                 onChange={(e) => {
                   const value = e.target.value
-                  setFormData({...formData, clientId: value ? Number(value) : null})
+                  setFormData({...formData, clientId: value || null})
                 }}
                 className="w-full p-3 border rounded-lg"
                 disabled={clients.length === 0}
@@ -689,7 +711,7 @@ export default function AgendaPage() {
                 value={formData.employeeId || ''}
                 onChange={(e) => {
                   const value = e.target.value
-                  setFormData({...formData, employeeId: value ? Number(value) : null})
+                  setFormData({...formData, employeeId: value || null})
                 }}
                 className="w-full p-3 border rounded-lg"
                 disabled={employees.length === 0}
