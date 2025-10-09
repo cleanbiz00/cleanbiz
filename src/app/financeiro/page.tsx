@@ -9,12 +9,111 @@ const CATEGORIES = [
   'Marketing', 'Manutenção', 'Seguros', 'Outros'
 ]
 
+// Componente de Gráfico de Pizza
+const PieChart = ({ data }: { data: { label: string, value: number, color: string }[] }) => {
+  const total = data.reduce((sum, item) => sum + item.value, 0)
+  if (total === 0) return <p className="text-gray-500 text-center py-8">Sem dados para exibir</p>
+  
+  let currentAngle = 0
+  const radius = 80
+  const centerX = 100
+  const centerY = 100
+
+  return (
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        {data.map((item, index) => {
+          const percentage = (item.value / total) * 100
+          const angle = (percentage / 100) * 360
+          const startAngle = currentAngle
+          const endAngle = currentAngle + angle
+          
+          const x1 = centerX + radius * Math.cos((startAngle - 90) * Math.PI / 180)
+          const y1 = centerY + radius * Math.sin((startAngle - 90) * Math.PI / 180)
+          const x2 = centerX + radius * Math.cos((endAngle - 90) * Math.PI / 180)
+          const y2 = centerY + radius * Math.sin((endAngle - 90) * Math.PI / 180)
+          
+          const largeArc = angle > 180 ? 1 : 0
+          const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+          
+          currentAngle += angle
+          
+          return <path key={index} d={pathData} fill={item.color} />
+        })}
+      </svg>
+      
+      <div className="space-y-2">
+        {data.map((item, index) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
+            <span className="text-gray-700">{item.label}</span>
+            <span className="font-semibold ml-auto">${item.value.toFixed(2)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Componente de Gráfico de Linha
+const LineChart = ({ data, label }: { data: { label: string, value: number }[], label: string }) => {
+  const maxValue = Math.max(...data.map(d => d.value), 1)
+  const width = 600
+  const height = 250
+  const padding = 40
+
+  return (
+    <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+      {/* Grid lines */}
+      {[0, 0.25, 0.5, 0.75, 1].map((percent, i) => {
+        const y = padding + (height - padding * 2) * (1 - percent)
+        return (
+          <g key={i}>
+            <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#e5e7eb" strokeWidth="1" />
+            <text x={padding - 10} y={y + 4} fontSize="12" fill="#6b7280" textAnchor="end">
+              ${(maxValue * percent).toFixed(0)}
+            </text>
+          </g>
+        )
+      })}
+      
+      {/* Line */}
+      <polyline
+        fill="none"
+        stroke="#3b82f6"
+        strokeWidth="3"
+        points={data.map((point, index) => {
+          const x = padding + ((width - padding * 2) / (data.length - 1 || 1)) * index
+          const y = padding + (height - padding * 2) * (1 - point.value / maxValue)
+          return `${x},${y}`
+        }).join(' ')}
+      />
+      
+      {/* Points */}
+      {data.map((point, index) => {
+        const x = padding + ((width - padding * 2) / (data.length - 1 || 1)) * index
+        const y = padding + (height - padding * 2) * (1 - point.value / maxValue)
+        return (
+          <g key={index}>
+            <circle cx={x} cy={y} r="5" fill="#3b82f6" />
+            <text x={x} y={height - 10} fontSize="11" fill="#6b7280" textAnchor="middle">
+              {point.label}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
 export default function FinanceiroPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [expenses, setExpenses] = useState<any[]>([])
   const [appointments, setAppointments] = useState<any[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
+  const [chartPeriod, setChartPeriod] = useState('mes_atual') // mes_atual, ultimos_3_meses, ano
+  const [chartMetric, setChartMetric] = useState('lucro') // lucro, despesas
   const [formData, setFormData] = useState<any>({
     category: CATEGORIES[0],
     description: '',
@@ -240,7 +339,7 @@ export default function FinanceiroPage() {
       </div>
 
       {/* Expenses List */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden mt-8">
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">Despesas Registradas</h3>
         </div>
@@ -298,81 +397,148 @@ export default function FinanceiroPage() {
 
       {/* Financial Reports */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Despesas por Categoria */}
+        {/* Despesas por Categoria - GRÁFICO DE PIZZA */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-lg font-semibold mb-4">Despesas por Categoria</h3>
-          <div className="space-y-3">
-            {CATEGORIES.map(category => {
+          <PieChart 
+            data={CATEGORIES.map((category, index) => {
               const categoryTotal = expenses
                 .filter(e => e.category === category)
                 .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0)
               
-              const percentage = totalExpenses > 0 ? (categoryTotal / totalExpenses) * 100 : 0
+              const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#64748b']
               
-              if (categoryTotal === 0) return null
-              
-              return (
-                <div key={category}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-700">{category}</span>
-                    <span className="font-semibold">${categoryTotal.toFixed(2)} ({percentage.toFixed(1)}%)</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-            {totalExpenses === 0 && (
-              <p className="text-gray-500 text-center py-4">Nenhuma despesa cadastrada</p>
-            )}
-          </div>
+              return {
+                label: category,
+                value: categoryTotal,
+                color: colors[index % colors.length]
+              }
+            }).filter(item => item.value > 0)}
+          />
         </div>
 
-        {/* Receita por Status */}
+        {/* Evolução Temporal - GRÁFICO DE LINHA */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">Agendamentos por Status (Mês Atual)</h3>
-          <div className="space-y-3">
-            {['Agendado', 'Confirmado', 'Concluído', 'Cancelado'].map(status => {
-              const statusAppointments = appointments.filter(a => {
-                const d = new Date(a.date)
-                const now = new Date()
-                return a.status === status && 
-                       d.getMonth() === now.getMonth() && 
-                       d.getFullYear() === now.getFullYear()
-              })
-              const statusTotal = statusAppointments.reduce((sum, a) => sum + parseFloat(a.price || 0), 0)
-              const count = statusAppointments.length
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+            <h3 className="text-lg font-semibold">Evolução no Tempo</h3>
+            <div className="flex gap-2 flex-wrap">
+              <select 
+                value={chartPeriod}
+                onChange={(e) => setChartPeriod(e.target.value)}
+                className="text-sm border rounded px-3 py-1"
+              >
+                <option value="mes_atual">Mês Atual</option>
+                <option value="ultimos_3_meses">Últimos 3 Meses</option>
+                <option value="ano">Ano Atual</option>
+              </select>
               
-              if (count === 0) return null
-              
-              const colors = {
-                'Agendado': 'bg-yellow-600',
-                'Confirmado': 'bg-blue-600',
-                'Concluído': 'bg-green-600',
-                'Cancelado': 'bg-red-600'
-              }
-              
-              return (
-                <div key={status} className="flex justify-between items-center p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${colors[status]}`} />
-                    <span className="font-medium">{status}</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold">${statusTotal.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">{count} agend.</p>
-                  </div>
-                </div>
-              )
-            })}
-            {appointments.length === 0 && (
-              <p className="text-gray-500 text-center py-4">Nenhum agendamento cadastrado</p>
-            )}
+              <select
+                value={chartMetric}
+                onChange={(e) => setChartMetric(e.target.value)}
+                className="text-sm border rounded px-3 py-1"
+              >
+                <option value="lucro">Lucro</option>
+                <option value="despesas">Despesas</option>
+              </select>
+            </div>
           </div>
+          
+          <LineChart 
+            data={(() => {
+              const now = new Date()
+              let months: string[] = []
+              
+              if (chartPeriod === 'mes_atual') {
+                // Últimos 30 dias por semana
+                const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
+                return weeks.map((week, index) => {
+                  const weekStart = new Date(now.getFullYear(), now.getMonth(), 1 + (index * 7))
+                  const weekEnd = new Date(now.getFullYear(), now.getMonth(), 1 + ((index + 1) * 7))
+                  
+                  const weekRevenue = allAppointments
+                    .filter(a => {
+                      const d = new Date(a.date)
+                      return a.status !== 'Cancelado' && d >= weekStart && d < weekEnd
+                    })
+                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
+                  
+                  const weekExpenses = expenses
+                    .filter(e => {
+                      const d = new Date(e.date)
+                      return d >= weekStart && d < weekEnd
+                    })
+                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+                  
+                  return {
+                    label: week,
+                    value: chartMetric === 'lucro' ? (weekRevenue - weekExpenses) : weekExpenses
+                  }
+                })
+              } else if (chartPeriod === 'ultimos_3_meses') {
+                months = []
+                for (let i = 2; i >= 0; i--) {
+                  const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+                  months.push(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''))
+                }
+                
+                return months.map((month, index) => {
+                  const monthDate = new Date(now.getFullYear(), now.getMonth() - (2 - index), 1)
+                  const nextMonth = new Date(now.getFullYear(), now.getMonth() - (2 - index) + 1, 1)
+                  
+                  const monthRevenue = allAppointments
+                    .filter(a => {
+                      const d = new Date(a.date)
+                      return a.status !== 'Cancelado' && d >= monthDate && d < nextMonth
+                    })
+                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
+                  
+                  const monthExpenses = expenses
+                    .filter(e => {
+                      const d = new Date(e.date)
+                      return d >= monthDate && d < nextMonth
+                    })
+                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+                  
+                  return {
+                    label: month,
+                    value: chartMetric === 'lucro' ? (monthRevenue - monthExpenses) : monthExpenses
+                  }
+                })
+              } else {
+                // Ano - 12 meses
+                months = []
+                for (let i = 11; i >= 0; i--) {
+                  const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+                  months.push(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''))
+                }
+                
+                return months.map((month, index) => {
+                  const monthDate = new Date(now.getFullYear(), now.getMonth() - (11 - index), 1)
+                  const nextMonth = new Date(now.getFullYear(), now.getMonth() - (11 - index) + 1, 1)
+                  
+                  const monthRevenue = allAppointments
+                    .filter(a => {
+                      const d = new Date(a.date)
+                      return a.status !== 'Cancelado' && d >= monthDate && d < nextMonth
+                    })
+                    .reduce((sum, a) => sum + Number(a.price || 0), 0)
+                  
+                  const monthExpenses = expenses
+                    .filter(e => {
+                      const d = new Date(e.date)
+                      return d >= monthDate && d < nextMonth
+                    })
+                    .reduce((sum, e) => sum + Number(e.amount || 0), 0)
+                  
+                  return {
+                    label: month,
+                    value: chartMetric === 'lucro' ? (monthRevenue - monthExpenses) : monthExpenses
+                  }
+                })
+              }
+            })()}
+            label={chartMetric === 'lucro' ? 'Lucro' : 'Despesas'}
+          />
         </div>
       </div>
 
