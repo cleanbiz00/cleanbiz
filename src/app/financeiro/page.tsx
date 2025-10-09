@@ -193,6 +193,11 @@ export default function FinanceiroPage() {
   const handleSave = async () => {
     if (!userId) return
 
+    if (!formData.description || !formData.amount) {
+      alert('Por favor, preencha descrição e valor')
+      return
+    }
+
     const expenseData = {
       category: formData.category,
       description: formData.description,
@@ -208,18 +213,45 @@ export default function FinanceiroPage() {
         .from('expenses')
         .update(expenseData)
         .eq('id', editingItem.id)
+        .eq('user_id', userId)
       
-      if (!error) {
-        setExpenses(expenses.map(e => e.id === editingItem.id ? { ...editingItem, ...expenseData } : e))
+      if (error) {
+        console.error('Erro ao atualizar despesa:', error)
+        alert('Erro ao atualizar despesa')
+        return
       }
+
+      // Recarregar despesas
+      const { data: reloadedExpenses } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+      
+      if (reloadedExpenses) setExpenses(reloadedExpenses)
+      alert('✅ Despesa atualizada!')
     } else {
       const { data, error } = await supabase
         .from('expenses')
         .insert([expenseData])
         .select()
       
-      if (!error && data) {
-        setExpenses([data[0], ...expenses])
+      if (error) {
+        console.error('Erro ao salvar despesa:', error)
+        alert('Erro ao salvar despesa')
+        return
+      }
+
+      if (data) {
+        // Recarregar despesas
+        const { data: reloadedExpenses } = await supabase
+          .from('expenses')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false })
+        
+        if (reloadedExpenses) setExpenses(reloadedExpenses)
+        alert('✅ Despesa adicionada!')
       }
     }
     closeModal()
@@ -450,61 +482,71 @@ export default function FinanceiroPage() {
               let months: string[] = []
               
               if (chartPeriod === 'mes_atual') {
-                // Últimos 30 dias por semana
-                const weeks = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
-                return weeks.map((week, index) => {
-                  const weekStart = new Date(now.getFullYear(), now.getMonth(), 1 + (index * 7))
-                  const weekEnd = new Date(now.getFullYear(), now.getMonth(), 1 + ((index + 1) * 7))
+                // Mês atual - por dia
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+                const days = []
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                  const dayDate = new Date(now.getFullYear(), now.getMonth(), day)
+                  const nextDay = new Date(now.getFullYear(), now.getMonth(), day + 1)
                   
-                  const weekRevenue = allAppointments
+                  const dayRevenue = allAppointments
                     .filter(a => {
                       const d = new Date(a.date)
-                      return a.status !== 'Cancelado' && d >= weekStart && d < weekEnd
+                      return a.status !== 'Cancelado' && d >= dayDate && d < nextDay
                     })
                     .reduce((sum, a) => sum + Number(a.price || 0), 0)
                   
-                  const weekExpenses = expenses
+                  const dayExpenses = expenses
                     .filter(e => {
                       const d = new Date(e.date)
-                      return d >= weekStart && d < weekEnd
+                      return d >= dayDate && d < nextDay
                     })
                     .reduce((sum, e) => sum + Number(e.amount || 0), 0)
                   
-                  return {
-                    label: week,
-                    value: chartMetric === 'lucro' ? (weekRevenue - weekExpenses) : weekExpenses
-                  }
-                })
-              } else if (chartPeriod === 'ultimos_3_meses') {
-                months = []
-                for (let i = 2; i >= 0; i--) {
-                  const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-                  months.push(date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''))
+                  days.push({
+                    label: String(day),
+                    value: chartMetric === 'lucro' ? (dayRevenue - dayExpenses) : dayExpenses
+                  })
                 }
                 
-                return months.map((month, index) => {
-                  const monthDate = new Date(now.getFullYear(), now.getMonth() - (2 - index), 1)
-                  const nextMonth = new Date(now.getFullYear(), now.getMonth() - (2 - index) + 1, 1)
+                return days
+              } else if (chartPeriod === 'ultimos_3_meses') {
+                // Últimos 3 meses - por dia (últimos 90 dias)
+                const days = []
+                
+                for (let i = 89; i >= 0; i--) {
+                  const dayDate = new Date(now)
+                  dayDate.setDate(now.getDate() - i)
+                  dayDate.setHours(0, 0, 0, 0)
                   
-                  const monthRevenue = allAppointments
+                  const nextDay = new Date(dayDate)
+                  nextDay.setDate(dayDate.getDate() + 1)
+                  
+                  const dayRevenue = allAppointments
                     .filter(a => {
                       const d = new Date(a.date)
-                      return a.status !== 'Cancelado' && d >= monthDate && d < nextMonth
+                      return a.status !== 'Cancelado' && d >= dayDate && d < nextDay
                     })
                     .reduce((sum, a) => sum + Number(a.price || 0), 0)
                   
-                  const monthExpenses = expenses
+                  const dayExpenses = expenses
                     .filter(e => {
                       const d = new Date(e.date)
-                      return d >= monthDate && d < nextMonth
+                      return d >= dayDate && d < nextDay
                     })
                     .reduce((sum, e) => sum + Number(e.amount || 0), 0)
                   
-                  return {
-                    label: month,
-                    value: chartMetric === 'lucro' ? (monthRevenue - monthExpenses) : monthExpenses
-                  }
-                })
+                  // Mostrar apenas alguns labels para não ficar muito poluído
+                  const label = (i % 7 === 0) ? `${dayDate.getDate()}/${dayDate.getMonth() + 1}` : ''
+                  
+                  days.push({
+                    label,
+                    value: chartMetric === 'lucro' ? (dayRevenue - dayExpenses) : dayExpenses
+                  })
+                }
+                
+                return days
               } else {
                 // Ano - 12 meses
                 months = []
