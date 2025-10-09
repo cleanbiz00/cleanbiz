@@ -12,6 +12,7 @@ const CATEGORIES = [
 export default function FinanceiroPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [expenses, setExpenses] = useState<any[]>([])
+  const [appointments, setAppointments] = useState<any[]>([])
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({
@@ -44,6 +45,20 @@ export default function FinanceiroPage() {
       if (!error && data) setExpenses(data)
     }
     loadExpenses()
+  }, [userId])
+
+  // Load appointments to calculate revenue
+  useEffect(() => {
+    const loadAppointments = async () => {
+      if (!userId) return
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+      if (!error && data) setAppointments(data)
+    }
+    loadAppointments()
   }, [userId])
 
   const openModal = (item: any = null) => {
@@ -121,7 +136,34 @@ export default function FinanceiroPage() {
     }
   }
 
+  // Calcular receita (agendamentos excluindo cancelados)
+  const totalRevenue = appointments
+    .filter(apt => apt.status !== 'Cancelado')
+    .reduce((sum, apt) => sum + parseFloat(apt.price || 0), 0)
+
+  // Calcular receita deste mês
+  const monthlyRevenue = appointments
+    .filter(apt => {
+      if (apt.status === 'Cancelado') return false
+      const aptDate = new Date(apt.date)
+      const now = new Date()
+      return aptDate.getMonth() === now.getMonth() && aptDate.getFullYear() === now.getFullYear()
+    })
+    .reduce((sum, apt) => sum + parseFloat(apt.price || 0), 0)
+
   const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+
+  // Despesas deste mês
+  const monthlyExpenses = expenses
+    .filter(e => {
+      const expenseDate = new Date(e.date)
+      const now = new Date()
+      return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear()
+    })
+    .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0)
+
+  const monthlyProfit = monthlyRevenue - monthlyExpenses
+  const totalProfit = totalRevenue - totalExpenses
 
   return (
     <div className="p-6 pb-28 min-h-screen">
@@ -137,12 +179,32 @@ export default function FinanceiroPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Total de Despesas</p>
-              <p className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</p>
+              <p className="text-gray-600 text-sm">Receita (Mês)</p>
+              <p className="text-2xl font-bold text-green-600">${monthlyRevenue.toFixed(2)}</p>
+              <p className="text-xs text-gray-500 mt-1">{appointments.filter(a => {
+                const d = new Date(a.date)
+                const now = new Date()
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== 'Cancelado'
+              }).length} serviços</p>
+            </div>
+            <DollarSign className="h-8 w-8 text-green-600" />
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Despesas (Mês)</p>
+              <p className="text-2xl font-bold text-red-600">${monthlyExpenses.toFixed(2)}</p>
+              <p className="text-xs text-gray-500 mt-1">{expenses.filter(e => {
+                const d = new Date(e.date)
+                const now = new Date()
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+              }).length} registros</p>
             </div>
             <DollarSign className="h-8 w-8 text-red-600" />
           </div>
@@ -151,27 +213,28 @@ export default function FinanceiroPage() {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Despesas Este Mês</p>
-              <p className="text-2xl font-bold text-orange-600">
-                ${expenses.filter(e => {
-                  const expenseDate = new Date(e.date)
-                  const now = new Date()
-                  return expenseDate.getMonth() === now.getMonth() && 
-                         expenseDate.getFullYear() === now.getFullYear()
-                }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0).toFixed(2)}
+              <p className="text-gray-600 text-sm">Lucro (Mês)</p>
+              <p className={`text-2xl font-bold ${monthlyProfit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                ${monthlyProfit.toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Margem: {monthlyRevenue > 0 ? ((monthlyProfit / monthlyRevenue) * 100).toFixed(1) : 0}%
               </p>
             </div>
-            <DollarSign className="h-8 w-8 text-orange-600" />
+            <DollarSign className="h-8 w-8 text-blue-600" />
           </div>
         </div>
         
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600">Total de Registros</p>
-              <p className="text-2xl font-bold text-blue-600">{expenses.length}</p>
+              <p className="text-gray-600 text-sm">Lucro (Total)</p>
+              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                ${totalProfit.toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Todos os períodos</p>
             </div>
-            <DollarSign className="h-8 w-8 text-blue-600" />
+            <DollarSign className="h-8 w-8 text-purple-600" />
           </div>
         </div>
       </div>
@@ -231,6 +294,86 @@ export default function FinanceiroPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Financial Reports */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Despesas por Categoria */}
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h3 className="text-lg font-semibold mb-4">Despesas por Categoria</h3>
+          <div className="space-y-3">
+            {CATEGORIES.map(category => {
+              const categoryTotal = expenses
+                .filter(e => e.category === category)
+                .reduce((sum, e) => sum + parseFloat(e.amount || 0), 0)
+              
+              const percentage = totalExpenses > 0 ? (categoryTotal / totalExpenses) * 100 : 0
+              
+              if (categoryTotal === 0) return null
+              
+              return (
+                <div key={category}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-700">{category}</span>
+                    <span className="font-semibold">${categoryTotal.toFixed(2)} ({percentage.toFixed(1)}%)</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+            {totalExpenses === 0 && (
+              <p className="text-gray-500 text-center py-4">Nenhuma despesa cadastrada</p>
+            )}
+          </div>
+        </div>
+
+        {/* Receita por Status */}
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h3 className="text-lg font-semibold mb-4">Agendamentos por Status (Mês Atual)</h3>
+          <div className="space-y-3">
+            {['Agendado', 'Confirmado', 'Concluído', 'Cancelado'].map(status => {
+              const statusAppointments = appointments.filter(a => {
+                const d = new Date(a.date)
+                const now = new Date()
+                return a.status === status && 
+                       d.getMonth() === now.getMonth() && 
+                       d.getFullYear() === now.getFullYear()
+              })
+              const statusTotal = statusAppointments.reduce((sum, a) => sum + parseFloat(a.price || 0), 0)
+              const count = statusAppointments.length
+              
+              if (count === 0) return null
+              
+              const colors = {
+                'Agendado': 'bg-yellow-600',
+                'Confirmado': 'bg-blue-600',
+                'Concluído': 'bg-green-600',
+                'Cancelado': 'bg-red-600'
+              }
+              
+              return (
+                <div key={status} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${colors[status]}`} />
+                    <span className="font-medium">{status}</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">${statusTotal.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">{count} agend.</p>
+                  </div>
+                </div>
+              )
+            })}
+            {appointments.length === 0 && (
+              <p className="text-gray-500 text-center py-4">Nenhum agendamento cadastrado</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Modal */}

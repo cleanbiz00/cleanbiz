@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [clients, setClients] = useState<any[]>([])
   const [appointments, setAppointments] = useState<any[]>([])
+  const [allAppointments, setAllAppointments] = useState<any[]>([])
 
   const monthRange = useMemo(() => {
     const now = new Date()
@@ -74,7 +75,7 @@ export default function DashboardPage() {
     loadClients()
   }, [userId])
 
-  // Carregar agendamentos do banco
+  // Carregar próximos agendamentos (para exibir na lista)
   useEffect(() => {
     const loadAppointments = async () => {
       if (!userId) return
@@ -108,17 +109,37 @@ export default function DashboardPage() {
     loadAppointments()
   }, [userId])
 
-  // Calcular receita mensal baseado nos clientes
+  // Carregar TODOS os agendamentos para calcular receita mensal
+  useEffect(() => {
+    const loadAllAppointments = async () => {
+      if (!userId) return
+      try {
+        const { data, error } = await supabase
+          .from('appointments')
+          .select('*')
+          .eq('user_id', userId)
+        
+        if (!error && data) {
+          setAllAppointments(data)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar todos agendamentos:', error)
+      }
+    }
+    loadAllAppointments()
+  }, [userId])
+
+  // Calcular receita mensal baseada nos agendamentos (excluindo cancelados)
   const monthlyRevenue = useMemo(() => {
-    return clients.reduce((total, client) => {
-      const price = Number(client.price || 0)
-      // Multiplicar pela frequência aproximada no mês
-      if (client.frequency === 'Semanal') return total + (price * 4)
-      if (client.frequency === 'Quinzenal') return total + (price * 2)
-      if (client.frequency === 'Mensal') return total + price
-      return total + price
-    }, 0)
-  }, [clients])
+    return allAppointments
+      .filter(apt => {
+        if (apt.status === 'Cancelado') return false
+        const aptDate = new Date(apt.date)
+        const now = new Date()
+        return aptDate.getMonth() === now.getMonth() && aptDate.getFullYear() === now.getFullYear()
+      })
+      .reduce((sum, apt) => sum + Number(apt.price || 0), 0)
+  }, [allAppointments])
 
   const financialData = {
     revenue: monthlyRevenue,
