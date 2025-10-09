@@ -305,7 +305,7 @@ const Schedule = ({
 
         if (accessToken) {
           const startDateTime = new Date(`${appointment.date}T${appointment.time}:00`);
-          const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000);
+          const endDateTime = new Date(startDateTime.getTime() + 4 * 60 * 60 * 1000); // 4 hours duration
 
           const eventDetails = {
             title: `${appointment.service} - ${getClientName(appointment.clientId)}`,

@@ -22,7 +22,7 @@ const CalendarView = ({
   const events = useMemo(() => {
     return appointments.map(appointment => {
       const startDate = new Date(`${appointment.date}T${appointment.time}:00`);
-      const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours duration
+      const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // 4 hours duration
       
       return {
         id: appointment.id,

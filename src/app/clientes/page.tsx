@@ -44,9 +44,7 @@ export default function ClientesPage() {
             email: c.email,
             phone: c.phone,
             address: c.address,
-            serviceType: c.service_type,
-            price: c.price,
-            frequency: c.frequency
+            serviceType: c.service_type
           }))
           setClients(formattedClients)
         }
@@ -86,8 +84,6 @@ export default function ClientesPage() {
           phone: formData.phone,
           address: formData.address,
           service_type: formData.serviceType,
-          price: formData.price,
-          frequency: formData.frequency,
           updated_at: new Date().toISOString()
         })
         .eq('id', editingItem.id)
@@ -99,7 +95,23 @@ export default function ClientesPage() {
         return
       }
 
-      setClients(clients.map(c => c.id === editingItem.id ? { ...formData, id: editingItem.id } as any : c))
+      // Recarregar clientes
+      const { data: reloadedClients } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId)
+        .order('name', { ascending: true })
+      
+      if (reloadedClients) {
+        setClients(reloadedClients.map(c => ({
+          id: c.id,
+          name: c.name,
+          email: c.email,
+          phone: c.phone,
+          address: c.address,
+          serviceType: c.service_type
+        })))
+      }
     } else {
       // Create new client
       const { data: newClient, error } = await supabase
@@ -111,9 +123,7 @@ export default function ClientesPage() {
             email: formData.email,
             phone: formData.phone,
             address: formData.address,
-            service_type: formData.serviceType,
-            price: formData.price,
-            frequency: formData.frequency
+            service_type: formData.serviceType
           }
         ])
         .select()
@@ -131,9 +141,7 @@ export default function ClientesPage() {
           email: newClient[0].email,
           phone: newClient[0].phone,
           address: newClient[0].address,
-          serviceType: newClient[0].service_type,
-          price: newClient[0].price,
-          frequency: newClient[0].frequency
+          serviceType: newClient[0].service_type
         }
         setClients([...clients, formatted])
       }
@@ -178,8 +186,7 @@ export default function ClientesPage() {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contato</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo de Serviço</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
             </tr>
           </thead>
@@ -208,13 +215,7 @@ export default function ClientesPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <div>
-                    <p>{client.serviceType}</p>
-                    <p className="text-sm text-gray-600">{client.frequency}</p>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <span className="text-green-600 font-semibold">${client.price}</span>
+                  <p>{client.serviceType}</p>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
@@ -256,10 +257,10 @@ export default function ClientesPage() {
                   <Mail size={14} className="mr-1" /> {client.email}
                 </p>
               </div>
-              <span className="text-green-600 font-semibold">${client.price}</span>
             </div>
-            <div className="text-sm text-gray-700 mt-2">{client.serviceType}</div>
-            <div className="text-xs text-gray-500">{client.frequency}</div>
+            <div className="text-sm text-gray-700 mt-2">
+              <span className="font-medium">Tipo:</span> {client.serviceType}
+            </div>
             <div className="mt-3 flex gap-2">
               <button onClick={() => openModal(client)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700 flex items-center gap-1">
                 <Edit3 size={14} /> Editar
@@ -318,23 +319,6 @@ export default function ClientesPage() {
                 <option value="Limpeza Residencial">Limpeza Residencial</option>
                 <option value="Limpeza Comercial">Limpeza Comercial</option>
                 <option value="Limpeza Pós-Obra">Limpeza Pós-Obra</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Valor do Serviço"
-                value={formData.price || ''}
-                onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})}
-                className="w-full p-3 border rounded-lg"
-              />
-              <select
-                value={formData.frequency || ''}
-                onChange={(e) => setFormData({...formData, frequency: e.target.value})}
-                className="w-full p-3 border rounded-lg"
-              >
-                <option value="">Selecione a frequência</option>
-                <option value="Semanal">Semanal</option>
-                <option value="Quinzenal">Quinzenal</option>
-                <option value="Mensal">Mensal</option>
               </select>
             </div>
             

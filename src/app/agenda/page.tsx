@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, Edit3, Trash2, Clock, Calendar, Mail, Grid3X3, List } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 import CalendarView from '../../components/Schedule/CalendarView'
+import { to12Hour, to24Hour } from '../../utils/timeFormat'
 
 export default function AgendaPage() {
   const [appointments, setAppointments] = useState<any[]>([])
@@ -250,12 +251,16 @@ export default function AgendaPage() {
 
   const openModal = (item: any = null) => {
     if (item) {
-      // Se está editando, garantir que os dados estão corretos
+      // Se está editando, garantir que os dados estão corretos e detectar AM/PM
+      const hour24 = item.time ? parseInt(item.time.split(':')[0]) : 9
+      const timePeriod = hour24 >= 12 ? 'PM' : 'AM'
+      
       const formattedItem = {
         clientId: item.clientId,
         employeeId: item.employeeId,
         date: item.date,
         time: item.time,
+        timePeriod: timePeriod,
         status: item.status,
         service: item.service,
         price: item.price,
@@ -263,7 +268,7 @@ export default function AgendaPage() {
       }
       setFormData(formattedItem)
     } else {
-      setFormData({})
+      setFormData({timePeriod: 'AM'})
     }
     
     setEditingItem(item)
@@ -609,7 +614,7 @@ export default function AgendaPage() {
                         <Clock size={16} className="mr-2 text-gray-400" />
                         <div>
                           <p className="font-medium">{appointment.date}</p>
-                          <p className="text-sm text-gray-600">{appointment.time}</p>
+                          <p className="text-sm text-gray-600">{to12Hour(appointment.time)}</p>
                         </div>
                       </div>
                     </td>
@@ -658,7 +663,7 @@ export default function AgendaPage() {
               <div key={appointment.id} className="bg-white rounded-lg shadow p-4">
                 <div className="flex justify-between">
                   <div>
-                    <div className="text-sm text-gray-600">{appointment.date} • {appointment.time}</div>
+                    <div className="text-sm text-gray-600">{appointment.date} • {to12Hour(appointment.time)}</div>
                     <div className="font-medium">{getClientName(appointment.clientId)}</div>
                     <div className="text-sm text-gray-600">{getEmployeeName(appointment.employeeId)}</div>
                   </div>
@@ -739,12 +744,88 @@ export default function AgendaPage() {
                 onChange={(e) => setFormData({...formData, date: e.target.value})}
                 className="w-full p-3 border rounded-lg"
               />
-              <input
-                type="time"
-                value={formData.time || ''}
-                onChange={(e) => setFormData({...formData, time: e.target.value})}
-                className="w-full p-3 border rounded-lg"
-              />
+              <div className="grid grid-cols-3 gap-2">
+                <select
+                  value={(() => {
+                    if (!formData.time) return ''
+                    const hour24 = parseInt(formData.time.split(':')[0])
+                    if (hour24 === 0) return '12' // Midnight
+                    if (hour24 > 12) return String(hour24 - 12)
+                    return String(hour24)
+                  })()}
+                  onChange={(e) => {
+                    const hour12 = parseInt(e.target.value)
+                    const minute = formData.time ? formData.time.split(':')[1] : '00'
+                    const period = formData.timePeriod || 'AM'
+                    
+                    // Convert to 24h
+                    let hour24 = hour12
+                    if (period === 'PM' && hour12 !== 12) {
+                      hour24 = hour12 + 12
+                    } else if (period === 'AM' && hour12 === 12) {
+                      hour24 = 0
+                    }
+                    
+                    setFormData({...formData, time: `${hour24.toString().padStart(2, '0')}:${minute}`})
+                  }}
+                  className="w-full p-3 border rounded-lg"
+                >
+                  <option value="">Hora</option>
+                  {Array.from({length: 12}, (_, i) => i + 1).map(hour => (
+                    <option key={hour} value={hour}>{hour}</option>
+                  ))}
+                </select>
+                
+                <select
+                  value={formData.time ? formData.time.split(':')[1] : ''}
+                  onChange={(e) => {
+                    const hour = formData.time ? formData.time.split(':')[0] : '09'
+                    const minute = e.target.value
+                    setFormData({...formData, time: `${hour}:${minute}`})
+                  }}
+                  className="w-full p-3 border rounded-lg"
+                >
+                  <option value="">Min</option>
+                  <option value="00">00</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </select>
+                
+                <select
+                  value={formData.timePeriod || 'AM'}
+                  onChange={(e) => {
+                    const period = e.target.value
+                    
+                    if (formData.time) {
+                      const [hourStr, minute] = formData.time.split(':')
+                      let hour24 = parseInt(hourStr)
+                      let hour12 = hour24
+                      
+                      // Convert current 24h to 12h
+                      if (hour24 === 0) hour12 = 12
+                      else if (hour24 > 12) hour12 = hour24 - 12
+                      
+                      // Now convert back to 24h with new period
+                      if (period === 'PM' && hour12 !== 12) {
+                        hour24 = hour12 + 12
+                      } else if (period === 'AM' && hour12 === 12) {
+                        hour24 = 0
+                      } else {
+                        hour24 = hour12
+                      }
+                      
+                      setFormData({...formData, time: `${hour24.toString().padStart(2, '0')}:${minute}`, timePeriod: period})
+                    } else {
+                      setFormData({...formData, timePeriod: period})
+                    }
+                  }}
+                  className="w-full p-3 border rounded-lg"
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
               <input
                 type="text"
                 placeholder="Serviço"

@@ -54,9 +54,9 @@ export async function POST(request) {
 
     const accessToken = userData.google_access_token;
 
-    // Calculate end time (1 hour duration)
+    // Calculate end time (4 hours duration)
     const [hours, minutes] = appointmentData.time.split(':');
-    const endHour = parseInt(hours) + 1;
+    const endHour = parseInt(hours) + 4;
     const endTime = `${endHour.toString().padStart(2, '0')}:${minutes}`;
 
     // Create the event object for Google Calendar
