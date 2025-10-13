@@ -168,11 +168,27 @@ export default function AgendaPage() {
         }
 
         if (data) {
-          // Convert database format to app format
-          const formattedAppointments = data.map(apt => ({
+          // Para cada agendamento, carregar os funcionários relacionados
+          const appointmentsWithEmployees = await Promise.all(
+            data.map(async (apt) => {
+              // Buscar funcionários relacionados na tabela appointment_employees
+              const { data: empRelations } = await supabase
+                .from('appointment_employees')
+                .select('employee_id')
+                .eq('appointment_id', apt.id)
+              
+              const employeeIds = empRelations?.map(rel => rel.employee_id) || []
+              
+              // Se não tem na nova tabela, usar o employee_id antigo para compatibilidade
+              if (employeeIds.length === 0 && apt.employee_id) {
+                employeeIds.push(apt.employee_id)
+              }
+
+              return {
             id: apt.id,
             clientId: apt.client_id,
-            employeeId: apt.employee_id,
+                employeeId: apt.employee_id, // Manter para compatibilidade
+                employeeIds: employeeIds, // Array de IDs
             date: apt.date,
             time: apt.time,
             status: apt.status,
@@ -180,8 +196,11 @@ export default function AgendaPage() {
             price: apt.price,
             clientEmail: apt.client_email,
             googleEventId: apt.google_event_id
-          }))
-          setAppointments(formattedAppointments)
+              }
+            })
+          )
+          
+          setAppointments(appointmentsWithEmployees)
         }
       } catch (error) {
         console.error('Erro ao carregar agendamentos:', error)
@@ -255,6 +274,17 @@ export default function AgendaPage() {
     return employee ? employee.name : 'Funcionário não encontrado'
   }
 
+  const getEmployeeNames = (employeeIds: string[]) => {
+    if (!employeeIds || employeeIds.length === 0) return 'Nenhum funcionário'
+    return employeeIds
+      .map(id => {
+        const emp = employees.find(e => e.id === id)
+        return emp ? emp.name : null
+      })
+      .filter(Boolean)
+      .join(', ')
+  }
+
   const openModal = (item: any = null, forceEdit: boolean = false) => {
     console.log('🔵 openModal chamado com:', item, 'forceEdit:', forceEdit)
     
@@ -271,7 +301,8 @@ export default function AgendaPage() {
       
       const formattedItem = {
         clientId: item.clientId,
-        employeeId: item.employeeId,
+        employeeId: item.employeeId, // Manter para compatibilidade
+        employeeIds: item.employeeIds || (item.employeeId ? [item.employeeId] : []), // Array
         date: item.date,
         time: item.time,
         timePeriod: timePeriod,
@@ -281,14 +312,14 @@ export default function AgendaPage() {
         clientEmail: item.clientEmail || ''
       }
       setFormData(formattedItem)
-      setEditingItem(item)
+    setEditingItem(item)
       setShowModal(true)
     } else {
       // Novo agendamento
       console.log('✅ Abrindo modal de novo agendamento')
-      setFormData({timePeriod: 'AM'})
+      setFormData({timePeriod: 'AM', employeeIds: []})
       setEditingItem(null)
-      setShowModal(true)
+    setShowModal(true)
     }
   }
 
@@ -320,7 +351,7 @@ export default function AgendaPage() {
     // Validação detalhada
     const missing = []
     if (!formData.clientId || formData.clientId === 'undefined') missing.push('Cliente')
-    if (!formData.employeeId || formData.employeeId === 'undefined') missing.push('Funcionário')
+    if (!formData.employeeIds || formData.employeeIds.length === 0) missing.push('Funcionário')
     if (!formData.date) missing.push('Data')
     if (!formData.time) missing.push('Hora')
     if (!formData.service) missing.push('Serviço')
@@ -337,20 +368,21 @@ export default function AgendaPage() {
       // Update existing appointment in database
       // Só inclui campos que têm valores válidos
       const updateData: any = {
-        date: formData.date,
-        time: formData.time,
+          date: formData.date,
+          time: formData.time,
         status: formData.status || 'Agendado',
-        service: formData.service,
+          service: formData.service,
         price: Number(formData.price) || 0,
-        updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
       }
       
       // Adiciona IDs apenas se forem válidos (não undefined, não null, não string vazia)
       if (formData.clientId && formData.clientId !== 'undefined') {
         updateData.client_id = formData.clientId
       }
-      if (formData.employeeId && formData.employeeId !== 'undefined') {
-        updateData.employee_id = formData.employeeId
+      // Manter compatibilidade: salvar primeiro funcionário em employee_id
+      if (formData.employeeIds && formData.employeeIds.length > 0) {
+        updateData.employee_id = formData.employeeIds[0]
       }
       if (formData.clientEmail) {
         updateData.client_email = formData.clientEmail
@@ -368,7 +400,30 @@ export default function AgendaPage() {
         return
       }
 
-      // Reload appointments from database
+      // Atualizar relacionamentos de funcionários
+      // 1. Deletar relacionamentos antigos
+      await supabase
+        .from('appointment_employees')
+        .delete()
+        .eq('appointment_id', editingItem.id)
+      
+      // 2. Inserir novos relacionamentos
+      if (formData.employeeIds && formData.employeeIds.length > 0) {
+        const employeeRelations = formData.employeeIds.map((empId: string) => ({
+          appointment_id: editingItem.id,
+          employee_id: empId
+        }))
+        
+        const { error: relError } = await supabase
+          .from('appointment_employees')
+          .insert(employeeRelations)
+        
+        if (relError) {
+          console.error('Erro ao salvar funcionários:', relError)
+        }
+      }
+
+      // Reload appointments from database (agora usando a mesma lógica de load)
       const { data: updatedAppointments } = await supabase
         .from('appointments')
         .select('*')
@@ -376,18 +431,34 @@ export default function AgendaPage() {
         .order('date', { ascending: true })
       
       if (updatedAppointments) {
-        setAppointments(updatedAppointments.map((a: any) => ({
-          id: a.id,
-          clientId: a.client_id,
-          employeeId: a.employee_id,
-          date: a.date,
-          time: a.time,
-          status: a.status,
-          service: a.service,
-          price: a.price,
-          clientEmail: a.client_email,
-          googleEventId: a.google_event_id
-        })))
+        const appointmentsWithEmployees = await Promise.all(
+          updatedAppointments.map(async (apt: any) => {
+            const { data: empRelations } = await supabase
+              .from('appointment_employees')
+              .select('employee_id')
+              .eq('appointment_id', apt.id)
+            
+            const employeeIds = empRelations?.map(rel => rel.employee_id) || []
+            if (employeeIds.length === 0 && apt.employee_id) {
+              employeeIds.push(apt.employee_id)
+            }
+
+            return {
+              id: apt.id,
+              clientId: apt.client_id,
+              employeeId: apt.employee_id,
+              employeeIds: employeeIds,
+              date: apt.date,
+              time: apt.time,
+              status: apt.status,
+              service: apt.service,
+              price: apt.price,
+              clientEmail: apt.client_email,
+              googleEventId: apt.google_event_id
+            }
+          })
+        )
+        setAppointments(appointmentsWithEmployees)
       }
 
       alert('✅ Agendamento atualizado com sucesso!')
@@ -465,13 +536,13 @@ export default function AgendaPage() {
 
       // Save appointment to database
       const insertData = {
-        user_id: userId,
-        client_id: formData.clientId,
-        employee_id: formData.employeeId,
-        date: formData.date,
-        time: formData.time,
-        status: formData.status || 'Agendado',
-        service: formData.service,
+            user_id: userId,
+            client_id: formData.clientId,
+        employee_id: formData.employeeIds[0], // Primeiro funcionário para compatibilidade
+            date: formData.date,
+            time: formData.time,
+            status: formData.status || 'Agendado',
+            service: formData.service,
         price: Number(formData.price) || 0,
         client_email: formData.clientEmail || null,
         google_event_id: googleEventId || null
@@ -491,11 +562,26 @@ export default function AgendaPage() {
       }
 
       if (newApt && newApt.length > 0) {
+        // Salvar relacionamentos de funcionários
+        const employeeRelations = formData.employeeIds.map((empId: string) => ({
+          appointment_id: newApt[0].id,
+          employee_id: empId
+        }))
+        
+        const { error: relError } = await supabase
+          .from('appointment_employees')
+          .insert(employeeRelations)
+        
+        if (relError) {
+          console.error('Erro ao salvar funcionários:', relError)
+        }
+        
         // Add to local state
         const formattedApt = {
           id: newApt[0].id,
           clientId: newApt[0].client_id,
           employeeId: newApt[0].employee_id,
+          employeeIds: formData.employeeIds,
           date: newApt[0].date,
           time: newApt[0].time,
           status: newApt[0].status,
@@ -675,7 +761,11 @@ export default function AgendaPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">{getClientName(appointment.clientId)}</td>
-                    <td className="px-6 py-4">{getEmployeeName(appointment.employeeId)}</td>
+                    <td className="px-6 py-4">
+                      {appointment.employeeIds && appointment.employeeIds.length > 0 
+                        ? getEmployeeNames(appointment.employeeIds)
+                        : getEmployeeName(appointment.employeeId)}
+                    </td>
                     <td className="px-6 py-4">
                       <div>
                         <p>{appointment.service}</p>
@@ -721,7 +811,11 @@ export default function AgendaPage() {
                   <div>
                     <div className="text-sm text-gray-600">{appointment.date} • {to12Hour(appointment.time)}</div>
                     <div className="font-medium">{getClientName(appointment.clientId)}</div>
-                    <div className="text-sm text-gray-600">{getEmployeeName(appointment.employeeId)}</div>
+                    <div className="text-sm text-gray-600">
+                      {appointment.employeeIds && appointment.employeeIds.length > 0 
+                        ? getEmployeeNames(appointment.employeeIds)
+                        : getEmployeeName(appointment.employeeId)}
+                    </div>
                   </div>
                   <div className="text-green-600 font-semibold">${appointment.price}</div>
                 </div>
@@ -789,8 +883,12 @@ export default function AgendaPage() {
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Funcionário Responsável</p>
-                  <p className="font-medium">{getEmployeeName(selectedAppointment.employeeId)}</p>
+                  <p className="text-sm text-gray-600">Funcionário(s) Responsável(is)</p>
+                  <p className="font-medium">
+                    {selectedAppointment.employeeIds && selectedAppointment.employeeIds.length > 0 
+                      ? getEmployeeNames(selectedAppointment.employeeIds)
+                      : getEmployeeName(selectedAppointment.employeeId)}
+                  </p>
                 </div>
               </div>
               
@@ -894,20 +992,44 @@ export default function AgendaPage() {
                   ⚠️ Você ainda não cadastrou nenhum funcionário. Vá em <strong>Funcionários</strong> para adicionar.
                 </div>
               )}
-              <select
-                value={formData.employeeId || ''}
-                onChange={(e) => {
-                  const value = e.target.value
-                  setFormData({...formData, employeeId: value || null})
-                }}
-                className="w-full p-3 border rounded-lg"
-                disabled={employees.length === 0}
-              >
-                <option value="">Selecione o funcionário</option>
-                {employees.map(employee => (
-                  <option key={employee.id} value={employee.id}>{employee.name}</option>
-                ))}
-              </select>
+              
+              {/* Multi-seleção de funcionários com checkboxes */}
+              <div className="w-full p-4 border rounded-lg bg-gray-50">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Funcionários (selecione um ou mais):
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {employees.length > 0 ? (
+                    employees.map(employee => (
+                      <label key={employee.id} className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.employeeIds?.includes(employee.id) || false}
+                          onChange={(e) => {
+                            const currentIds = formData.employeeIds || []
+                            if (e.target.checked) {
+                              // Adicionar funcionário
+                              setFormData({...formData, employeeIds: [...currentIds, employee.id]})
+                            } else {
+                              // Remover funcionário
+                              setFormData({...formData, employeeIds: currentIds.filter((id: string) => id !== employee.id)})
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                        />
+                        <span className="text-sm text-gray-700">{employee.name}</span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">Nenhum funcionário disponível</p>
+                  )}
+                </div>
+                {formData.employeeIds && formData.employeeIds.length > 0 && (
+                  <p className="text-xs text-gray-600 mt-2">
+                    {formData.employeeIds.length} funcionário(s) selecionado(s)
+                  </p>
+                )}
+              </div>
               <input
                 type="date"
                 value={formData.date || ''}
@@ -938,7 +1060,7 @@ export default function AgendaPage() {
                     
                     setFormData({...formData, time: `${hour24.toString().padStart(2, '0')}:${minute}`})
                   }}
-                  className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border rounded-lg"
                 >
                   <option value="">Hora</option>
                   {Array.from({length: 12}, (_, i) => i + 1).map(hour => (
