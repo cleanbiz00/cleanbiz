@@ -52,7 +52,50 @@ export async function POST(request) {
       }, { status: 401 });
     }
 
-    const accessToken = userData.google_access_token;
+    let accessToken = userData.google_access_token;
+    
+    // Verificar se o token expirou e renovar se necessário
+    const tokenExpiresAt = userData.google_token_expires_at ? new Date(userData.google_token_expires_at) : null;
+    const now = new Date();
+    
+    if (tokenExpiresAt && now >= tokenExpiresAt && userData.google_refresh_token) {
+      console.log('🔄 Access token expirado, renovando...');
+      
+      // Renovar o token usando refresh_token
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          refresh_token: userData.google_refresh_token,
+          grant_type: 'refresh_token'
+        })
+      });
+      
+      const tokenData = await tokenResponse.json();
+      
+      if (!tokenResponse.ok) {
+        console.error('❌ Erro ao renovar token:', tokenData);
+        return NextResponse.json({ 
+          error: 'Failed to refresh Google token. Please reconnect your Google Calendar.' 
+        }, { status: 401 });
+      }
+      
+      // Atualizar access token no banco
+      accessToken = tokenData.access_token;
+      const newExpiresAt = new Date(now.getTime() + (tokenData.expires_in * 1000));
+      
+      await supabase
+        .from('app_users')
+        .update({
+          google_access_token: accessToken,
+          google_token_expires_at: newExpiresAt.toISOString()
+        })
+        .eq('id', userData.id);
+      
+      console.log('✅ Token renovado com sucesso, expira em:', newExpiresAt);
+    }
 
     // Calculate end time (4 hours duration)
     const [hours, minutes] = appointmentData.time.split(':');
@@ -62,7 +105,12 @@ export async function POST(request) {
     // Create the event object for Google Calendar
     const event = {
       summary: `Limpeza - ${appointmentData.clientName}`,
-      description: `Serviço: ${appointmentData.service}\nCliente: ${appointmentData.clientName}\nFuncionário: ${appointmentData.employeeName}\nPreço: R$ ${appointmentData.price}`,
+      description: `Serviço: ${appointmentData.service}\n\n` +
+                   `👤 Cliente: ${appointmentData.clientName}\n` +
+                   `📍 Endereço: ${appointmentData.clientAddress || 'Não informado'}\n` +
+                   `📞 Telefone: ${appointmentData.clientPhone || 'Não informado'}\n\n` +
+                   `👷 Funcionário: ${appointmentData.employeeName}\n` +
+                   `💰 Preço: R$ ${appointmentData.price}`,
       start: {
         dateTime: `${appointmentData.date}T${appointmentData.time}:00-03:00`,
         timeZone: 'America/Sao_Paulo',

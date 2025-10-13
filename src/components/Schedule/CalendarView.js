@@ -45,6 +45,24 @@ const CalendarView = ({
     return employeeColors[hash % employeeColors.length];
   };
 
+  // Função para criar gradiente com múltiplas cores (listras)
+  const getMultipleEmployeeColors = (employeeIds) => {
+    if (!employeeIds || employeeIds.length === 0) return employeeColors[0];
+    if (employeeIds.length === 1) return getEmployeeColor(employeeIds[0]);
+    
+    // Criar listras coloridas para múltiplos funcionários
+    const colors = employeeIds.map(id => getEmployeeColor(id));
+    const percentage = 100 / colors.length;
+    
+    const gradientStops = colors.map((color, index) => {
+      const start = index * percentage;
+      const end = (index + 1) * percentage;
+      return `${color} ${start}%, ${color} ${end}%`;
+    }).join(', ');
+    
+    return `linear-gradient(135deg, ${gradientStops})`;
+  };
+
   // Convert appointments to calendar events
   const events = useMemo(() => {
     return appointments.map(appointment => {
@@ -55,6 +73,9 @@ const CalendarView = ({
       const client = clients.find(c => c.id === appointment.clientId);
       const address = client?.address || '';
       
+      // Usar employeeIds se disponível, senão usar employeeId legado
+      const employeeIds = appointment.employeeIds || (appointment.employeeId ? [appointment.employeeId] : []);
+      
       return {
         id: appointment.id,
         title: `${appointment.service} - ${getClientName(appointment.clientId)}`,
@@ -64,21 +85,26 @@ const CalendarView = ({
         status: appointment.status,
         client: getClientName(appointment.clientId),
         employee: getEmployeeName(appointment.employeeId),
-        employeeId: appointment.employeeId,
+        employeeId: appointment.employeeId, // Manter para compatibilidade
+        employeeIds: employeeIds, // Array de IDs
         address: address,
         price: appointment.price
       };
     });
   }, [appointments, getClientName, getEmployeeName, clients]);
 
-  // Event style getter - define cor de fundo por funcionário
+  // Event style getter - define cor de fundo por funcionário(s)
   const eventStyleGetter = (event) => {
-    const employeeColor = getEmployeeColor(event.employeeId);
     const opacity = event.status === 'Cancelado' ? 0.5 : 1;
+    
+    // Se tem múltiplos funcionários, usar gradiente listrado
+    const background = event.employeeIds && event.employeeIds.length > 1
+      ? getMultipleEmployeeColors(event.employeeIds)
+      : getEmployeeColor(event.employeeId);
     
     return {
       style: {
-        backgroundColor: employeeColor,
+        background: background, // Pode ser cor sólida ou gradiente
         opacity: opacity,
         border: 'none',
         borderRadius: '4px',

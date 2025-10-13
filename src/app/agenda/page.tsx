@@ -501,6 +501,9 @@ export default function AgendaPage() {
 
       // Create Google Calendar event
       try {
+        // Buscar dados completos do cliente
+        const client = clients.find(c => c.id === formData.clientId)
+        
         const calendarResponse = await fetch('/api/google-calendar/create-event', {
           method: 'POST',
           headers: {
@@ -517,6 +520,8 @@ export default function AgendaPage() {
               clientId: formData.clientId,
               employeeId: formData.employeeId,
               clientName: getClientName(formData.clientId),
+              clientPhone: client?.phone || '',
+              clientAddress: client?.address || '',
               employeeName: getEmployeeName(formData.employeeId)
             },
             clientEmail: formData.clientEmail
