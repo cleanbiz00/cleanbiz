@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Phone, Mail, MapPin } from 'lucide-react'
+import { Plus, Edit3, Trash2, Phone, Mail, MapPin, Search } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function ClientesPage() {
@@ -10,6 +10,7 @@ export default function ClientesPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Load user
   useEffect(() => {
@@ -167,6 +168,15 @@ export default function ClientesPage() {
     setClients(clients.filter(c => c.id !== id))
   }
 
+  // Filtrar clientes baseado no termo de busca
+  const filteredClients = clients.filter(client =>
+    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.phone.includes(searchTerm) ||
+    client.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.serviceType.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="p-6 pb-28 min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -180,6 +190,25 @@ export default function ClientesPage() {
         </button>
       </div>
       
+      {/* Campo de busca */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Buscar por nome, email, telefone, endereço..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-gray-600 mt-2">
+            {filteredClients.length} {filteredClients.length === 1 ? 'cliente encontrado' : 'clientes encontrados'}
+          </p>
+        )}
+      </div>
+      
       <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
         <table className="min-w-full">
           <thead className="bg-gray-50">
@@ -191,7 +220,7 @@ export default function ClientesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {clients.map(client => (
+            {filteredClients.map(client => (
               <tr key={client.id}>
                 <td className="px-6 py-4">
                   <div>
@@ -241,7 +270,7 @@ export default function ClientesPage() {
 
       {/* Mobile cards */}
       <div className="lg:hidden space-y-3">
-        {clients.map(client => (
+        {filteredClients.map(client => (
           <div key={client.id} className="bg-white rounded-lg shadow p-4">
             <div className="flex justify-between items-start">
               <div>

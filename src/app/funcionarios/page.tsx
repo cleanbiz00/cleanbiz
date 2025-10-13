@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Phone, Mail } from 'lucide-react'
+import { Plus, Edit3, Trash2, Phone, Mail, Search } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function FuncionariosPage() {
@@ -10,6 +10,7 @@ export default function FuncionariosPage() {
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
   const [formData, setFormData] = useState<any>({})
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Load user
   useEffect(() => {
@@ -133,6 +134,14 @@ export default function FuncionariosPage() {
     setEmployees(employees.filter(e => e.id !== id))
   }
 
+  // Filtrar funcionários baseado no termo de busca
+  const filteredEmployees = employees.filter(employee =>
+    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    employee.phone.includes(searchTerm) ||
+    employee.role.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="p-6 pb-28 min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -146,8 +155,27 @@ export default function FuncionariosPage() {
         </button>
       </div>
       
+      {/* Campo de busca */}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Buscar por nome, email, telefone, cargo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-gray-600 mt-2">
+            {filteredEmployees.length} {filteredEmployees.length === 1 ? 'funcionário encontrado' : 'funcionários encontrados'}
+          </p>
+        )}
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {employees.map(employee => (
+        {filteredEmployees.map(employee => (
           <div key={employee.id} className="bg-white p-6 rounded-lg shadow-lg">
             <div className="flex justify-between items-start mb-4">
               <div>
