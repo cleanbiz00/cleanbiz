@@ -981,7 +981,13 @@ export default function AgendaPage() {
                 value={formData.clientId || ''}
                 onChange={(e) => {
                   const value = e.target.value
-                  setFormData({...formData, clientId: value || null})
+                  // Buscar email do cliente selecionado
+                  const selectedClient = clients.find(c => c.id === value)
+                  setFormData({
+                    ...formData, 
+                    clientId: value || null,
+                    clientEmail: selectedClient?.email || '' // Preencher email automaticamente
+                  })
                 }}
                 className="w-full p-3 border rounded-lg"
                 disabled={clients.length === 0}
@@ -1148,13 +1154,21 @@ export default function AgendaPage() {
                 <option value="Concluído">Concluído</option>
                 <option value="Cancelado">Cancelado</option>
               </select>
-              <input
-                type="email"
-                placeholder="Email do cliente (para notificações)"
-                value={formData.clientEmail || ''}
-                onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
-                className="w-full p-3 border rounded-lg"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email para notificações {formData.clientEmail && '(preenchido automaticamente)'}
+                </label>
+                <input
+                  type="email"
+                  placeholder="Email do cliente"
+                  value={formData.clientEmail || ''}
+                  onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
+                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 O email é preenchido automaticamente ao selecionar o cliente, mas você pode editá-lo se necessário
+                </p>
+              </div>
             </div>
             
             <div className="flex space-x-4 mt-6">
