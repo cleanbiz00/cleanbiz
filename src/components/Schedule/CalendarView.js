@@ -17,27 +17,33 @@ const CalendarView = ({
   clients = []
 }) => {
   // Detectar se é mobile para definir visualização padrão
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    // Verificar se estamos no cliente (browser)
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false; // Fallback para SSR
+  });
+  
+  const [view, setView] = useState('month'); // Começar sempre com 'month'
+  const [date, setDate] = useState(new Date());
   
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768); // Tailwind 'md' breakpoint
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Atualizar view baseado no tamanho da tela
+      setView(mobile ? 'day' : 'month');
     };
     
+    // Checar imediatamente
     checkMobile();
+    
+    // Adicionar listener
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
-  // View padrão: 'day' para mobile, 'month' para desktop
-  const [view, setView] = useState(isMobile ? 'day' : 'month');
-  const [date, setDate] = useState(new Date());
-  
-  // Atualizar view quando isMobile mudar
-  useEffect(() => {
-    setView(isMobile ? 'day' : 'month');
-  }, [isMobile]);
 
   // Cores fixas para funcionários (cada funcionário sempre terá a mesma cor)
   const employeeColors = [
