@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -16,8 +16,28 @@ const CalendarView = ({
   getEmployeeName,
   clients = []
 }) => {
-  const [view, setView] = useState('month');
+  // Detectar se é mobile para definir visualização padrão
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // Tailwind 'md' breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // View padrão: 'day' para mobile, 'month' para desktop
+  const [view, setView] = useState(isMobile ? 'day' : 'month');
   const [date, setDate] = useState(new Date());
+  
+  // Atualizar view quando isMobile mudar
+  useEffect(() => {
+    setView(isMobile ? 'day' : 'month');
+  }, [isMobile]);
 
   // Cores fixas para funcionários (cada funcionário sempre terá a mesma cor)
   const employeeColors = [
@@ -242,15 +262,15 @@ const CalendarView = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-2 md:p-6">
       <Calendar
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 600 }}
+        style={{ height: isMobile ? 500 : 600 }}
         view={view}
-        views={['month', 'week', 'day', 'agenda']}
+        views={isMobile ? ['day', 'agenda'] : ['month', 'week', 'day', 'agenda']}
         onView={setView}
         date={date}
         onNavigate={setDate}

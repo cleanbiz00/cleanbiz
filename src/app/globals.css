@@ -200,3 +200,66 @@ html, body {
 .rbc-event.status-concluido {
   background: #3b82f6;
 }
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .rbc-calendar {
+    font-size: 14px;
+  }
+  
+  .rbc-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .rbc-toolbar-label {
+    font-size: 1rem;
+    order: -1;
+    text-align: center;
+    padding: 8px 0;
+  }
+  
+  .rbc-btn-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .rbc-btn-group > button,
+  .rbc-toolbar button {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin: 2px;
+  }
+  
+  .rbc-header {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  
+  .rbc-event {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+  
+  .rbc-time-slot {
+    min-height: 30px;
+  }
+  
+  .rbc-timeslot-group {
+    min-height: 60px;
+  }
+  
+  .rbc-day-slot .rbc-event {
+    padding: 4px;
+  }
+  
+  .rbc-agenda-date-cell,
+  .rbc-agenda-time-cell,
+  .rbc-agenda-event-cell {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
