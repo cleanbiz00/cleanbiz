@@ -255,17 +255,17 @@ export default function AgendaPage() {
     return employee ? employee.name : 'Funcionário não encontrado'
   }
 
-  const openModal = (item: any = null) => {
-    console.log('🔵 openModal chamado com:', item)
-    console.log('🔵 Tem ID?', item?.id)
+  const openModal = (item: any = null, forceEdit: boolean = false) => {
+    console.log('🔵 openModal chamado com:', item, 'forceEdit:', forceEdit)
     
-    if (item && item.id) {
-      // Se tem ID, é um agendamento existente - abrir modal de detalhes
+    if (item && item.id && !forceEdit) {
+      // Se tem ID e NÃO é forceEdit, abrir modal de detalhes
       console.log('✅ Abrindo modal de detalhes')
       setSelectedAppointment(item)
       setShowDetailsModal(true)
     } else if (item) {
-      // Se tem item mas sem ID, preencher dados para edição
+      // Editar agendamento existente ou novo com dados pré-preenchidos
+      console.log('✅ Abrindo modal de edição')
       const hour24 = item.time ? parseInt(item.time.split(':')[0]) : 9
       const timePeriod = hour24 >= 12 ? 'PM' : 'AM'
       
@@ -285,6 +285,7 @@ export default function AgendaPage() {
       setShowModal(true)
     } else {
       // Novo agendamento
+      console.log('✅ Abrindo modal de novo agendamento')
       setFormData({timePeriod: 'AM'})
       setEditingItem(null)
       setShowModal(true)
@@ -294,7 +295,8 @@ export default function AgendaPage() {
   const openEditFromDetails = () => {
     if (selectedAppointment) {
       setShowDetailsModal(false)
-      openModal(selectedAppointment)
+      // Forçar abertura do modal de edição
+      openModal(selectedAppointment, true)
     }
   }
 
