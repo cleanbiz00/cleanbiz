@@ -960,8 +960,8 @@ export default function AgendaPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4">
               {editingItem ? 'Editar Agendamento' : 'Novo Agendamento'}
             </h3>
@@ -995,10 +995,10 @@ export default function AgendaPage() {
               
               {/* Multi-seleção de funcionários com checkboxes */}
               <div className="w-full p-4 border rounded-lg bg-gray-50">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Funcionários (selecione um ou mais):
                 </label>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
+                <div className="space-y-2 max-h-32 overflow-y-auto">
                   {employees.length > 0 ? (
                     employees.map(employee => (
                       <label key={employee.id} className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded cursor-pointer">
