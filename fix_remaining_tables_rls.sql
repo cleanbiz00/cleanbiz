@@ -155,3 +155,5 @@ WHERE schemaname = 'public'
 AND tablename IN ('clients', 'appointments', 'employees', 'expenses', 'recurring_expense_templates', 'app_users')
 ORDER BY tablename;
 
+
+

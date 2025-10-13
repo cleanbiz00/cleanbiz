@@ -150,3 +150,5 @@ ORDER BY tablename, policyname;
 -- Isso garante que cada usuário veja APENAS seus próprios dados!
 -- =============================================
 
+
+

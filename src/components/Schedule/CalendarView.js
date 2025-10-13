@@ -103,8 +103,8 @@ const CalendarView = ({
 
   // Handle event selection
   const handleSelectEvent = (event) => {
-    // Show event details modal
-    openModal('appointment', event.resource);
+    // Show event details modal - passar apenas o resource (appointment data)
+    openModal(event.resource);
   };
 
   // Handle date/time selection for new events
@@ -114,7 +114,7 @@ const CalendarView = ({
       time: start.toTimeString().slice(0, 5),
       status: 'Agendado'
     };
-    openModal('appointment', newAppointment);
+    openModal(newAppointment);
   };
 
   // Custom toolbar component
@@ -196,7 +196,7 @@ const CalendarView = ({
           </div>
           
           <button
-            onClick={() => openModal('appointment')}
+            onClick={() => openModal()}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
           >
             <Plus size={16} />

@@ -73,3 +73,5 @@ ORDER BY tablename, policyname;
 -- As views problemáticas devem estar removidas
 -- =============================================
 
+
+

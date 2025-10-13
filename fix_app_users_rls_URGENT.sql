@@ -60,3 +60,5 @@ ORDER BY tablename;
 -- recurring_expense_templates → true  (com RLS, protegido por user_id)
 -- =============================================
 
+
+

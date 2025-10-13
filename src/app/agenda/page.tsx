@@ -102,9 +102,13 @@ export default function AgendaPage() {
           const formattedClients = data.map(c => ({
             id: c.id,
             name: c.name,
-            email: c.email
+            email: c.email,
+            phone: c.phone,
+            address: c.address,
+            serviceType: c.service_type
           }))
           setClients(formattedClients)
+          console.log('✅ Clientes carregados com todos os campos:', formattedClients)
         }
       } catch (error) {
         console.error('Erro ao carregar clientes:', error)
@@ -252,8 +256,12 @@ export default function AgendaPage() {
   }
 
   const openModal = (item: any = null) => {
+    console.log('🔵 openModal chamado com:', item)
+    console.log('🔵 Tem ID?', item?.id)
+    
     if (item && item.id) {
       // Se tem ID, é um agendamento existente - abrir modal de detalhes
+      console.log('✅ Abrindo modal de detalhes')
       setSelectedAppointment(item)
       setShowDetailsModal(true)
     } else if (item) {
@@ -632,7 +640,7 @@ export default function AgendaPage() {
           deleteItem={deleteItem}
           getClientName={getClientName}
           getEmployeeName={getEmployeeName}
-          clients={clients}
+          clients={clients as any}
         />
       )}
 
