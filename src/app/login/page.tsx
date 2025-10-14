@@ -39,7 +39,22 @@ export default function LoginPage() {
         {/* Logo e Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">
-            <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-16 w-auto" />
+            <img 
+              src="/logo-with-text.svg" 
+              alt="CleanBiz360" 
+              className="h-32 md:h-40 w-auto"
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1)) contrast(1.2)',
+                background: 'transparent',
+                backgroundColor: 'transparent'
+              }}
+              onLoad={(e) => {
+                // Força remoção do fundo branco
+                const img = e.target as HTMLImageElement;
+                img.style.backgroundColor = 'transparent';
+                img.style.background = 'none';
+              }}
+            />
           </div>
           <p className="text-slate-600 text-sm">Sistema Premium de Gerenciamento</p>
         </div>
