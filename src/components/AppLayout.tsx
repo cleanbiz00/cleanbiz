@@ -87,7 +87,7 @@ export default function AppLayout({
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
       {/* Desktop Sidebar Premium */}
       <div className="hidden lg:block">
-        <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-slate-900 via-slate-800 to-cyan-900 text-white p-6 shadow-2xl">
+        <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
           {/* Logo Premium */}
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-2">
@@ -98,7 +98,7 @@ export default function AppLayout({
                 <h1 className="text-2xl font-bold">CleanBiz360</h1>
               </div>
             </div>
-            <p className="text-cyan-200/80 text-sm ml-12">Sistema Premium</p>
+            <p className="text-slate-600 text-sm ml-12">Sistema Premium</p>
           </div>
           
           {/* Menu Items */}
@@ -113,14 +113,14 @@ export default function AppLayout({
                   onClick={() => router.push(item.path)}
                   className={`group w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 ${
                     isActive 
-                      ? 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg' 
-                      : 'hover:bg-white/5 hover:translate-x-1'
+                      ? 'bg-white/80 backdrop-blur-xl border border-cleanbiz-200 shadow-lg' 
+                      : 'hover:bg-white/60 hover:translate-x-1'
                   }`}
                 >
                   <div className={`p-2 bg-gradient-to-br ${item.gradient} rounded-lg shadow-md ${isActive ? 'shadow-lg' : 'group-hover:shadow-lg'} transition-shadow`}>
                     <Icon size={18} />
                   </div>
-                  <span className={`font-medium ${isActive ? 'text-white' : 'text-white/70 group-hover:text-white'} transition-colors`}>
+                  <span className={`font-medium ${isActive ? 'text-slate-800' : 'text-slate-600 group-hover:text-slate-800'} transition-colors`}>
                     {item.label}
                   </span>
                   {isActive && (
@@ -133,19 +133,19 @@ export default function AppLayout({
             {/* Botão Sair */}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 hover:border-red-400/40 mt-8"
+              className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 mt-8"
             >
               <div className="p-2 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg shadow-md">
                 <LogOut size={18} />
               </div>
-              <span className="font-medium text-red-200">Sair</span>
+              <span className="font-medium text-red-600">Sair</span>
             </button>
           </nav>
           
           {/* Badge Premium no fundo */}
           <div className="absolute bottom-6 left-6 right-6">
-            <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 text-center">
-              <p className="text-white/60 text-xs flex items-center justify-center gap-2">
+            <div className="bg-white/80 backdrop-blur-lg border border-slate-200 rounded-xl p-3 text-center">
+              <p className="text-slate-600 text-xs flex items-center justify-center gap-2">
                 <img src="/logo-icon.svg" alt="CleanBiz360" className="h-3 w-3" />
                 Premium Edition
               </p>
@@ -158,7 +158,7 @@ export default function AppLayout({
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-cyan-900 text-white p-6 shadow-2xl">
+          <div className="absolute left-0 top-0 bottom-0 w-80 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
             {/* Logo Premium */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
@@ -169,7 +169,7 @@ export default function AppLayout({
                   <h1 className="text-2xl font-bold">CleanBiz360</h1>
                 </div>
               </div>
-              <p className="text-cyan-200/80 text-sm ml-12">Sistema Premium</p>
+              <p className="text-slate-600 text-sm ml-12">Sistema Premium</p>
             </div>
             
             {/* Menu Items */}
@@ -184,14 +184,14 @@ export default function AppLayout({
                     onClick={() => router.push(item.path)}
                     className={`group w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 ${
                       isActive 
-                        ? 'bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg' 
-                        : 'hover:bg-white/5 hover:translate-x-1'
+                        ? 'bg-white/80 backdrop-blur-xl border border-cleanbiz-200 shadow-lg' 
+                        : 'hover:bg-white/60 hover:translate-x-1'
                     }`}
                   >
                     <div className={`p-2 bg-gradient-to-br ${item.gradient} rounded-lg shadow-md ${isActive ? 'shadow-lg' : 'group-hover:shadow-lg'} transition-shadow`}>
                       <Icon size={18} />
                     </div>
-                    <span className={`font-medium ${isActive ? 'text-white' : 'text-white/70 group-hover:text-white'} transition-colors`}>
+                    <span className={`font-medium ${isActive ? 'text-slate-800' : 'text-slate-600 group-hover:text-slate-800'} transition-colors`}>
                       {item.label}
                     </span>
                     {isActive && (
@@ -204,19 +204,19 @@ export default function AppLayout({
               {/* Botão Sair */}
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 hover:border-red-400/40 mt-8"
+                className="w-full flex items-center space-x-3 p-4 rounded-xl transition-all duration-300 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 mt-8"
               >
                 <div className="p-2 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg shadow-md">
                   <LogOut size={18} />
                 </div>
-                <span className="font-medium text-red-200">Sair</span>
+                <span className="font-medium text-red-600">Sair</span>
               </button>
             </nav>
             
             {/* Badge Premium no fundo */}
             <div className="absolute bottom-6 left-6 right-6">
-              <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-3 text-center">
-                <p className="text-white/60 text-xs flex items-center justify-center gap-2">
+              <div className="bg-white/80 backdrop-blur-lg border border-slate-200 rounded-xl p-3 text-center">
+                <p className="text-slate-600 text-xs flex items-center justify-center gap-2">
                   <img src="/logo-icon.svg" alt="CleanBiz360" className="h-3 w-3" />
                   Premium Edition
                 </p>

@@ -9,18 +9,18 @@ module.exports = {
     extend: {
       colors: {
         'cleanbiz': {
-          50: '#e0f7fa',
-          100: '#b2f5ea',
-          200: '#81e6d9',
-          300: '#4fd1c7',
-          400: '#38b2ac',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
           500: '#14b8a6',
-          600: '#06b6d4',
-          700: '#0891b2',
-          800: '#0e7490',
-          900: '#164e63',
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
         },
-        'cleanbiz-dark': {
+        'cleanbiz-light': {
           50: '#f0f9ff',
           100: '#e0f2fe',
           200: '#bae6fd',
@@ -34,8 +34,9 @@ module.exports = {
         }
       },
       backgroundImage: {
-        'cleanbiz-gradient': 'linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%)',
-        'cleanbiz-gradient-dark': 'linear-gradient(135deg, #0891b2 0%, #0ea5e9 100%)',
+        'cleanbiz-gradient': 'linear-gradient(135deg, #14b8a6 0%, #0ea5e9 100%)',
+        'cleanbiz-gradient-light': 'linear-gradient(135deg, #5eead4 0%, #38bdf8 100%)',
+        'cleanbiz-gradient-soft': 'linear-gradient(135deg, #ccfbf1 0%, #e0f2fe 100%)',
       }
     },
   },
