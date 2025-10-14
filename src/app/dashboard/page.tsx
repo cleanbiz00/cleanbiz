@@ -160,11 +160,13 @@ export default function DashboardPage() {
         boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)'
       }}>
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <img src="/logo-icon.svg" alt="CleanBiz360" className="h-8 w-8" />
-            <h2 className="text-3xl font-bold text-white">Dashboard</h2>
+          <div className="flex items-center justify-center mb-4">
+            <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-12 w-auto" />
           </div>
-          <p className="text-white/80 text-sm">Visão geral do seu negócio</p>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-white mb-2">Dashboard</h2>
+            <p className="text-white/80 text-sm">Visão geral do seu negócio</p>
+          </div>
         </div>
         {/* Efeito de brilho */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -182,7 +184,7 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl shadow-lg">
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
-              <div>
+            <div>
                 <p className="text-sm text-gray-500 font-medium">Receita Mensal</p>
               </div>
             </div>
@@ -206,7 +208,7 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-red-400 to-rose-500 rounded-xl shadow-lg">
                 <TrendingDown className="h-6 w-6 text-white" />
               </div>
-              <div>
+            <div>
                 <p className="text-sm text-gray-500 font-medium">Despesas</p>
               </div>
             </div>
@@ -230,7 +232,7 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl shadow-lg">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
-              <div>
+            <div>
                 <p className="text-sm text-gray-500 font-medium">Lucro Líquido</p>
               </div>
             </div>
@@ -254,7 +256,7 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl shadow-lg">
                 <Users className="h-6 w-6 text-white" />
               </div>
-              <div>
+            <div>
                 <p className="text-sm text-gray-500 font-medium">Clientes Ativos</p>
               </div>
             </div>
@@ -288,21 +290,21 @@ export default function DashboardPage() {
               appointments.map(appointment => (
                 <div key={appointment.id} className="group relative bg-gradient-to-r from-white to-blue-50/30 p-4 rounded-xl border border-blue-100/50 hover:border-blue-300/50 transition-all duration-300 hover:shadow-lg">
                   <div className="flex justify-between items-center">
-                    <div>
+                <div>
                       <p className="font-semibold text-gray-800">{getClientName(appointment.clientId)}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Calendar className="h-3 w-3 text-gray-400" />
                         <p className="text-sm text-gray-600">{appointment.date} • {appointment.time}</p>
                       </div>
-                    </div>
+                </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       appointment.status === 'Confirmado' 
                         ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-sm' 
                         : 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-sm'
-                    }`}>
-                      {appointment.status}
-                    </span>
-                  </div>
+                }`}>
+                  {appointment.status}
+                </span>
+              </div>
                   {/* Barra de progresso decorativa */}
                   <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full group-hover:w-full transition-all duration-500"></div>
                 </div>
@@ -333,7 +335,7 @@ export default function DashboardPage() {
               clients.map(client => (
                 <div key={client.id} className="group relative bg-gradient-to-r from-white to-purple-50/30 p-4 rounded-xl border border-purple-100/50 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg">
                   <div className="flex justify-between items-center">
-                    <div>
+                <div>
                       <p className="font-semibold text-gray-800">{client.name}</p>
                       <p className="text-sm text-gray-600 mt-1">{client.serviceType}</p>
                     </div>

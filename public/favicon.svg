@@ -13,27 +13,33 @@
       <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
     </linearGradient>
+    <linearGradient id="swooshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0891b2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
   </defs>
   
-  <!-- House icon -->
+  <!-- House icon only (no background) -->
   <g transform="translate(4, 4)">
     <!-- House base -->
-    <rect x="6" y="12" width="12" height="10" fill="url(#houseGradient)" rx="1"/>
+    <rect x="8" y="16" width="16" height="12" fill="url(#houseGradient)" rx="1.5"/>
     <!-- Roof -->
-    <polygon points="6,12 12,6 18,12" fill="url(#roofGradient)"/>
+    <polygon points="8,16 16,8 24,16" fill="url(#roofGradient)"/>
     <!-- Chimney -->
-    <rect x="14" y="4" width="4" height="6" fill="url(#houseGradient)" rx="0.5"/>
-    <!-- Windows (2x2 grid) -->
-    <rect x="8" y="14" width="2" height="2" fill="#0ea5e9" rx="0.2"/>
-    <rect x="11" y="14" width="2" height="2" fill="#0ea5e9" rx="0.2"/>
-    <rect x="8" y="17" width="2" height="2" fill="#0ea5e9" rx="0.2"/>
-    <rect x="11" y="17" width="2" height="2" fill="#0ea5e9" rx="0.2"/>
-    <!-- Curved swoosh -->
-    <path d="M 3 18 Q 12 24 21 18" stroke="url(#blueGradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <!-- Sparkle stars -->
-    <g fill="#14b8a6">
-      <polygon points="16,2 16.5,3 17.5,3 16.8,3.7 17,4.5 16,4 15,4.5 15.2,3.7 14.5,3 15.5,3"/>
-      <polygon points="20,6 20.3,6.5 20.8,6.5 20.5,6.8 20.6,7.3 20,7 19.4,7.3 19.5,6.8 19.2,6.5 19.7,6.5"/>
+    <rect x="18" y="6" width="6" height="8" fill="url(#houseGradient)" rx="0.8"/>
+    <!-- Window (single square) -->
+    <rect x="12" y="18" width="8" height="8" fill="#0ea5e9" rx="0.8"/>
+    <line x1="16" y1="18" x2="16" y2="26" stroke="white" stroke-width="0.8"/>
+    <line x1="12" y1="22" x2="20" y2="22" stroke="white" stroke-width="0.8"/>
+    <!-- First swoosh -->
+    <path d="M 4 20 Q 16 28 28 20" stroke="url(#swooshGradient)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Second swoosh -->
+    <path d="M 6 22 Q 16 30 26 22" stroke="url(#swooshGradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- Sparkle stars (white) -->
+    <g fill="white">
+      <polygon points="20,4 20.5,5 21.5,5 20.8,5.7 21,6.5 20,6 19,6.5 19.2,5.7 18.5,5 19.5,5"/>
+      <polygon points="24,6 24.3,6.5 24.8,6.5 24.5,6.8 24.6,7.3 24,7 23.4,7.3 23.5,6.8 23.2,6.5 23.7,6.5"/>
+      <polygon points="26,4 26.3,4.5 26.8,4.5 26.5,4.8 26.6,5.3 26,5 25.4,5.3 25.5,4.8 25.2,4.5 25.7,4.5"/>
     </g>
   </g>
 </svg>

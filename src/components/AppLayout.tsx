@@ -90,15 +90,10 @@ export default function AppLayout({
         <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
           {/* Logo Premium */}
           <div className="mb-10">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-cleanbiz-gradient rounded-xl shadow-lg">
-                <img src="/logo-icon.svg" alt="CleanBiz360" className="h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">CleanBiz360</h1>
-              </div>
+            <div className="flex items-center justify-center mb-4">
+              <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-16 w-auto" />
             </div>
-            <p className="text-slate-600 text-sm ml-12">Sistema Premium</p>
+            <p className="text-slate-600 text-sm text-center">Sistema Premium de Gerenciamento</p>
           </div>
           
           {/* Menu Items */}
@@ -161,15 +156,10 @@ export default function AppLayout({
           <div className="absolute left-0 top-0 bottom-0 w-80 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
             {/* Logo Premium */}
             <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-cleanbiz-gradient rounded-xl shadow-lg">
-                  <img src="/logo-icon.svg" alt="CleanBiz360" className="h-6 w-6" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">CleanBiz360</h1>
-                </div>
+              <div className="flex items-center justify-center mb-4">
+                <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-14 w-auto" />
               </div>
-              <p className="text-slate-600 text-sm ml-12">Sistema Premium</p>
+              <p className="text-slate-600 text-sm text-center">Sistema Premium de Gerenciamento</p>
             </div>
             
             {/* Menu Items */}
@@ -237,10 +227,10 @@ export default function AppLayout({
             <Menu size={22} className="text-cyan-600" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-cleanbiz-gradient rounded-lg">
-              <img src="/logo-icon.svg" alt="CleanBiz360" className="h-4 w-4" />
+            <div className="p-1.5 bg-white rounded-lg shadow-sm">
+              <img src="/favicon.svg" alt="CleanBiz360" className="h-5 w-5" />
             </div>
-            <span className="font-bold bg-cleanbiz-gradient bg-clip-text text-transparent">
+            <span className="font-bold text-slate-800">
               CleanBiz360
             </span>
           </div>
