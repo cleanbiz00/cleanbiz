@@ -89,11 +89,16 @@ export default function AppLayout({
       <div className="hidden lg:block">
         <div className="w-72 h-screen sticky top-0 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
           {/* Logo Premium */}
-          <div className="mb-10">
-            <div className="flex items-center justify-center mb-4">
-              <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-16 w-auto" />
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2 bg-cleanbiz-gradient rounded-lg shadow-md">
+                <img src="/favicon.svg" alt="CleanBiz360" className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-800">CleanBiz360</h1>
+                <p className="text-slate-600 text-xs">Sistema Premium</p>
+              </div>
             </div>
-            <p className="text-slate-600 text-sm text-center">Sistema Premium de Gerenciamento</p>
           </div>
           
           {/* Menu Items */}
@@ -156,10 +161,15 @@ export default function AppLayout({
           <div className="absolute left-0 top-0 bottom-0 w-80 bg-gradient-to-b from-slate-100 via-cyan-50 to-blue-100 text-slate-800 p-6 shadow-2xl border-r border-slate-200">
             {/* Logo Premium */}
             <div className="mb-8">
-              <div className="flex items-center justify-center mb-4">
-                <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-14 w-auto" />
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-cleanbiz-gradient rounded-lg shadow-md">
+                  <img src="/favicon.svg" alt="CleanBiz360" className="h-6 w-6" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-slate-800">CleanBiz360</h1>
+                  <p className="text-slate-600 text-xs">Sistema Premium</p>
+                </div>
               </div>
-              <p className="text-slate-600 text-sm text-center">Sistema Premium de Gerenciamento</p>
             </div>
             
             {/* Menu Items */}

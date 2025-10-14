@@ -160,12 +160,14 @@ export default function DashboardPage() {
         boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)'
       }}>
         <div className="relative z-10">
-          <div className="flex items-center justify-center mb-4">
-            <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-12 w-auto" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-2">Dashboard</h2>
-            <p className="text-white/80 text-sm">Visão geral do seu negócio</p>
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/20 rounded-xl shadow-lg">
+              <img src="/favicon.svg" alt="CleanBiz360" className="h-8 w-8" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-1">Dashboard</h2>
+              <p className="text-white/80 text-sm">Visão geral do seu negócio</p>
+            </div>
           </div>
         </div>
         {/* Efeito de brilho */}
