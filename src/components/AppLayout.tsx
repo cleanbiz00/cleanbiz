@@ -58,11 +58,11 @@ export default function AppLayout({
   }
 
   const menuItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: Home, gradient: 'from-cyan-400 to-blue-500' },
-    { path: '/clientes', label: 'Clientes', icon: Users, gradient: 'from-teal-400 to-cyan-500' },
-    { path: '/funcionarios', label: 'Funcionários', icon: Briefcase, gradient: 'from-cyan-500 to-blue-600' },
-    { path: '/agenda', label: 'Agenda', icon: Calendar, gradient: 'from-blue-500 to-indigo-600' },
-    { path: '/financeiro', label: 'Financeiro', icon: DollarSign, gradient: 'from-indigo-500 to-purple-600' },
+    { path: '/dashboard', label: 'Dashboard', icon: Home, gradient: 'from-sky-300 to-cyan-400' },
+    { path: '/clientes', label: 'Clientes', icon: Users, gradient: 'from-cyan-300 to-teal-400' },
+    { path: '/funcionarios', label: 'Funcionários', icon: Briefcase, gradient: 'from-blue-300 to-sky-400' },
+    { path: '/agenda', label: 'Agenda', icon: Calendar, gradient: 'from-indigo-300 to-blue-400' },
+    { path: '/financeiro', label: 'Financeiro', icon: DollarSign, gradient: 'from-purple-300 to-indigo-400' },
   ]
 
   // Se for página de login, renderizar sem layout
