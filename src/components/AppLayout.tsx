@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../utils/supabaseClient'
-import { Menu, Home, Users, Calendar, DollarSign, LogOut, Briefcase } from 'lucide-react'
+import { Menu, Home, Users, Calendar, DollarSign, LogOut, Briefcase, Sparkles } from 'lucide-react'
 
 export default function AppLayout({
   children,
@@ -92,7 +92,7 @@ export default function AppLayout({
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 bg-cleanbiz-gradient rounded-lg shadow-md">
-                <img src="/favicon.png" alt="CleanBiz360" className="h-6 w-6" />
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-800">CleanBiz360</h1>
@@ -146,7 +146,7 @@ export default function AppLayout({
           <div className="absolute bottom-6 left-6 right-6">
             <div className="bg-white/80 backdrop-blur-lg border border-slate-200 rounded-xl p-3 text-center">
               <p className="text-slate-600 text-xs flex items-center justify-center gap-2">
-                <img src="/favicon.png" alt="CleanBiz360" className="h-3 w-3" />
+                <Sparkles className="h-3 w-3" />
                 Premium Edition
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function AppLayout({
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-cleanbiz-gradient rounded-lg shadow-md">
-                  <img src="/favicon.png" alt="CleanBiz360" className="h-6 w-6" />
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">CleanBiz360</h1>
@@ -217,7 +217,7 @@ export default function AppLayout({
             <div className="absolute bottom-6 left-6 right-6">
               <div className="bg-white/80 backdrop-blur-lg border border-slate-200 rounded-xl p-3 text-center">
                 <p className="text-slate-600 text-xs flex items-center justify-center gap-2">
-                  <img src="/favicon.png" alt="CleanBiz360" className="h-3 w-3" />
+                  <Sparkles className="h-3 w-3" />
                   Premium Edition
                 </p>
               </div>
@@ -237,8 +237,8 @@ export default function AppLayout({
             <Menu size={22} className="text-cyan-600" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-white rounded-lg shadow-sm">
-              <img src="/favicon.png" alt="CleanBiz360" className="h-5 w-5" />
+            <div className="p-1.5 bg-cleanbiz-gradient rounded-lg shadow-sm">
+              <Sparkles className="h-4 w-4 text-white" />
             </div>
             <span className="font-bold text-slate-800">
               CleanBiz360

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../../utils/supabaseClient'
-import { DollarSign, TrendingUp, TrendingDown, Users, Calendar } from 'lucide-react'
+import { DollarSign, TrendingUp, TrendingDown, Users, Calendar, Sparkles } from 'lucide-react'
 
 export default function DashboardPage() {
   const [monthlyExpenses, setMonthlyExpenses] = useState(0)
@@ -162,7 +162,7 @@ export default function DashboardPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/20 rounded-xl shadow-lg">
-              <img src="/favicon.png" alt="CleanBiz360" className="h-8 w-8" />
+              <Sparkles className="h-8 w-8 text-white" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-white mb-1">Dashboard</h2>
