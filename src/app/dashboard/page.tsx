@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../../utils/supabaseClient'
-import { DollarSign, TrendingUp, TrendingDown, Users, Calendar, Sparkles } from 'lucide-react'
+import { DollarSign, TrendingUp, TrendingDown, Users, Calendar } from 'lucide-react'
 
 export default function DashboardPage() {
   const [monthlyExpenses, setMonthlyExpenses] = useState(0)
@@ -154,15 +154,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-6 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="p-6 min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
       {/* Header Premium com Glassmorphism */}
-      <div className="relative mb-8 p-8 rounded-3xl overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        boxShadow: '0 20px 60px rgba(102, 126, 234, 0.3)'
+      <div className="relative mb-8 p-8 rounded-3xl overflow-hidden bg-cleanbiz-gradient shadow-2xl" style={{
+        boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)'
       }}>
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="h-8 w-8 text-white" />
+            <img src="/logo-icon.svg" alt="CleanBiz360" className="h-8 w-8" />
             <h2 className="text-3xl font-bold text-white">Dashboard</h2>
           </div>
           <p className="text-white/80 text-sm">Visão geral do seu negócio</p>

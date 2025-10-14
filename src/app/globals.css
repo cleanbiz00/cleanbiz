@@ -51,11 +51,11 @@ html, body {
 }
 
 .rbc-today {
-  background: #fef3c7;
+  background: #e0f7fa;
 }
 
 .rbc-current-time-indicator {
-  background: #ef4444;
+  background: #06b6d4;
   height: 2px;
 }
 
@@ -142,9 +142,9 @@ html, body {
 }
 
 .rbc-btn-group > button.rbc-active {
-  background: #3b82f6;
+  background: #06b6d4;
   color: white;
-  border-color: #3b82f6;
+  border-color: #06b6d4;
 }
 
 .rbc-toolbar button {
@@ -186,7 +186,7 @@ html, body {
 
 /* Event status colors */
 .rbc-event.status-confirmado {
-  background: #10b981;
+  background: #14b8a6;
 }
 
 .rbc-event.status-agendado {
@@ -198,7 +198,7 @@ html, body {
 }
 
 .rbc-event.status-concluido {
-  background: #3b82f6;
+  background: #06b6d4;
 }
 
 /* Mobile responsive styles */

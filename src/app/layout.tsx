@@ -3,8 +3,13 @@ import "./globals.css";
 import AppLayout from "../components/AppLayout";
 
 export const metadata: Metadata = {
-  title: "CleanBiz - Sistema de Gerenciamento",
-  description: "Sistema de gerenciamento para empresas de limpeza",
+  title: "CleanBiz360 - Sistema Premium de Gerenciamento",
+  description: "Sistema premium de gerenciamento para empresas de limpeza e serviços",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.svg',
+  },
 };
 
 // Force rebuild - v3.0

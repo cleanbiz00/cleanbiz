@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../utils/supabaseClient'
-import { Sparkles, Mail, Lock, LogIn } from 'lucide-react'
+import { Mail, Lock, LogIn } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,20 +29,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-900 relative overflow-hidden">
       {/* Efeitos de fundo animados */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       
       {/* Card de Login Premium */}
       <div className="w-full max-w-md relative z-10">
         {/* Logo e Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl shadow-2xl mb-4">
-            <Sparkles className="h-10 w-10 text-white" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-cleanbiz-gradient rounded-2xl shadow-2xl mb-4">
+            <img src="/logo-icon.svg" alt="CleanBiz360" className="h-10 w-10" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">CleanBiz</h1>
-          <p className="text-blue-200">Sistema Premium de Gerenciamento</p>
+          <h1 className="text-4xl font-bold text-white mb-2">CleanBiz360</h1>
+          <p className="text-cyan-200">Sistema Premium de Gerenciamento</p>
         </div>
         
         {/* Form Card com Glassmorphism */}
@@ -55,7 +55,7 @@ export default function LoginPage() {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
                 <input 
                   type="email" 
-                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:bg-white/20 transition-all" 
+                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400 focus:border-transparent focus:bg-white/20 transition-all" 
                   placeholder="seu@email.com"
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
                 <input 
                   type="password" 
-                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:bg-white/20 transition-all" 
+                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-cyan-400 focus:border-transparent focus:bg-white/20 transition-all" 
                   placeholder="••••••••"
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
@@ -91,7 +91,7 @@ export default function LoginPage() {
             <button 
               type="submit" 
               disabled={loading} 
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+              className="w-full bg-cleanbiz-gradient text-white py-3 rounded-xl font-medium hover:opacity-90 disabled:opacity-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -118,7 +118,7 @@ export default function LoginPage() {
         {/* Badge de versão */}
         <div className="text-center mt-6">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 text-white/80 text-xs">
-            <Sparkles className="h-3 w-3" />
+            <img src="/logo-icon.svg" alt="CleanBiz360" className="h-3 w-3" />
             Premium Edition
           </span>
         </div>

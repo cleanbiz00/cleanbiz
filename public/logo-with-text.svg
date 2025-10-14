@@ -1,0 +1,37 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14b8a6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="houseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- House icon -->
+  <g transform="translate(10, 10)">
+    <!-- House base -->
+    <rect x="8" y="16" width="16" height="12" fill="url(#houseGradient)" rx="1"/>
+    <!-- Roof -->
+    <polygon points="8,16 16,8 24,16" fill="url(#blueGradient)"/>
+    <!-- Window -->
+    <rect x="12" y="18" width="8" height="8" fill="#0891b2" rx="0.5"/>
+    <line x1="16" y1="18" x2="16" y2="26" stroke="white" stroke-width="0.5"/>
+    <line x1="12" y1="22" x2="20" y2="22" stroke="white" stroke-width="0.5"/>
+    <!-- Curved arc around house -->
+    <path d="M 4 24 Q 16 32 28 24" stroke="url(#blueGradient)" stroke-width="3" fill="none"/>
+    <!-- Sparkle stars -->
+    <g fill="#06b6d4">
+      <polygon points="20,6 21,8 23,8 21.5,9.5 22,11.5 20,10 18,11.5 18.5,9.5 17,8 19,8"/>
+      <polygon points="26,4 26.5,5 27.5,5 26.8,5.7 27,6.5 26,6 25,6.5 25.2,5.7 24.5,5 25.5,5"/>
+      <polygon points="30,8 30.3,8.5 30.8,8.5 30.5,8.8 30.6,9.3 30,9 29.4,9.3 29.5,8.8 29.2,8.5 29.7,8.5"/>
+    </g>
+  </g>
+  
+  <!-- Text -->
+  <text x="45" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1e293b">Clean</text>
+  <text x="45" y="45" font-family="Arial, sans-serif" font-size="16" font-weight="normal" fill="url(#blueGradient)">Biz360®</text>
+</svg>
