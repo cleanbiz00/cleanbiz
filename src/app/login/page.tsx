@@ -39,7 +39,7 @@ export default function LoginPage() {
         {/* Logo e Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">
-            <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-16 w-auto" />
+            <img src="/logo-with-text.png" alt="CleanBiz360" className="h-16 w-auto" />
           </div>
           <p className="text-slate-600 text-sm">Sistema Premium de Gerenciamento</p>
         </div>
@@ -117,7 +117,7 @@ export default function LoginPage() {
         {/* Badge de versão */}
         <div className="text-center mt-6">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-lg rounded-full border border-slate-200 text-slate-600 text-xs shadow-sm">
-            <img src="/favicon.svg" alt="CleanBiz360" className="h-3 w-3" />
+            <img src="/favicon.png" alt="CleanBiz360" className="h-3 w-3" />
             Premium Edition
           </span>
         </div>

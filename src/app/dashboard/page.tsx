@@ -162,7 +162,7 @@ export default function DashboardPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-white/20 rounded-xl shadow-lg">
-              <img src="/favicon.svg" alt="CleanBiz360" className="h-8 w-8" />
+              <img src="/favicon.png" alt="CleanBiz360" className="h-8 w-8" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-white mb-1">Dashboard</h2>
