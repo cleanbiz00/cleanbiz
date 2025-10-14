@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Phone, Mail, MapPin, Search } from 'lucide-react'
+import { Plus, Edit3, Trash2, Phone, Mail, MapPin, Search, Users } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function ClientesPage() {
@@ -178,33 +178,49 @@ export default function ClientesPage() {
   )
 
   return (
-    <div className="p-6 pb-28 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Clientes</h2>
-        <button
-          onClick={() => openModal()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
-        >
-          <Plus size={20} />
-          <span>Novo Cliente</span>
-        </button>
+    <div className="p-4 md:p-6 pb-28 min-h-screen">
+      {/* Header Premium */}
+      <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+        boxShadow: '0 20px 60px rgba(168, 85, 247, 0.3)'
+      }}>
+        <div className="relative z-10 flex justify-between items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Users className="h-7 w-7 text-white" />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Clientes</h2>
+            </div>
+            <p className="text-white/80 text-sm">Gerencie sua base de clientes</p>
+          </div>
+          <button
+            onClick={() => openModal()}
+            className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            <Plus size={20} />
+            <span className="hidden sm:inline">Novo Cliente</span>
+            <span className="sm:hidden">Novo</span>
+          </button>
+        </div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
       </div>
       
-      {/* Campo de busca */}
-      <div className="mb-4">
+      {/* Campo de busca Premium */}
+      <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-400" size={20} />
           <input
             type="text"
             placeholder="Buscar por nome, email, telefone, endereço..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-xl border border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent shadow-lg transition-all"
           />
         </div>
         {searchTerm && (
-          <p className="text-sm text-gray-600 mt-2">
-            {filteredClients.length} {filteredClients.length === 1 ? 'cliente encontrado' : 'clientes encontrados'}
+          <p className="text-sm text-gray-600 mt-2 ml-1 flex items-center gap-2">
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+              {filteredClients.length} {filteredClients.length === 1 ? 'cliente encontrado' : 'clientes encontrados'}
+            </span>
           </p>
         )}
       </div>
@@ -268,81 +284,96 @@ export default function ClientesPage() {
         </table>
       </div>
 
-      {/* Mobile cards */}
-      <div className="lg:hidden space-y-3">
+      {/* Mobile cards Premium */}
+      <div className="lg:hidden space-y-4">
         {filteredClients.map(client => (
-          <div key={client.id} className="bg-white rounded-lg shadow p-4">
-            <div className="flex justify-between items-start">
+          <div key={client.id} className="group relative bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-xl p-5 rounded-2xl border border-purple-100/50 hover:border-purple-300/50 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="font-medium">{client.name}</p>
-                <p className="text-sm text-gray-600 flex items-center">
-                  <MapPin size={14} className="mr-1" />
-                  {client.address}
-                </p>
-                <p className="text-sm flex items-center mt-1">
-                  <Phone size={14} className="mr-1" /> {client.phone}
-                </p>
-                <p className="text-sm text-gray-600 flex items-center">
-                  <Mail size={14} className="mr-1" /> {client.email}
-                </p>
+                <p className="text-lg font-bold text-gray-800">{client.name}</p>
+                <p className="text-xs text-purple-600 font-medium mt-1">{client.serviceType}</p>
               </div>
             </div>
-            <div className="text-sm text-gray-700 mt-2">
-              <span className="font-medium">Tipo:</span> {client.serviceType}
+            <div className="space-y-2 text-sm">
+              <p className="flex items-center gap-2 text-gray-600">
+                <MapPin size={14} className="text-purple-400" />
+                {client.address}
+              </p>
+              <p className="flex items-center gap-2 text-gray-600">
+                <Phone size={14} className="text-purple-400" />
+                {client.phone}
+              </p>
+              <p className="flex items-center gap-2 text-gray-600">
+                <Mail size={14} className="text-purple-400" />
+                {client.email}
+              </p>
             </div>
-            <div className="mt-3 flex gap-2">
-              <button onClick={() => openModal(client)} className="px-3 py-2 text-sm rounded bg-blue-50 text-blue-700 flex items-center gap-1">
+            <div className="mt-4 flex gap-2">
+              <button 
+                onClick={() => openModal(client)} 
+                className="flex-1 px-4 py-2.5 text-sm rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white flex items-center justify-center gap-2 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all"
+              >
                 <Edit3 size={14} /> Editar
               </button>
-              <button onClick={() => deleteItem(client.id)} className="px-3 py-2 text-sm rounded bg-red-50 text-red-700 flex items-center gap-1">
+              <button 
+                onClick={() => deleteItem(client.id)} 
+                className="px-4 py-2.5 text-sm rounded-xl bg-gradient-to-r from-red-500 to-rose-600 text-white flex items-center gap-2 hover:from-red-600 hover:to-rose-700 shadow-md hover:shadow-lg transition-all"
+              >
                 <Trash2 size={14} /> Excluir
               </button>
             </div>
+            {/* Barra decorativa no hover */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full group-hover:w-full transition-all duration-500"></div>
           </div>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Modal Premium com Glassmorphism */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-bold mb-4">
-              {editingItem ? 'Editar Cliente' : 'Novo Cliente'}
-            </h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {editingItem ? 'Editar Cliente' : 'Novo Cliente'}
+              </h3>
+            </div>
             
             <div className="space-y-4">
               <input
                 type="text"
-                placeholder="Nome"
+                placeholder="Nome completo"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               />
               <input
                 type="email"
                 placeholder="Email"
                 value={formData.email || ''}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               />
               <input
                 type="tel"
                 placeholder="Telefone"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               />
               <input
                 type="text"
-                placeholder="Endereço"
+                placeholder="Endereço completo"
                 value={formData.address || ''}
                 onChange={(e) => setFormData({...formData, address: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               />
               <select
                 value={formData.serviceType || ''}
                 onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               >
                 <option value="">Selecione o tipo de serviço</option>
                 <option value="Limpeza Residencial">Limpeza Residencial</option>
@@ -351,16 +382,16 @@ export default function ClientesPage() {
               </select>
             </div>
             
-            <div className="flex space-x-4 mt-6">
+            <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSave}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
               >
                 Salvar
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
+                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
               >
                 Cancelar
               </button>

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Edit3, Trash2, Phone, Mail, Search } from 'lucide-react'
+import { Plus, Edit3, Trash2, Phone, Mail, Search, Briefcase } from 'lucide-react'
 import { supabase } from '../../utils/supabaseClient'
 
 export default function FuncionariosPage() {
@@ -143,108 +143,138 @@ export default function FuncionariosPage() {
   )
 
   return (
-    <div className="p-6 pb-28 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Funcionários</h2>
-        <button
-          onClick={() => openModal()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
-        >
-          <Plus size={20} />
-          <span>Novo Funcionário</span>
-        </button>
+    <div className="p-4 md:p-6 pb-28 min-h-screen">
+      {/* Header Premium */}
+      <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        boxShadow: '0 20px 60px rgba(16, 185, 129, 0.3)'
+      }}>
+        <div className="relative z-10 flex justify-between items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Briefcase className="h-7 w-7 text-white" />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Funcionários</h2>
+            </div>
+            <p className="text-white/80 text-sm">Gerencie sua equipe</p>
+          </div>
+          <button
+            onClick={() => openModal()}
+            className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            <Plus size={20} />
+            <span className="hidden sm:inline">Novo Funcionário</span>
+            <span className="sm:hidden">Novo</span>
+          </button>
+        </div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
       </div>
       
-      {/* Campo de busca */}
+      {/* Campo de busca Premium */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-500" size={20} />
           <input
             type="text"
             placeholder="Buscar por nome, email, telefone, cargo..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-xl border border-green-200/50 rounded-2xl focus:ring-2 focus:ring-green-400 focus:border-transparent shadow-lg transition-all"
           />
         </div>
         {searchTerm && (
-          <p className="text-sm text-gray-600 mt-2">
-            {filteredEmployees.length} {filteredEmployees.length === 1 ? 'funcionário encontrado' : 'funcionários encontrados'}
+          <p className="text-sm text-gray-600 mt-2 ml-1 flex items-center gap-2">
+            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+              {filteredEmployees.length} {filteredEmployees.length === 1 ? 'funcionário encontrado' : 'funcionários encontrados'}
+            </span>
           </p>
         )}
       </div>
       
+      {/* Grid de Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEmployees.map(employee => (
-          <div key={employee.id} className="bg-white p-6 rounded-lg shadow-lg">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">{employee.name}</h3>
-                <p className="text-blue-600">{employee.role}</p>
+          <div key={employee.id} className="group relative bg-gradient-to-br from-white to-green-50/30 backdrop-blur-xl p-6 rounded-2xl border border-green-100/50 hover:border-green-300/50 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
+            <div className="relative">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">{employee.name}</h3>
+                  <p className="text-sm font-medium text-green-600 mt-1 flex items-center gap-1">
+                    <Briefcase size={12} />
+                    {employee.role}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openModal(employee)}
+                    className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                  >
+                    <Edit3 size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteItem(employee.id)}
+                    className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => openModal(employee)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <Edit3 size={16} />
-                </button>
-                <button
-                  onClick={() => deleteItem(employee.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 size={16} />
-                </button>
+              <div className="space-y-2 text-sm">
+                <p className="flex items-center gap-2 text-gray-600">
+                  <Phone size={14} className="text-green-500" />
+                  {employee.phone}
+                </p>
+                <p className="flex items-center gap-2 text-gray-600">
+                  <Mail size={14} className="text-green-500" />
+                  {employee.email}
+                </p>
               </div>
             </div>
-            <div className="space-y-2 text-sm">
-              <p className="flex items-center">
-                <Phone size={14} className="mr-2" />
-                {employee.phone}
-              </p>
-              <p className="flex items-center">
-                <Mail size={14} className="mr-2" />
-                {employee.email}
-              </p>
-            </div>
+            {/* Barra decorativa no hover */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full group-hover:w-full transition-all duration-500"></div>
           </div>
         ))}
       </div>
 
-      {/* Modal */}
+      {/* Modal Premium com Glassmorphism */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-bold mb-4">
-              {editingItem ? 'Editar Funcionário' : 'Novo Funcionário'}
-            </h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl">
+                <Briefcase className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                {editingItem ? 'Editar Funcionário' : 'Novo Funcionário'}
+              </h3>
+            </div>
             
             <div className="space-y-4">
               <input
                 type="text"
-                placeholder="Nome"
+                placeholder="Nome completo"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
               />
               <input
                 type="email"
                 placeholder="Email"
                 value={formData.email || ''}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
               />
               <input
                 type="tel"
                 placeholder="Telefone"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
               />
               <select
                 value={formData.role || ''}
                 onChange={(e) => setFormData({...formData, role: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-400 focus:border-transparent transition-all"
               >
                 <option value="">Selecione o cargo</option>
                 <option value="Supervisora">Supervisora</option>
@@ -253,16 +283,16 @@ export default function FuncionariosPage() {
               </select>
             </div>
             
-            <div className="flex space-x-4 mt-6">
+            <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSave}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
               >
                 Salvar
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
+                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
               >
                 Cancelar
               </button>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../utils/supabaseClient'
-import { Plus, Edit3, Trash2, DollarSign } from 'lucide-react'
+import { Plus, Edit3, Trash2, DollarSign, TrendingUp, TrendingDown, Wallet, PieChart as PieChartIcon } from 'lucide-react'
 
 const CATEGORIES = [
   'Despesas com Pessoal',
@@ -309,84 +309,135 @@ export default function FinanceiroPage() {
   const totalProfit = totalRevenue - totalExpenses
 
   return (
-    <div className="p-6 pb-28 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Financeiro</h2>
+    <div className="p-4 md:p-6 pb-28 min-h-screen">
+      {/* Header Premium */}
+      <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
+        boxShadow: '0 20px 60px rgba(245, 158, 11, 0.3)'
+      }}>
+        <div className="relative z-10 flex justify-between items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Wallet className="h-7 w-7 text-white" />
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Financeiro</h2>
+            </div>
+            <p className="text-white/80 text-sm">Controle completo das finanças</p>
+          </div>
         <button
           onClick={() => openModal()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+            className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
         >
           <Plus size={20} />
-          <span>Nova Despesa</span>
+            <span className="hidden sm:inline">Nova Despesa</span>
+            <span className="sm:hidden">Nova</span>
         </button>
+        </div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Receita (Mês)</p>
-              <p className="text-2xl font-bold text-green-600">${monthlyRevenue.toFixed(2)}</p>
-              <p className="text-xs text-gray-500 mt-1">{allAppointments.filter(a => {
-                const d = new Date(a.date)
-                const now = new Date()
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== 'Cancelado'
-              }).length} serviços</p>
+        {/* Receita Mensal */}
+        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl shadow-lg">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm text-gray-500 font-medium">Receita (Mês)</p>
             </div>
-            <DollarSign className="h-8 w-8 text-green-600" />
+            <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              ${monthlyRevenue.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">{allAppointments.filter(a => {
+              const d = new Date(a.date)
+              const now = new Date()
+              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== 'Cancelado'
+            }).length} serviços</p>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Despesas (Mês)</p>
-              <p className="text-2xl font-bold text-red-600">${monthlyExpenses.toFixed(2)}</p>
-              <p className="text-xs text-gray-500 mt-1">{expenses.filter(e => {
-                const d = new Date(e.date)
-                const now = new Date()
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-              }).length} registros</p>
+        {/* Despesas Mensais */}
+        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-400/20 to-rose-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-red-400 to-rose-500 rounded-xl shadow-lg">
+                <TrendingDown className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm text-gray-500 font-medium">Despesas (Mês)</p>
             </div>
-            <DollarSign className="h-8 w-8 text-red-600" />
+            <p className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+              ${monthlyExpenses.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">{expenses.filter(e => {
+              const d = new Date(e.date)
+                  const now = new Date()
+              return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            }).length} registros</p>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Lucro (Mês)</p>
-              <p className={`text-2xl font-bold ${monthlyProfit >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                ${monthlyProfit.toFixed(2)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Margem: {monthlyRevenue > 0 ? ((monthlyProfit / monthlyRevenue) * 100).toFixed(1) : 0}%
-              </p>
+        {/* Lucro Mensal */}
+        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl shadow-lg">
+                <Wallet className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm text-gray-500 font-medium">Lucro (Mês)</p>
             </div>
-            <DollarSign className="h-8 w-8 text-blue-600" />
+            <p className={`text-3xl font-bold bg-gradient-to-r ${monthlyProfit >= 0 ? 'from-blue-600 to-indigo-600' : 'from-red-600 to-rose-600'} bg-clip-text text-transparent`}>
+              ${monthlyProfit.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">
+              Margem: {monthlyRevenue > 0 ? ((monthlyProfit / monthlyRevenue) * 100).toFixed(1) : 0}%
+            </p>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-600 text-sm">Lucro (Total)</p>
-              <p className={`text-2xl font-bold ${totalProfit >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
-                ${totalProfit.toFixed(2)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Todos os períodos</p>
+        {/* Lucro Total */}
+        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-3 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl shadow-lg">
+                <DollarSign className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm text-gray-500 font-medium">Lucro (Total)</p>
             </div>
-            <DollarSign className="h-8 w-8 text-purple-600" />
+            <p className={`text-3xl font-bold bg-gradient-to-r ${totalProfit >= 0 ? 'from-purple-600 to-pink-600' : 'from-red-600 to-rose-600'} bg-clip-text text-transparent`}>
+              ${totalProfit.toFixed(2)}
+            </p>
+            <p className="text-xs text-gray-500 mt-2">Todos os períodos</p>
           </div>
         </div>
       </div>
 
-      {/* Financial Reports */}
+      {/* Financial Reports Premium */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Despesas por Categoria - GRÁFICO DE PIZZA */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">Despesas por Categoria</h3>
+        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
+              <PieChartIcon className="h-5 w-5 text-white" />
+            </div>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Despesas por Categoria
+            </h3>
+          </div>
           <PieChart 
             data={CATEGORIES.map((category, index) => {
               const categoryTotal = expenses
@@ -405,13 +456,22 @@ export default function FinanceiroPage() {
         </div>
 
         {/* Evolução Anual - GRÁFICO DE LINHA */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <h3 className="text-lg font-semibold">Evolução Anual</h3>
+        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
+          boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+        }}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Evolução Anual
+              </h3>
+            </div>
             <select
               value={chartMetric}
               onChange={(e) => setChartMetric(e.target.value)}
-              className="text-sm border rounded px-3 py-1"
+              className="text-sm border border-blue-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
             >
               <option value="lucro">Lucro Total</option>
               <option value="despesas">Despesas</option>
@@ -458,51 +518,61 @@ export default function FinanceiroPage() {
         </div>
       </div>
 
-      {/* Expenses List */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-lg font-semibold">Despesas Registradas</h3>
+      {/* Expenses List Premium */}
+      <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden" style={{
+        boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
+      }}>
+        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-amber-50">
+          <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+            Despesas Registradas
+          </h3>
         </div>
         
         {expenses.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <DollarSign size={48} className="mx-auto mb-4 text-gray-300" />
-            <p>Nenhuma despesa registrada ainda.</p>
-            <p className="text-sm">Clique em "Nova Despesa" para começar.</p>
+          <div className="p-12 text-center">
+            <div className="p-4 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl inline-block mb-4">
+              <DollarSign size={48} className="text-orange-400" />
+            </div>
+            <p className="text-gray-600 font-medium">Nenhuma despesa registrada ainda.</p>
+            <p className="text-sm text-gray-500 mt-1">Clique em "Nova Despesa" para começar.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-100">
             {expenses.map(expense => (
-              <div key={expense.id} className="p-6 hover:bg-gray-50">
+              <div key={expense.id} className="group p-6 hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-amber-50/50 transition-all duration-300">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="flex items-center space-x-3">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs rounded-full font-medium">
                         {expense.category}
                       </span>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        expense.type === 'Fixa' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${
+                        expense.type === 'Fixa' 
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
+                          : 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white'
                       }`}>
                         {expense.type}
                       </span>
                     </div>
-                    <h4 className="text-lg font-medium mt-2">{expense.description}</h4>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <h4 className="text-lg font-bold text-gray-800">{expense.description}</h4>
+                    <p className="text-sm text-gray-500 mt-1">
                       {new Date(expense.date).toLocaleDateString('pt-BR')} • {expense.frequency}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-bold text-red-600">${parseFloat(expense.amount).toFixed(2)}</p>
-                    <div className="flex space-x-2 mt-2">
+                    <p className="text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                      ${parseFloat(expense.amount).toFixed(2)}
+                    </p>
+                    <div className="flex gap-2 mt-3">
                       <button
                         onClick={() => openModal(expense)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                       >
                         <Edit3 size={16} />
                       </button>
                       <button
                         onClick={() => deleteItem(expense.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -515,19 +585,24 @@ export default function FinanceiroPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal Premium com Glassmorphism */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-bold mb-4">
-              {editingItem ? 'Editar Despesa' : 'Nova Despesa'}
-            </h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl">
+                <DollarSign className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                {editingItem ? 'Editar Despesa' : 'Nova Despesa'}
+              </h3>
+            </div>
             
             <div className="space-y-4">
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               >
                 {CATEGORIES.map(category => (
                   <option key={category} value={category}>{category}</option>
@@ -539,7 +614,7 @@ export default function FinanceiroPage() {
                 placeholder="Descrição da despesa"
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               />
               
               <input
@@ -547,20 +622,20 @@ export default function FinanceiroPage() {
                 placeholder="Valor"
                 value={formData.amount}
                 onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               />
               
               <input
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({...formData, date: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               />
               
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({...formData, type: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               >
                 <option value="Fixa">Fixa</option>
                 <option value="Variável">Variável</option>
@@ -569,7 +644,7 @@ export default function FinanceiroPage() {
               <select
                 value={formData.frequency}
                 onChange={(e) => setFormData({...formData, frequency: e.target.value})}
-                className="w-full p-3 border rounded-lg"
+                className="w-full p-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all"
               >
                 <option value="Única">Única</option>
                 <option value="Mensal">Mensal</option>
@@ -578,16 +653,16 @@ export default function FinanceiroPage() {
               </select>
             </div>
             
-            <div className="flex space-x-4 mt-6">
+            <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSave}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                className="flex-1 bg-gradient-to-r from-orange-500 to-amber-600 text-white py-3 rounded-xl hover:from-orange-600 hover:to-amber-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
               >
                 Salvar
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
+                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
               >
                 Cancelar
               </button>

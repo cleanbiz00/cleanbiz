@@ -624,46 +624,65 @@ export default function AgendaPage() {
   }
 
   return (
-    <div className="p-6 pb-28 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Agenda</h2>
-        <div className="flex items-center space-x-4">
-          {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('calendar')}
-              className={`p-2 rounded flex items-center space-x-2 transition-colors ${
-                viewMode === 'calendar' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <Grid3X3 size={16} />
-              <span className="hidden sm:inline">Calendário</span>
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`p-2 rounded flex items-center space-x-2 transition-colors ${
-                viewMode === 'table' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <List size={16} />
-              <span className="hidden sm:inline">Lista</span>
-            </button>
+    <div className="p-4 md:p-6 pb-28 min-h-screen">
+      {/* Header Premium */}
+      <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
+        background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+        boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)'
+      }}>
+        <div className="relative z-10">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Calendar className="h-7 w-7 text-white" />
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Agenda</h2>
+              </div>
+              <p className="text-white/80 text-sm">Gerencie seus agendamentos</p>
+            </div>
+            
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* View Mode Toggle Premium */}
+              <div className="flex bg-white/20 backdrop-blur-lg rounded-xl p-1 border border-white/30">
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`px-3 md:px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
+                    viewMode === 'calendar' 
+                      ? 'bg-white text-cyan-600 shadow-lg' 
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <Grid3X3 size={16} />
+                  <span className="hidden sm:inline text-sm">Calendário</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('table')}
+                  className={`px-3 md:px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
+                    viewMode === 'table' 
+                      ? 'bg-white text-cyan-600 shadow-lg' 
+                      : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  <List size={16} />
+                  <span className="hidden sm:inline text-sm">Lista</span>
+                </button>
+              </div>
+              
+              <button
+                onClick={() => openModal()}
+                className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                <Plus size={20} />
+                <span className="text-sm">Novo</span>
+              </button>
+            </div>
           </div>
-          
-          <button
-            onClick={() => openModal()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
-          >
-            <Plus size={20} />
-            <span className="hidden sm:inline">Novo Agendamento</span>
-            <span className="sm:hidden">Novo</span>
-          </button>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
       </div>
       
-      {/* Integration Status */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="text-sm font-semibold mb-2">Status das Integrações:</h3>
+      {/* Integration Status Premium */}
+      <div className="mb-6 p-5 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg">
+        <h3 className="text-sm font-bold text-gray-700 mb-3">Status das Integrações:</h3>
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center space-x-2">
             <Calendar size={16} className={googleConnected ? 'text-green-600' : 'text-gray-400'} />

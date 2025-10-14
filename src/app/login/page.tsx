@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../utils/supabaseClient'
+import { Sparkles, Mail, Lock, LogIn } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,43 +29,99 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
-      <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-blue-900">CleanBiz</h1>
-          <p className="text-gray-600">Sistema de Gerenciamento</p>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 relative overflow-hidden">
+      {/* Efeitos de fundo animados */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      
+      {/* Card de Login Premium */}
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo e Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl shadow-2xl mb-4">
+            <Sparkles className="h-10 w-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-2">CleanBiz</h1>
+          <p className="text-blue-200">Sistema Premium de Gerenciamento</p>
         </div>
         
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input 
-              type="email" 
-              className="w-full border rounded p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
-            />
+        {/* Form Card com Glassmorphism */}
+        <div className="bg-white/10 backdrop-blur-2xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Campo Email */}
+            <div>
+              <label className="block text-sm font-medium text-white/90 mb-2">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input 
+                  type="email" 
+                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:bg-white/20 transition-all" 
+                  placeholder="seu@email.com"
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                />
+              </div>
+            </div>
+            
+            {/* Campo Senha */}
+            <div>
+              <label className="block text-sm font-medium text-white/90 mb-2">Senha</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                <input 
+                  type="password" 
+                  className="w-full bg-white/10 border border-white/20 rounded-xl pl-11 pr-4 py-3 text-white placeholder-white/40 focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:bg-white/20 transition-all" 
+                  placeholder="••••••••"
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                />
+              </div>
+            </div>
+            
+            {/* Mensagem de erro */}
+            {error && (
+              <div className="bg-red-500/20 border border-red-400/50 rounded-xl p-3">
+                <p className="text-red-200 text-sm">{error}</p>
+              </div>
+            )}
+            
+            {/* Botão de Login */}
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Entrando...
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5" />
+                  Entrar
+                </>
+              )}
+            </button>
+          </form>
+          
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-white/60 text-xs">
+              Gestão profissional para seu negócio
+            </p>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Senha</label>
-            <input 
-              type="password" 
-              className="w-full border rounded p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-            />
-          </div>
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+        </div>
+        
+        {/* Badge de versão */}
+        <div className="text-center mt-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg rounded-full border border-white/20 text-white/80 text-xs">
+            <Sparkles className="h-3 w-3" />
+            Premium Edition
+          </span>
+        </div>
       </div>
     </div>
   )
