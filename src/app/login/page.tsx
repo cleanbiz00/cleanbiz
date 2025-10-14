@@ -39,7 +39,7 @@ export default function LoginPage() {
         {/* Logo e Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-6">
-            <img src="/logo-with-text.png" alt="CleanBiz360" className="h-16 w-auto" />
+            <img src="/logo-with-text.svg" alt="CleanBiz360" className="h-16 w-auto" />
           </div>
           <p className="text-slate-600 text-sm">Sistema Premium de Gerenciamento</p>
         </div>

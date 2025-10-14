@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   title: "CleanBiz360 - Sistema Premium de Gerenciamento",
   description: "Sistema premium de gerenciamento para empresas de limpeza e serviços",
   icons: {
-    icon: '/favicon.png',
+    icon: '/favicon.ico',
     shortcut: '/favicon.ico',
     apple: '/favicon.png',
   },
 };
 
-// Force rebuild - v3.0
+// Force rebuild - v4.0 - Updated favicon and logo
 
 export default function RootLayout({
   children,
@@ -22,8 +22,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="icon" href="/favicon.png" type="image/png" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/favicon.png" />
         <meta name="theme-color" content="#14b8a6" />
       </head>
