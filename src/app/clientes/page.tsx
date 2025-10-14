@@ -178,7 +178,7 @@ export default function ClientesPage() {
   )
 
   return (
-    <div className="p-4 md:p-6 pb-28 min-h-screen">
+    <div className="p-4 md:p-6 pb-28 min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header Premium */}
       <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
         background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
@@ -213,35 +213,35 @@ export default function ClientesPage() {
             placeholder="Buscar por nome, email, telefone, endereço..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white/80 backdrop-blur-xl border border-purple-200/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent shadow-lg transition-all"
+            className="w-full pl-12 pr-4 py-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-purple-200/50 dark:border-slate-600/50 rounded-2xl focus:ring-2 focus:ring-purple-400 focus:border-transparent shadow-lg transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
           />
         </div>
         {searchTerm && (
           <p className="text-sm text-gray-600 mt-2 ml-1 flex items-center gap-2">
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full font-medium">
               {filteredClients.length} {filteredClients.length === 1 ? 'cliente encontrado' : 'clientes encontrados'}
             </span>
           </p>
         )}
       </div>
       
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hidden lg:block">
         <table className="min-w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-slate-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contato</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo de Serviço</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nome</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Contato</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tipo de Serviço</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ações</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
             {filteredClients.map(client => (
               <tr key={client.id}>
                 <td className="px-6 py-4">
                   <div>
-                    <p className="font-medium">{client.name}</p>
-                    <p className="text-sm text-gray-600 flex items-center">
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{client.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
                       <MapPin size={14} className="mr-1" />
                       {client.address}
                     </p>
@@ -249,18 +249,18 @@ export default function ClientesPage() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="text-sm">
-                    <p className="flex items-center">
+                    <p className="flex items-center text-gray-900 dark:text-gray-100">
                       <Phone size={14} className="mr-1" />
                       {client.phone}
                     </p>
-                    <p className="flex items-center text-gray-600">
+                    <p className="flex items-center text-gray-600 dark:text-gray-400">
                       <Mail size={14} className="mr-1" />
                       {client.email}
                     </p>
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <p>{client.serviceType}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{client.serviceType}</p>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
@@ -287,23 +287,23 @@ export default function ClientesPage() {
       {/* Mobile cards Premium */}
       <div className="lg:hidden space-y-4">
         {filteredClients.map(client => (
-          <div key={client.id} className="group relative bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-xl p-5 rounded-2xl border border-purple-100/50 hover:border-purple-300/50 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div key={client.id} className="group relative bg-gradient-to-br from-white to-purple-50/30 dark:from-slate-800 dark:to-purple-900/20 backdrop-blur-xl p-5 rounded-2xl border border-purple-100/50 dark:border-slate-600/50 hover:border-purple-300/50 dark:hover:border-purple-500/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <p className="text-lg font-bold text-gray-800">{client.name}</p>
-                <p className="text-xs text-purple-600 font-medium mt-1">{client.serviceType}</p>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{client.name}</p>
+                <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-1">{client.serviceType}</p>
               </div>
             </div>
             <div className="space-y-2 text-sm">
-              <p className="flex items-center gap-2 text-gray-600">
+              <p className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <MapPin size={14} className="text-purple-400" />
                 {client.address}
               </p>
-              <p className="flex items-center gap-2 text-gray-600">
+              <p className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Phone size={14} className="text-purple-400" />
                 {client.phone}
               </p>
-              <p className="flex items-center gap-2 text-gray-600">
+              <p className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                 <Mail size={14} className="text-purple-400" />
                 {client.email}
               </p>
@@ -331,12 +331,12 @@ export default function ClientesPage() {
       {/* Modal Premium com Glassmorphism */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
+          <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20 dark:border-slate-600/50">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl">
                 <Users className="h-5 w-5 text-white" />
               </div>
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
                 {editingItem ? 'Editar Cliente' : 'Novo Cliente'}
               </h3>
             </div>
@@ -347,33 +347,33 @@ export default function ClientesPage() {
                 placeholder="Nome completo"
                 value={formData.name || ''}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full p-3 border border-purple-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <input
                 type="email"
                 placeholder="Email"
                 value={formData.email || ''}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full p-3 border border-purple-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <input
                 type="tel"
                 placeholder="Telefone"
                 value={formData.phone || ''}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full p-3 border border-purple-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <input
                 type="text"
                 placeholder="Endereço completo"
                 value={formData.address || ''}
                 onChange={(e) => setFormData({...formData, address: e.target.value})}
-                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full p-3 border border-purple-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
               <select
                 value={formData.serviceType || ''}
                 onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
-                className="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
+                className="w-full p-3 border border-purple-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">Selecione o tipo de serviço</option>
                 <option value="Limpeza Residencial">Limpeza Residencial</option>
@@ -391,7 +391,7 @@ export default function ClientesPage() {
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
+                className="flex-1 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 py-3 rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition-all font-medium"
               >
                 Cancelar
               </button>

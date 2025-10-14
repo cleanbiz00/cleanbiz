@@ -15,7 +15,7 @@ const CATEGORIES = [
 // Componente de Gráfico de Pizza
 const PieChart = ({ data }: { data: { label: string, value: number, color: string }[] }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0)
-  if (total === 0) return <p className="text-gray-500 text-center py-8">Sem dados para exibir</p>
+  if (total === 0) return <p className="text-gray-500 dark:text-gray-400 text-center py-8">Sem dados para exibir</p>
   
   let currentAngle = 0
   const radius = 80
@@ -57,7 +57,7 @@ const PieChart = ({ data }: { data: { label: string, value: number, color: strin
           return (
             <div key={index} className="flex items-center gap-2 text-sm">
               <div className="w-4 h-4 rounded" style={{ backgroundColor: item.color }} />
-              <span className="text-gray-700">{item.label}</span>
+              <span className="text-gray-700 dark:text-gray-300">{item.label}</span>
               <span className="font-semibold ml-auto">${item.value.toFixed(2)} ({percentage.toFixed(1)}%)</span>
             </div>
           )
@@ -309,7 +309,7 @@ export default function FinanceiroPage() {
   const totalProfit = totalRevenue - totalExpenses
 
   return (
-    <div className="p-4 md:p-6 pb-28 min-h-screen">
+    <div className="p-4 md:p-6 pb-28 min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header Premium */}
       <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
         background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
@@ -325,20 +325,20 @@ export default function FinanceiroPage() {
           </div>
         <button
           onClick={() => openModal()}
-            className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+            className="bg-white dark:bg-slate-800/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
         >
           <Plus size={20} />
             <span className="hidden sm:inline">Nova Despesa</span>
             <span className="sm:hidden">Nova</span>
         </button>
         </div>
-        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white dark:bg-slate-800/10 rounded-full blur-3xl"></div>
       </div>
 
       {/* Summary Cards Premium */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Receita Mensal */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -347,12 +347,12 @@ export default function FinanceiroPage() {
               <div className="p-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl shadow-lg">
                 <TrendingUp className="h-5 w-5 text-white" />
               </div>
-              <p className="text-sm text-gray-500 font-medium">Receita (Mês)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Receita (Mês)</p>
             </div>
             <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               ${monthlyRevenue.toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">{allAppointments.filter(a => {
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{allAppointments.filter(a => {
               const d = new Date(a.date)
               const now = new Date()
               return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && a.status !== 'Cancelado'
@@ -361,7 +361,7 @@ export default function FinanceiroPage() {
         </div>
         
         {/* Despesas Mensais */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-400/20 to-rose-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -370,12 +370,12 @@ export default function FinanceiroPage() {
               <div className="p-3 bg-gradient-to-br from-red-400 to-rose-500 rounded-xl shadow-lg">
                 <TrendingDown className="h-5 w-5 text-white" />
               </div>
-              <p className="text-sm text-gray-500 font-medium">Despesas (Mês)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Despesas (Mês)</p>
             </div>
             <p className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
               ${monthlyExpenses.toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">{expenses.filter(e => {
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{expenses.filter(e => {
               const d = new Date(e.date)
                   const now = new Date()
               return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
@@ -384,7 +384,7 @@ export default function FinanceiroPage() {
         </div>
         
         {/* Lucro Mensal */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -393,19 +393,19 @@ export default function FinanceiroPage() {
               <div className="p-3 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl shadow-lg">
                 <Wallet className="h-5 w-5 text-white" />
               </div>
-              <p className="text-sm text-gray-500 font-medium">Lucro (Mês)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Lucro (Mês)</p>
             </div>
             <p className={`text-3xl font-bold bg-gradient-to-r ${monthlyProfit >= 0 ? 'from-blue-600 to-indigo-600' : 'from-red-600 to-rose-600'} bg-clip-text text-transparent`}>
               ${monthlyProfit.toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               Margem: {monthlyRevenue > 0 ? ((monthlyProfit / monthlyRevenue) * 100).toFixed(1) : 0}%
             </p>
           </div>
         </div>
         
         {/* Lucro Total */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -414,12 +414,12 @@ export default function FinanceiroPage() {
               <div className="p-3 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl shadow-lg">
                 <DollarSign className="h-5 w-5 text-white" />
               </div>
-              <p className="text-sm text-gray-500 font-medium">Lucro (Total)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Lucro (Total)</p>
             </div>
             <p className={`text-3xl font-bold bg-gradient-to-r ${totalProfit >= 0 ? 'from-purple-600 to-pink-600' : 'from-red-600 to-rose-600'} bg-clip-text text-transparent`}>
               ${totalProfit.toFixed(2)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">Todos os períodos</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Todos os períodos</p>
           </div>
         </div>
       </div>
@@ -427,7 +427,7 @@ export default function FinanceiroPage() {
       {/* Financial Reports Premium */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Despesas por Categoria - GRÁFICO DE PIZZA */}
-        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
+        <div className="relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="flex items-center gap-3 mb-6">
@@ -456,7 +456,7 @@ export default function FinanceiroPage() {
         </div>
 
         {/* Evolução Anual - GRÁFICO DE LINHA */}
-        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
+        <div className="relative bg-white dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 shadow-lg" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
@@ -519,7 +519,7 @@ export default function FinanceiroPage() {
       </div>
 
       {/* Expenses List Premium */}
-      <div className="relative bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden" style={{
+      <div className="relative bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg overflow-hidden" style={{
         boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
       }}>
         <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-amber-50">
@@ -533,8 +533,8 @@ export default function FinanceiroPage() {
             <div className="p-4 bg-gradient-to-br from-orange-100 to-amber-100 rounded-2xl inline-block mb-4">
               <DollarSign size={48} className="text-orange-400" />
             </div>
-            <p className="text-gray-600 font-medium">Nenhuma despesa registrada ainda.</p>
-            <p className="text-sm text-gray-500 mt-1">Clique em "Nova Despesa" para começar.</p>
+            <p className="text-gray-600 dark:text-gray-400 font-medium">Nenhuma despesa registrada ainda.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Clique em "Nova Despesa" para começar.</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -554,8 +554,8 @@ export default function FinanceiroPage() {
                         {expense.type}
                       </span>
                     </div>
-                    <h4 className="text-lg font-bold text-gray-800">{expense.description}</h4>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <h4 className="text-lg font-bold text-gray-800 dark:text-gray-100">{expense.description}</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {new Date(expense.date).toLocaleDateString('pt-BR')} • {expense.frequency}
                     </p>
                   </div>
@@ -588,7 +588,7 @@ export default function FinanceiroPage() {
       {/* Modal Premium com Glassmorphism */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
+          <div className="bg-white dark:bg-slate-800/90 backdrop-blur-2xl rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-white/20">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl">
                 <DollarSign className="h-5 w-5 text-white" />
@@ -662,7 +662,7 @@ export default function FinanceiroPage() {
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
+                className="flex-1 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
               >
                 Cancelar
               </button>

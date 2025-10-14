@@ -624,7 +624,7 @@ export default function AgendaPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 pb-28 min-h-screen">
+    <div className="p-4 md:p-6 pb-28 min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header Premium */}
       <div className="relative mb-8 p-6 md:p-8 rounded-3xl overflow-hidden" style={{
         background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
@@ -642,7 +642,7 @@ export default function AgendaPage() {
             
             <div className="flex items-center gap-3 flex-wrap">
               {/* View Mode Toggle Premium */}
-              <div className="flex bg-white/20 backdrop-blur-lg rounded-xl p-1 border border-white/30">
+              <div className="flex bg-white dark:bg-slate-800/20 backdrop-blur-lg rounded-xl p-1 border border-white/30">
                 <button
                   onClick={() => setViewMode('calendar')}
                   className={`px-3 md:px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${
@@ -669,7 +669,7 @@ export default function AgendaPage() {
               
               <button
                 onClick={() => openModal()}
-                className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+                className="bg-white dark:bg-slate-800/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
               >
                 <Plus size={20} />
                 <span className="text-sm">Novo</span>
@@ -677,16 +677,16 @@ export default function AgendaPage() {
             </div>
           </div>
         </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white dark:bg-slate-800/10 rounded-full blur-3xl"></div>
       </div>
       
       {/* Integration Status Premium */}
-      <div className="mb-6 p-5 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg">
-        <h3 className="text-sm font-bold text-gray-700 mb-3">Status das Integrações:</h3>
+      <div className="mb-6 p-5 bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg">
+        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Status das Integrações:</h3>
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center space-x-2">
             <Calendar size={16} className={googleConnected ? 'text-green-600' : 'text-gray-400'} />
-            <span className={googleConnected ? 'text-green-600' : 'text-gray-500'}>
+            <span className={googleConnected ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}>
               Google Calendar {googleConnected ? 'Configurado' : 'Não configurado'}
             </span>
             {!googleConnected ? (
@@ -707,13 +707,13 @@ export default function AgendaPage() {
           </div>
           <div className="flex items-center space-x-2">
             <Mail size={16} className={emailConfigured ? 'text-green-600' : 'text-gray-400'} />
-            <span className={emailConfigured ? 'text-green-600' : 'text-gray-500'}>
+            <span className={emailConfigured ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}>
               Email {emailConfigured ? 'Configurado' : 'Não configurado'}
             </span>
           </div>
         </div>
         {(!googleConnected || !emailConfigured) && (
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             {!googleConnected ? 'Clique em "Conectar" para sincronizar com seu Google Calendar.' : 'Configure as variáveis de ambiente para ativar as integrações.'}
           </p>
         )}
@@ -721,8 +721,8 @@ export default function AgendaPage() {
       
       {/* Employee Color Legend */}
       {viewMode === 'calendar' && employees.length > 0 && (
-        <div className="mb-4 p-4 bg-white rounded-lg shadow-lg">
-          <h3 className="text-sm font-semibold mb-2">Legenda de Funcionários:</h3>
+        <div className="mb-4 p-4 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
+          <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">Legenda de Funcionários:</h3>
           <div className="flex flex-wrap gap-3">
             {employees.map(employee => {
               // Mesma lógica de hash do CalendarView
@@ -736,7 +736,7 @@ export default function AgendaPage() {
                     className="w-4 h-4 rounded" 
                     style={{ backgroundColor: color }}
                   />
-                  <span className="text-sm text-gray-700">{employee.name}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{employee.name}</span>
                 </div>
               )
             })}
@@ -760,19 +760,19 @@ export default function AgendaPage() {
       {viewMode === 'table' && (
         <>
           {/* Desktop table */}
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden hidden lg:block">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden hidden lg:block">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-slate-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data/Hora</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Funcionário</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Serviço</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Data/Hora</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Cliente</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Funcionário</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Serviço</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ações</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
                 {appointments.map(appointment => (
                   <tr key={appointment.id}>
                     <td className="px-6 py-4">
@@ -780,7 +780,7 @@ export default function AgendaPage() {
                         <Clock size={16} className="mr-2 text-gray-400" />
                         <div>
                           <p className="font-medium">{appointment.date}</p>
-                          <p className="text-sm text-gray-600">{to12Hour(appointment.time)}</p>
+                           <p className="text-sm text-gray-600 dark:text-gray-200">{to12Hour(appointment.time)}</p>
                         </div>
                       </div>
                     </td>
@@ -830,12 +830,12 @@ export default function AgendaPage() {
           {/* Mobile cards */}
           <div className="lg:hidden space-y-3">
             {appointments.map(appointment => (
-              <div key={appointment.id} className="bg-white rounded-lg shadow p-4">
+              <div key={appointment.id} className="bg-white dark:bg-slate-800 rounded-lg shadow p-4">
                 <div className="flex justify-between">
                   <div>
-                    <div className="text-sm text-gray-600">{appointment.date} • {to12Hour(appointment.time)}</div>
+                     <div className="text-sm text-gray-600 dark:text-gray-200">{appointment.date} • {to12Hour(appointment.time)}</div>
                     <div className="font-medium">{getClientName(appointment.clientId)}</div>
-                    <div className="text-sm text-gray-600">
+                     <div className="text-sm text-gray-600 dark:text-gray-200">
                       {appointment.employeeIds && appointment.employeeIds.length > 0 
                         ? getEmployeeNames(appointment.employeeIds)
                         : getEmployeeName(appointment.employeeId)}
@@ -867,10 +867,10 @@ export default function AgendaPage() {
       {/* Details Modal - Ao clicar em um agendamento */}
       {showDetailsModal && selectedAppointment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-2xl font-bold">Detalhes do Agendamento</h3>
-              <button onClick={closeDetailsModal} className="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+              <button onClick={closeDetailsModal} className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 text-2xl">×</button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -879,18 +879,18 @@ export default function AgendaPage() {
                 <h4 className="text-lg font-semibold text-blue-600 mb-3">📅 Agendamento</h4>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Serviço</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-200">Serviço</p>
                   <p className="font-medium text-lg">{selectedAppointment.service}</p>
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Data e Hora</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-200">Data e Hora</p>
                   <p className="font-medium">{selectedAppointment.date} às {to12Hour(selectedAppointment.time)}</p>
-                  <p className="text-xs text-gray-500">Duração: 4 horas</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Duração: 4 horas</p>
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-200">Status</p>
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
                     selectedAppointment.status === 'Confirmado' ? 'bg-green-100 text-green-800' : 
                     selectedAppointment.status === 'Agendado' ? 'bg-yellow-100 text-yellow-800' :
@@ -902,12 +902,12 @@ export default function AgendaPage() {
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Valor</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-200">Valor</p>
                   <p className="font-bold text-2xl text-green-600">${selectedAppointment.price}</p>
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-600">Funcionário(s) Responsável(is)</p>
+                   <p className="text-sm text-gray-600 dark:text-gray-200">Funcionário(s) Responsável(is)</p>
                   <p className="font-medium">
                     {selectedAppointment.employeeIds && selectedAppointment.employeeIds.length > 0 
                       ? getEmployeeNames(selectedAppointment.employeeIds)
@@ -922,32 +922,32 @@ export default function AgendaPage() {
                 
                 {(() => {
                   const client = clients.find(c => c.id === selectedAppointment.clientId)
-                  if (!client) return <p className="text-gray-500">Cliente não encontrado</p>
+                  if (!client) return <p className="text-gray-500 dark:text-gray-400">Cliente não encontrado</p>
                   
                   return (
                     <>
                       <div>
-                        <p className="text-sm text-gray-600">Nome</p>
+                         <p className="text-sm text-gray-600 dark:text-gray-200">Nome</p>
                         <p className="font-medium text-lg">{client.name}</p>
                       </div>
                       
                       <div>
-                        <p className="text-sm text-gray-600">Endereço</p>
+                         <p className="text-sm text-gray-600 dark:text-gray-200">Endereço</p>
                         <p className="font-medium">📍 {client.address}</p>
                       </div>
                       
                       <div>
-                        <p className="text-sm text-gray-600">Telefone</p>
+                         <p className="text-sm text-gray-600 dark:text-gray-200">Telefone</p>
                         <p className="font-medium">📞 {client.phone}</p>
                       </div>
                       
                       <div>
-                        <p className="text-sm text-gray-600">Email</p>
+                         <p className="text-sm text-gray-600 dark:text-gray-200">Email</p>
                         <p className="font-medium">📧 {client.email}</p>
                       </div>
                       
                       <div>
-                        <p className="text-sm text-gray-600">Tipo de Serviço</p>
+                         <p className="text-sm text-gray-600 dark:text-gray-200">Tipo de Serviço</p>
                         <p className="font-medium">{client.serviceType}</p>
                       </div>
                     </>
@@ -985,7 +985,7 @@ export default function AgendaPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4">
               {editingItem ? 'Editar Agendamento' : 'Novo Agendamento'}
             </h3>
@@ -1024,14 +1024,14 @@ export default function AgendaPage() {
               )}
               
               {/* Multi-seleção de funcionários com checkboxes */}
-              <div className="w-full p-4 border rounded-lg bg-gray-50">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="w-full p-4 border rounded-lg bg-gray-50 dark:bg-slate-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Funcionários (selecione um ou mais):
                 </label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {employees.length > 0 ? (
                     employees.map(employee => (
-                      <label key={employee.id} className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded cursor-pointer">
+                      <label key={employee.id} className="flex items-center space-x-3 p-2 hover:bg-gray-100 dark:bg-slate-700 rounded cursor-pointer">
                         <input
                           type="checkbox"
                           checked={formData.employeeIds?.includes(employee.id) || false}
@@ -1047,15 +1047,15 @@ export default function AgendaPage() {
                           }}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">{employee.name}</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-100">{employee.name}</span>
                       </label>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">Nenhum funcionário disponível</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum funcionário disponível</p>
                   )}
                 </div>
                 {formData.employeeIds && formData.employeeIds.length > 0 && (
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                     {formData.employeeIds.length} funcionário(s) selecionado(s)
                   </p>
                 )}
@@ -1174,7 +1174,7 @@ export default function AgendaPage() {
                 <option value="Cancelado">Cancelado</option>
               </select>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Email para notificações {formData.clientEmail && '(preenchido automaticamente)'}
                 </label>
                 <input
@@ -1184,7 +1184,7 @@ export default function AgendaPage() {
                   onChange={(e) => setFormData({...formData, clientEmail: e.target.value})}
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   💡 O email é preenchido automaticamente ao selecionar o cliente, mas você pode editá-lo se necessário
                 </p>
               </div>
@@ -1199,7 +1199,7 @@ export default function AgendaPage() {
               </button>
               <button
                 onClick={closeModal}
-                className="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400"
+                className="flex-1 bg-gray-300 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-400"
               >
                 Cancelar
               </button>
