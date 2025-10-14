@@ -16,19 +16,16 @@ const CalendarView = ({
   getEmployeeName,
   clients = []
 }) => {
-  // Detectar se é mobile para definir visualização padrão
-  const [isMobile, setIsMobile] = useState(() => {
-    // Verificar se estamos no cliente (browser)
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768;
-    }
-    return false; // Fallback para SSR
-  });
-  
-  const [view, setView] = useState('month'); // Começar sempre com 'month'
+  // Estado para controlar quando o componente está pronto (evita SSR hydration mismatch)
+  const [isClient, setIsClient] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [view, setView] = useState('month');
   const [date, setDate] = useState(new Date());
   
   useEffect(() => {
+    // Marcar que estamos no cliente
+    setIsClient(true);
+    
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
@@ -91,32 +88,58 @@ const CalendarView = ({
 
   // Convert appointments to calendar events
   const events = useMemo(() => {
-    return appointments.map(appointment => {
-      const startDate = new Date(`${appointment.date}T${appointment.time}:00`);
-      const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // 4 hours duration
-      
-      // Buscar endereço do cliente
-      const client = clients.find(c => c.id === appointment.clientId);
-      const address = client?.address || '';
-      
-      // Usar employeeIds se disponível, senão usar employeeId legado
-      const employeeIds = appointment.employeeIds || (appointment.employeeId ? [appointment.employeeId] : []);
-      
-      return {
-        id: appointment.id,
-        title: `${appointment.service} - ${getClientName(appointment.clientId)}`,
-        start: startDate,
-        end: endDate,
-        resource: appointment,
-        status: appointment.status,
-        client: getClientName(appointment.clientId),
-        employee: getEmployeeName(appointment.employeeId),
-        employeeId: appointment.employeeId, // Manter para compatibilidade
-        employeeIds: employeeIds, // Array de IDs
-        address: address,
-        price: appointment.price
-      };
-    });
+    // Validar se appointments existe e é um array
+    if (!Array.isArray(appointments) || appointments.length === 0) {
+      return [];
+    }
+    
+    return appointments
+      .filter(appointment => {
+        // Filtrar apenas appointments válidos com dados necessários
+        return appointment && 
+               appointment.date && 
+               appointment.time && 
+               appointment.service &&
+               appointment.clientId;
+      })
+      .map(appointment => {
+        try {
+          const startDate = new Date(`${appointment.date}T${appointment.time}:00`);
+          const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // 4 hours duration
+          
+          // Validar se as datas são válidas
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            console.error('Data inválida no appointment:', appointment);
+            return null;
+          }
+          
+          // Buscar endereço do cliente
+          const client = clients.find(c => c.id === appointment.clientId);
+          const address = client?.address || '';
+          
+          // Usar employeeIds se disponível, senão usar employeeId legado
+          const employeeIds = appointment.employeeIds || (appointment.employeeId ? [appointment.employeeId] : []);
+          
+          return {
+            id: appointment.id || `temp-${Math.random()}`,
+            title: `${appointment.service || 'Serviço'} - ${getClientName(appointment.clientId)}`,
+            start: startDate,
+            end: endDate,
+            resource: appointment,
+            status: appointment.status || 'Agendado',
+            client: getClientName(appointment.clientId),
+            employee: getEmployeeName(appointment.employeeId),
+            employeeId: appointment.employeeId, // Manter para compatibilidade
+            employeeIds: employeeIds, // Array de IDs
+            address: address,
+            price: appointment.price || 0
+          };
+        } catch (error) {
+          console.error('Erro ao processar appointment:', appointment, error);
+          return null;
+        }
+      })
+      .filter(event => event !== null); // Remover eventos inválidos
   }, [appointments, getClientName, getEmployeeName, clients]);
 
   // Event style getter - define cor de fundo por funcionário(s)
@@ -169,7 +192,7 @@ const CalendarView = ({
     openModal(newAppointment);
   };
 
-  // Custom toolbar component
+  // Custom toolbar component - Responsivo para mobile
   const CustomToolbar = ({ date, view, onView, onNavigate }) => {
     const goToBack = () => {
       onNavigate('PREV');
@@ -187,72 +210,65 @@ const CalendarView = ({
       return moment(date).format('MMMM [de] YYYY');
     };
 
+    // Views disponíveis baseado em mobile ou desktop
+    const availableViews = isMobile 
+      ? [{ key: 'day', label: 'Dia' }, { key: 'agenda', label: 'Lista' }]
+      : [
+          { key: 'month', label: 'Mês' },
+          { key: 'week', label: 'Semana' },
+          { key: 'day', label: 'Dia' },
+          { key: 'agenda', label: 'Lista' }
+        ];
+
     return (
-      <div className="flex items-center justify-between mb-4 p-4 bg-white rounded-lg shadow-sm">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={goToBack}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            ←
-          </button>
-          <button
-            onClick={goToCurrent}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            Hoje
-          </button>
-          <button
-            onClick={goToNext}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            →
-          </button>
-          <h2 className="text-xl font-semibold text-gray-800">{label()}</h2>
+      <div className="mb-4 p-3 md:p-4 bg-white rounded-lg shadow-sm space-y-3 md:space-y-0">
+        {/* Linha 1: Título e Navegação */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={goToBack}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-lg"
+            >
+              ←
+            </button>
+            <button
+              onClick={goToCurrent}
+              className="px-3 py-1 text-xs md:text-sm rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Hoje
+            </button>
+            <button
+              onClick={goToNext}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-lg"
+            >
+              →
+            </button>
+          </div>
+          <h2 className="text-base md:text-xl font-semibold text-gray-800">{label()}</h2>
         </div>
         
-        <div className="flex items-center space-x-2">
+        {/* Linha 2: Views e Novo botão */}
+        <div className="flex items-center justify-between gap-2">
           <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => onView('month')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                view === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Mês
-            </button>
-            <button
-              onClick={() => onView('week')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                view === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Semana
-            </button>
-            <button
-              onClick={() => onView('day')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                view === 'day' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Dia
-            </button>
-            <button
-              onClick={() => onView('agenda')}
-              className={`px-3 py-1 rounded text-sm transition-colors ${
-                view === 'agenda' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Agenda
-            </button>
+            {availableViews.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => onView(key)}
+                className={`px-2 md:px-3 py-1 rounded text-xs md:text-sm transition-colors whitespace-nowrap ${
+                  view === key ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
           
           <button
             onClick={() => openModal()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg flex items-center space-x-1 md:space-x-2 hover:bg-blue-700 transition-colors"
           >
             <Plus size={16} />
-            <span>Novo</span>
+            <span className="text-xs md:text-sm">Novo</span>
           </button>
         </div>
       </div>
@@ -266,6 +282,18 @@ const CalendarView = ({
       color: '#92400e'
     }
   };
+
+  // Mostrar loading enquanto não estiver pronto no cliente (evita SSR errors)
+  if (!isClient) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-2 md:p-6 flex items-center justify-center" style={{ height: 600 }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando calendário...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 md:p-6">
