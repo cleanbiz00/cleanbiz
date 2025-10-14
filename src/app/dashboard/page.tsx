@@ -154,7 +154,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-6 min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50">
+    <div className="p-6 min-h-screen bg-gradient-to-br from-slate-50 via-cyan-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header Premium com Glassmorphism */}
       <div className="relative mb-8 p-8 rounded-3xl overflow-hidden bg-cleanbiz-gradient shadow-2xl" style={{
         boxShadow: '0 20px 60px rgba(6, 182, 212, 0.3)'
@@ -177,7 +177,7 @@ export default function DashboardPage() {
       {/* Métricas Premium com Glassmorphism */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Card 1: Receita */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-green-400/20 to-emerald-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -187,10 +187,10 @@ export default function DashboardPage() {
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
             <div>
-                <p className="text-sm text-gray-500 font-medium">Receita Mensal</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Receita Mensal</p>
               </div>
             </div>
-            <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+            <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
               ${financialData.revenue.toLocaleString('pt-BR')}
             </p>
             <div className="flex items-center gap-1 mt-2">
@@ -201,7 +201,7 @@ export default function DashboardPage() {
         </div>
         
         {/* Card 2: Despesas */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-400/20 to-rose-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -211,10 +211,10 @@ export default function DashboardPage() {
                 <TrendingDown className="h-6 w-6 text-white" />
               </div>
             <div>
-                <p className="text-sm text-gray-500 font-medium">Despesas</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Despesas</p>
               </div>
             </div>
-            <p className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+            <p className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 dark:from-red-400 dark:to-rose-400 bg-clip-text text-transparent">
               ${financialData.expenses.toLocaleString('pt-BR')}
             </p>
             <div className="flex items-center gap-1 mt-2">
@@ -225,7 +225,7 @@ export default function DashboardPage() {
         </div>
         
         {/* Card 3: Lucro */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -235,10 +235,10 @@ export default function DashboardPage() {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
             <div>
-                <p className="text-sm text-gray-500 font-medium">Lucro Líquido</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Lucro Líquido</p>
               </div>
             </div>
-            <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
               ${financialData.profit.toLocaleString('pt-BR')}
             </p>
             <div className="flex items-center gap-1 mt-2">
@@ -249,7 +249,7 @@ export default function DashboardPage() {
         </div>
         
         {/* Card 4: Clientes */}
-        <div className="group relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
+        <div className="group relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-300"></div>
@@ -259,10 +259,10 @@ export default function DashboardPage() {
                 <Users className="h-6 w-6 text-white" />
               </div>
             <div>
-                <p className="text-sm text-gray-500 font-medium">Clientes Ativos</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">Clientes Ativos</p>
               </div>
             </div>
-            <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <p className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               {clients.length}
             </p>
             <div className="flex items-center gap-1 mt-2">
@@ -276,27 +276,27 @@ export default function DashboardPage() {
       {/* Seções de Listas com Visual Premium */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Próximos Agendamentos */}
-        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20" style={{
+        <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
               Próximos Agendamentos
             </h3>
           </div>
           <div className="space-y-3">
             {appointments.length > 0 ? (
               appointments.map(appointment => (
-                <div key={appointment.id} className="group relative bg-gradient-to-r from-white to-blue-50/30 p-4 rounded-xl border border-blue-100/50 hover:border-blue-300/50 transition-all duration-300 hover:shadow-lg">
+                <div key={appointment.id} className="group relative bg-gradient-to-r from-white to-blue-50/30 dark:from-slate-700/50 dark:to-blue-900/20 p-4 rounded-xl border border-blue-100/50 dark:border-slate-600/50 hover:border-blue-300/50 dark:hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg">
                   <div className="flex justify-between items-center">
                 <div>
-                      <p className="font-semibold text-gray-800">{getClientName(appointment.clientId)}</p>
+                      <p className="font-semibold text-gray-800 dark:text-gray-100">{getClientName(appointment.clientId)}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Calendar className="h-3 w-3 text-gray-400" />
-                        <p className="text-sm text-gray-600">{appointment.date} • {appointment.time}</p>
+                        <Calendar className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.date} • {appointment.time}</p>
                       </div>
                 </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -313,39 +313,39 @@ export default function DashboardPage() {
               ))
             ) : (
               <div className="text-center py-12">
-                <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium">Nenhum agendamento futuro</p>
+                <Calendar className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 font-medium">Nenhum agendamento futuro</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Clientes Ativos */}
-        <div className="relative bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20" style={{
+        <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-slate-700/50" style={{
           boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)'
         }}>
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg">
               <Users className="h-5 w-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
               Clientes Ativos
             </h3>
           </div>
           <div className="space-y-3">
             {clients.length > 0 ? (
               clients.map(client => (
-                <div key={client.id} className="group relative bg-gradient-to-r from-white to-purple-50/30 p-4 rounded-xl border border-purple-100/50 hover:border-purple-300/50 transition-all duration-300 hover:shadow-lg">
+                <div key={client.id} className="group relative bg-gradient-to-r from-white to-purple-50/30 dark:from-slate-700/50 dark:to-purple-900/20 p-4 rounded-xl border border-purple-100/50 dark:border-slate-600/50 hover:border-purple-300/50 dark:hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg">
                   <div className="flex justify-between items-center">
                 <div>
-                      <p className="font-semibold text-gray-800">{client.name}</p>
-                      <p className="text-sm text-gray-600 mt-1">{client.serviceType}</p>
+                      <p className="font-semibold text-gray-800 dark:text-gray-100">{client.name}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{client.serviceType}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      <p className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
                         ${client.price}
                       </p>
-                      <p className="text-xs text-gray-500">{client.frequency}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{client.frequency}</p>
                     </div>
                   </div>
                   {/* Barra de progresso decorativa */}
@@ -354,8 +354,8 @@ export default function DashboardPage() {
               ))
             ) : (
               <div className="text-center py-12">
-                <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium">Nenhum cliente cadastrado</p>
+                <Users className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 font-medium">Nenhum cliente cadastrado</p>
               </div>
             )}
           </div>
