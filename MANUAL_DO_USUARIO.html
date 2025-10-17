@@ -1,0 +1,605 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual do Usuário - CleanBiz360</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #ffffff;
+        }
+        
+        h1 {
+            color: #1e293b;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 1rem;
+        }
+        
+        h2 {
+            color: #1e3a8a;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            color: #1e40af;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            color: #1e40af;
+        }
+        
+        strong {
+            font-weight: bold;
+            color: #1e40af;
+        }
+        
+        a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 2rem 0;
+        }
+        
+        .alert {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .alert strong {
+            color: #92400e;
+        }
+        
+        @media print {
+            body {
+                max-width: none;
+                margin: 0;
+                padding: 1rem;
+            }
+            
+            h1 {
+                page-break-before: always;
+            }
+            
+            h1:first-child {
+                page-break-before: avoid;
+            }
+            
+            h2 {
+                page-break-before: avoid;
+                page-break-after: avoid;
+            }
+            
+            h3 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color: #1e293b; margin-top: 3rem; margin-bottom: 2rem; font-size: 2rem; font-weight: bold; text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 1rem;">📋 Manual do Usuário - CleanBiz360</h1>
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">Sistema Premium de Gerenciamento para Empresas de Limpeza</h2>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">📖 Índice</h2>
+
+<li style="margin-bottom: 0.5rem;">1. <a href="#introdução" style="color: #3b82f6; text-decoration: underline;">Introdução</a></li>
+<li style="margin-bottom: 0.5rem;">2. <a href="#primeiros-passos" style="color: #3b82f6; text-decoration: underline;">Primeiros Passos</a></li>
+<li style="margin-bottom: 0.5rem;">3. <a href="#dashboard" style="color: #3b82f6; text-decoration: underline;">Dashboard</a></li>
+<li style="margin-bottom: 0.5rem;">4. <a href="#gestão-de-clientes" style="color: #3b82f6; text-decoration: underline;">Gestão de Clientes</a></li>
+<li style="margin-bottom: 0.5rem;">5. <a href="#gestão-de-funcionários" style="color: #3b82f6; text-decoration: underline;">Gestão de Funcionários</a></li>
+<li style="margin-bottom: 0.5rem;">6. <a href="#agenda-e-agendamentos" style="color: #3b82f6; text-decoration: underline;">Agenda e Agendamentos</a></li>
+<li style="margin-bottom: 0.5rem;">7. <a href="#financeiro" style="color: #3b82f6; text-decoration: underline;">Financeiro</a></li>
+<li style="margin-bottom: 0.5rem;">8. <a href="#integrações" style="color: #3b82f6; text-decoration: underline;">Integrações</a></li>
+<li style="margin-bottom: 0.5rem;">9. <a href="#modo-escuro" style="color: #3b82f6; text-decoration: underline;">Modo Escuro</a></li>
+<li style="margin-bottom: 0.5rem;">10. <a href="#dicas-e-truques" style="color: #3b82f6; text-decoration: underline;">Dicas e Truques</a></li>
+<li style="margin-bottom: 0.5rem;">11. <a href="#resolução-de-problemas" style="color: #3b82f6; text-decoration: underline;">Resolução de Problemas</a></li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🚀 Introdução</h2>
+
+O <strong style="font-weight: bold; color: #1e40af;">CleanBiz360</strong> é um sistema completo de gerenciamento para empresas de limpeza, desenvolvido para otimizar todos os aspectos do seu negócio.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">✨ Principais Funcionalidades</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Dashboard Inteligente</strong> - Visão geral completa do negócio</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Gestão de Clientes</strong> - Controle total da base de clientes</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Gestão de Funcionários</strong> - Administração da equipe</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Agenda Integrada</strong> - Agendamentos com Google Calendar</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Controle Financeiro</strong> - Receitas, despesas e relatórios</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Integração por Email</strong> - Notificações automáticas</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Modo Escuro</strong> - Interface adaptável</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">🌐 Acesso ao Sistema</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">URL</strong>: https://app.cleanbiz360.com</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Navegadores Suportados</strong>: Chrome, Firefox, Safari, Edge</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Dispositivos</strong>: Desktop, Tablet, Mobile (responsivo)</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🎯 Primeiros Passos</h2>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">1. Fazer Login</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Acesse https://app.cleanbiz360.com</li>
+<li style="margin-bottom: 0.5rem;">2. Digite seu <strong style="font-weight: bold; color: #1e40af;">email</strong> e <strong style="font-weight: bold; color: #1e40af;">senha</strong></li>
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Entrar"</strong></li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">2. Interface Principal</h3>
+
+Após o login, você verá:
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Sidebar Esquerda</strong>: Menu de navegação</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Área Principal</strong>: Conteúdo da página atual</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Botão Modo Escuro</strong>: Canto superior direito</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">3. Navegação</h3>
+
+Use o menu lateral para acessar:
+<li style="margin-bottom: 0.5rem;">🏠 <strong style="font-weight: bold; color: #1e40af;">Dashboard</strong> - Visão geral</li>
+<li style="margin-bottom: 0.5rem;">👥 <strong style="font-weight: bold; color: #1e40af;">Clientes</strong> - Gestão de clientes</li>
+<li style="margin-bottom: 0.5rem;">👔 <strong style="font-weight: bold; color: #1e40af;">Funcionários</strong> - Gestão da equipe</li>
+<li style="margin-bottom: 0.5rem;">📅 <strong style="font-weight: bold; color: #1e40af;">Agenda</strong> - Agendamentos</li>
+<li style="margin-bottom: 0.5rem;">💰 <strong style="font-weight: bold; color: #1e40af;">Financeiro</strong> - Controle financeiro</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">📊 Dashboard</h2>
+
+O Dashboard oferece uma visão completa do seu negócio em tempo real.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Métricas Principais</h3>
+
+#### 📈 Receita Mensal
+<li style="margin-bottom: 0.5rem;">Mostra o total arrecadado no mês atual</li>
+<li style="margin-bottom: 0.5rem;">Atualização automática baseada nos agendamentos</li>
+
+#### 👥 Total de Clientes
+<li style="margin-bottom: 0.5rem;">Contagem atual de clientes cadastrados</li>
+<li style="margin-bottom: 0.5rem;">Crescimento comparado ao mês anterior</li>
+
+#### 👔 Total de Funcionários
+<li style="margin-bottom: 0.5rem;">Número de funcionários ativos</li>
+<li style="margin-bottom: 0.5rem;">Status da equipe</li>
+
+#### 📅 Agendamentos do Dia
+<li style="margin-bottom: 0.5rem;">Lista de serviços agendados para hoje</li>
+<li style="margin-bottom: 0.5rem;">Status de cada agendamento</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Próximos Agendamentos</h3>
+
+Lista os próximos 5 agendamentos com:
+<li style="margin-bottom: 0.5rem;">Data e hora</li>
+<li style="margin-bottom: 0.5rem;">Cliente</li>
+<li style="margin-bottom: 0.5rem;">Funcionário responsável</li>
+<li style="margin-bottom: 0.5rem;">Status (Confirmado, Pendente, Concluído)</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Clientes Recentes</h3>
+
+Mostra os últimos clientes cadastrados com:
+<li style="margin-bottom: 0.5rem;">Nome</li>
+<li style="margin-bottom: 0.5rem;">Data de cadastro</li>
+<li style="margin-bottom: 0.5rem;">Tipo de serviço</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">👥 Gestão de Clientes</h2>
+
+Gerencie toda sua base de clientes de forma eficiente.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Cadastrar Novo Cliente</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique em <strong style="font-weight: bold; color: #1e40af;">"Novo Cliente"</strong></li>
+<li style="margin-bottom: 0.5rem;">2. Preencha os dados:</li>
+   - <strong style="font-weight: bold; color: #1e40af;">Nome</strong>: Nome completo do cliente
+   - <strong style="font-weight: bold; color: #1e40af;">Email</strong>: Email para comunicações
+   - <strong style="font-weight: bold; color: #1e40af;">Telefone</strong>: Número de contato
+   - <strong style="font-weight: bold; color: #1e40af;">Endereço</strong>: Endereço completo
+   - <strong style="font-weight: bold; color: #1e40af;">Tipo de Serviço</strong>: Residencial ou Comercial
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Salvar"</strong></li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Buscar Clientes</h3>
+
+Use a barra de busca para encontrar clientes por:
+<li style="margin-bottom: 0.5rem;">Nome</li>
+<li style="margin-bottom: 0.5rem;">Email</li>
+<li style="margin-bottom: 0.5rem;">Telefone</li>
+<li style="margin-bottom: 0.5rem;">Endereço</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Visualizar Cliente</h3>
+
+Clique em qualquer cliente para ver:
+<li style="margin-bottom: 0.5rem;">Informações completas</li>
+<li style="margin-bottom: 0.5rem;">Histórico de agendamentos</li>
+<li style="margin-bottom: 0.5rem;">Opções de edição</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Editar Cliente</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique no ícone de <strong style="font-weight: bold; color: #1e40af;">edição</strong> (lápis)</li>
+<li style="margin-bottom: 0.5rem;">2. Modifique os dados necessários</li>
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Salvar Alterações"</strong></li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Excluir Cliente</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique no ícone de <strong style="font-weight: bold; color: #1e40af;">exclusão</strong> (lixeira)</li>
+<li style="margin-bottom: 0.5rem;">2. Confirme a exclusão</li>
+<li style="margin-bottom: 0.5rem;">3. ⚠️ <strong style="font-weight: bold; color: #1e40af;">Atenção</strong>: Esta ação não pode ser desfeita</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">👔 Gestão de Funcionários</h2>
+
+Administre sua equipe de funcionários.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Cadastrar Funcionário</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique em <strong style="font-weight: bold; color: #1e40af;">"Novo Funcionário"</strong></li>
+<li style="margin-bottom: 0.5rem;">2. Preencha os dados:</li>
+   - <strong style="font-weight: bold; color: #1e40af;">Nome</strong>: Nome completo
+   - <strong style="font-weight: bold; color: #1e40af;">Email</strong>: Email corporativo
+   - <strong style="font-weight: bold; color: #1e40af;">Telefone</strong>: Número de contato
+   - <strong style="font-weight: bold; color: #1e40af;">Cargo</strong>: Função na empresa
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Salvar"</strong></li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Gerenciar Funcionários</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Buscar</strong>: Use a barra de busca para encontrar funcionários</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Editar</strong>: Clique no ícone de edição para modificar dados</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Excluir</strong>: Clique no ícone de exclusão (com confirmação)</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Visualização</h3>
+
+Os funcionários são exibidos em cards com:
+<li style="margin-bottom: 0.5rem;">Nome e cargo</li>
+<li style="margin-bottom: 0.5rem;">Informações de contato</li>
+<li style="margin-bottom: 0.5rem;">Botões de ação</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">📅 Agenda e Agendamentos</h2>
+
+Sistema completo de agendamentos com integrações.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Criar Agendamento</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique em <strong style="font-weight: bold; color: #1e40af;">"Novo Agendamento"</strong></li>
+<li style="margin-bottom: 0.5rem;">2. Preencha os dados:</li>
+   - <strong style="font-weight: bold; color: #1e40af;">Cliente</strong>: Selecione da lista
+   - <strong style="font-weight: bold; color: #1e40af;">Funcionário(s)</strong>: Escolha um ou múltiplos
+   - <strong style="font-weight: bold; color: #1e40af;">Data</strong>: Data do serviço
+   - <strong style="font-weight: bold; color: #1e40af;">Horário</strong>: Hora de início
+   - <strong style="font-weight: bold; color: #1e40af;">Serviço</strong>: Tipo de limpeza
+   - <strong style="font-weight: bold; color: #1e40af;">Valor</strong>: Preço do serviço
+   - <strong style="font-weight: bold; color: #1e40af;">Status</strong>: Confirmado, Pendente, etc.
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Salvar"</strong></li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Visualizações da Agenda</h3>
+
+#### 📅 Visualização em Calendário
+<li style="margin-bottom: 0.5rem;">Visão mensal com agendamentos</li>
+<li style="margin-bottom: 0.5rem;">Cores diferentes para cada funcionário</li>
+<li style="margin-bottom: 0.5rem;">Clique para ver detalhes</li>
+
+#### 📋 Visualização em Lista
+<li style="margin-bottom: 0.5rem;">Lista detalhada de todos os agendamentos</li>
+<li style="margin-bottom: 0.5rem;">Filtros por data e status</li>
+<li style="margin-bottom: 0.5rem;">Ações rápidas</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Editar Agendamento</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique no agendamento desejado</li>
+<li style="margin-bottom: 0.5rem;">2. Modifique as informações</li>
+<li style="margin-bottom: 0.5rem;">3. Salve as alterações</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Excluir Agendamento</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique no agendamento</li>
+<li style="margin-bottom: 0.5rem;">2. Clique em <strong style="font-weight: bold; color: #1e40af;">"Excluir"</strong></li>
+<li style="margin-bottom: 0.5rem;">3. Confirme a exclusão</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Integração com Google Calendar</h3>
+
+#### Conectar Google Calendar
+
+<li style="margin-bottom: 0.5rem;">1. Na página da Agenda, clique em <strong style="font-weight: bold; color: #1e40af;">"Conectar Google Calendar"</strong></li>
+<li style="margin-bottom: 0.5rem;">2. Faça login na sua conta Google</li>
+<li style="margin-bottom: 0.5rem;">3. Autorize o acesso</li>
+<li style="margin-bottom: 0.5rem;">4. Pronto! Os agendamentos serão sincronizados automaticamente</li>
+
+#### Funcionalidades da Integração
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Sincronização Automática</strong>: Agendamentos criados no CleanBiz360 aparecem no Google Calendar</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Notificações</strong>: Lembretes automáticos</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Atualizações</strong>: Mudanças são refletidas em ambos os sistemas</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">💰 Financeiro</h2>
+
+Controle completo das finanças do negócio.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Receitas</h3>
+
+As receitas são calculadas automaticamente baseadas nos agendamentos confirmados e concluídos.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Despesas</h3>
+
+#### Cadastrar Despesa
+
+<li style="margin-bottom: 0.5rem;">1. Clique em <strong style="font-weight: bold; color: #1e40af;">"Nova Despesa"</strong></li>
+<li style="margin-bottom: 0.5rem;">2. Preencha:</li>
+   - <strong style="font-weight: bold; color: #1e40af;">Categoria</strong>: Tipo da despesa
+   - <strong style="font-weight: bold; color: #1e40af;">Descrição</strong>: Detalhes da despesa
+   - <strong style="font-weight: bold; color: #1e40af;">Valor</strong>: Valor gasto
+   - <strong style="font-weight: bold; color: #1e40af;">Data</strong>: Data da despesa
+   - <strong style="font-weight: bold; color: #1e40af;">Tipo</strong>: Fixa ou Variável
+   - <strong style="font-weight: bold; color: #1e40af;">Frequência</strong>: Única, Mensal, etc.
+<li style="margin-bottom: 0.5rem;">3. Clique em <strong style="font-weight: bold; color: #1e40af;">"Salvar"</strong></li>
+
+#### Categorias Disponíveis
+
+<li style="margin-bottom: 0.5rem;">Equipamentos</li>
+<li style="margin-bottom: 0.5rem;">Produtos de Limpeza</li>
+<li style="margin-bottom: 0.5rem;">Transporte</li>
+<li style="margin-bottom: 0.5rem;">Salários</li>
+<li style="margin-bottom: 0.5rem;">Marketing</li>
+<li style="margin-bottom: 0.5rem;">Outros</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Relatórios</h3>
+
+#### Gráfico de Lucro/Despesas
+
+Visualize a evolução financeira com gráficos interativos:
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Lucro</strong>: Receita - Despesas</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Despesas</strong>: Total de gastos por período</li>
+
+#### Resumo Financeiro
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Receita Total</strong>: Soma de todos os agendamentos pagos</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Despesas Totais</strong>: Soma de todas as despesas</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Lucro Líquido</strong>: Diferença entre receita e despesas</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Exportar Dados</h3>
+
+Os dados financeiros podem ser exportados para análise externa.
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🔗 Integrações</h2>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Google Calendar</h3>
+
+#### Configuração
+
+<li style="margin-bottom: 0.5rem;">1. Acesse a página da Agenda</li>
+<li style="margin-bottom: 0.5rem;">2. Clique em <strong style="font-weight: bold; color: #1e40af;">"Conectar Google Calendar"</strong></li>
+<li style="margin-bottom: 0.5rem;">3. Autorize o acesso</li>
+<li style="margin-bottom: 0.5rem;">4. Os agendamentos serão sincronizados automaticamente</li>
+
+#### Funcionalidades
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Criação Automática</strong>: Agendamentos criados no sistema aparecem no Google Calendar</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Atualizações</strong>: Mudanças são sincronizadas em tempo real</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Exclusões</strong>: Agendamentos cancelados são removidos do Google Calendar</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Sistema de Email</h3>
+
+#### Notificações Automáticas
+
+O sistema envia emails automaticamente para:
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Confirmação</strong>: Quando um agendamento é criado</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Lembrete</strong>: Antes do serviço</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Cancelamento</strong>: Quando um agendamento é cancelado</li>
+
+#### Configuração
+
+O sistema de email é configurado automaticamente e não requer intervenção do usuário.
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🌙 Modo Escuro</h2>
+
+O CleanBiz360 oferece suporte completo ao modo escuro para melhor experiência visual.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Ativar/Desativar</h3>
+
+<li style="margin-bottom: 0.5rem;">1. Clique no ícone da <strong style="font-weight: bold; color: #1e40af;">lua</strong> (modo escuro) ou <strong style="font-weight: bold; color: #1e40af;">sol</strong> (modo claro)</li>
+<li style="margin-bottom: 0.5rem;">2. A preferência é salva automaticamente</li>
+<li style="margin-bottom: 0.5rem;">3. O tema será aplicado em todas as páginas</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Benefícios</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Redução de fadiga visual</strong></li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Economia de bateria</strong> (em dispositivos OLED)</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Melhor experiência noturna</strong></li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Preferência salva automaticamente</strong></li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">💡 Dicas e Truques</h2>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Atalhos de Navegação</h3>
+
+<li style="margin-bottom: 0.5rem;">Use a <strong style="font-weight: bold; color: #1e40af;">barra de busca</strong> para encontrar rapidamente clientes, funcionários ou agendamentos</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Filtros</strong> ajudam a organizar informações</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Modo escuro</strong> pode ser ativado/desativado a qualquer momento</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Gestão Eficiente</h3>
+
+#### Para Clientes
+<li style="margin-bottom: 0.5rem;">Mantenha informações de contato sempre atualizadas</li>
+<li style="margin-bottom: 0.5rem;">Use o campo "Tipo de Serviço" para categorizar</li>
+<li style="margin-bottom: 0.5rem;">Cadastre endereços completos para facilitar o planejamento</li>
+
+#### Para Funcionários
+<li style="margin-bottom: 0.5rem;">Organize por cargo para melhor visualização</li>
+<li style="margin-bottom: 0.5rem;">Mantenha contatos atualizados</li>
+<li style="margin-bottom: 0.5rem;">Use múltiplos funcionários em agendamentos quando necessário</li>
+
+#### Para Agendamentos
+<li style="margin-bottom: 0.5rem;">Use a integração com Google Calendar</li>
+<li style="margin-bottom: 0.5rem;">Configure lembretes automáticos</li>
+<li style="margin-bottom: 0.5rem;">Mantenha status atualizados</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Produtividade</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Dashboard</strong>: Verifique diariamente as métricas principais</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Agenda</strong>: Planeje a semana com antecedência</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Financeiro</strong>: Revise despesas regularmente</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Integrações</strong>: Aproveite as automações disponíveis</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🔧 Resolução de Problemas</h2>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Problemas de Login</h3>
+
+<strong style="font-weight: bold; color: #1e40af;">Erro</strong>: "Credenciais inválidas"
+<li style="margin-bottom: 0.5rem;">Verifique se o email e senha estão corretos</li>
+<li style="margin-bottom: 0.5rem;">Certifique-se de que a conta está ativa</li>
+
+<strong style="font-weight: bold; color: #1e40af;">Erro</strong>: "Página não carrega"
+<li style="margin-bottom: 0.5rem;">Verifique sua conexão com a internet</li>
+<li style="margin-bottom: 0.5rem;">Tente atualizar a página (F5)</li>
+<li style="margin-bottom: 0.5rem;">Limpe o cache do navegador</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Problemas com Google Calendar</h3>
+
+<strong style="font-weight: bold; color: #1e40af;">Erro</strong>: "Não foi possível conectar"
+<li style="margin-bottom: 0.5rem;">Verifique se você tem uma conta Google ativa</li>
+<li style="margin-bottom: 0.5rem;">Certifique-se de que autorizou o acesso</li>
+<li style="margin-bottom: 0.5rem;">Tente desconectar e reconectar</li>
+
+<strong style="font-weight: bold; color: #1e40af;">Agendamentos não aparecem no Google Calendar</strong>
+<li style="margin-bottom: 0.5rem;">Aguarde alguns minutos para sincronização</li>
+<li style="margin-bottom: 0.5rem;">Verifique se o agendamento está "Confirmado"</li>
+<li style="margin-bottom: 0.5rem;">Tente recarregar a página</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Problemas de Email</h3>
+
+<strong style="font-weight: bold; color: #1e40af;">Emails não são enviados</strong>
+<li style="margin-bottom: 0.5rem;">Verifique se o email do cliente está correto</li>
+<li style="margin-bottom: 0.5rem;">Aguarde alguns minutos (pode haver delay)</li>
+<li style="margin-bottom: 0.5rem;">Verifique a pasta de spam</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Problemas Gerais</h3>
+
+<strong style="font-weight: bold; color: #1e40af;">Página não responde</strong>
+<li style="margin-bottom: 0.5rem;">Atualize a página (F5)</li>
+<li style="margin-bottom: 0.5rem;">Limpe o cache do navegador</li>
+<li style="margin-bottom: 0.5rem;">Tente em outro navegador</li>
+
+<strong style="font-weight: bold; color: #1e40af;">Dados não salvam</strong>
+<li style="margin-bottom: 0.5rem;">Verifique sua conexão com a internet</li>
+<li style="margin-bottom: 0.5rem;">Certifique-se de preencher todos os campos obrigatórios</li>
+<li style="margin-bottom: 0.5rem;">Tente novamente em alguns minutos</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">📞 Suporte</h2>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Contato</h3>
+
+Para suporte técnico ou dúvidas:
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Email</strong>: suporte@cleanbiz360.com</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Horário</strong>: Segunda a Sexta, 9h às 18h</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Recursos Adicionais</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Documentação Online</strong>: Disponível no sistema</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Tutoriais em Vídeo</strong>: Em breve</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">FAQ</strong>: Perguntas frequentes em desenvolvimento</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">🔄 Atualizações</h2>
+
+O CleanBiz360 é constantemente atualizado com novas funcionalidades e melhorias.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Como Receber Atualizações</h3>
+
+<li style="margin-bottom: 0.5rem;">As atualizações são aplicadas automaticamente</li>
+<li style="margin-bottom: 0.5rem;">Não é necessário fazer download de nada</li>
+<li style="margin-bottom: 0.5rem;">Novas funcionalidades aparecem gradualmente</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Histórico de Versões</h3>
+
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">v1.0</strong>: Sistema básico de gerenciamento</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">v1.1</strong>: Integração com Google Calendar</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">v1.2</strong>: Sistema de email automático</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">v1.3</strong>: Modo escuro e melhorias de interface</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">v1.4</strong>: Melhorias de performance e estabilidade</li>
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<h2 style="color: #1e3a8a; margin-top: 2.5rem; margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem;">📝 Notas Finais</h2>
+
+O CleanBiz360 foi desenvolvido para simplificar e otimizar a gestão do seu negócio de limpeza. Com suas funcionalidades integradas e interface intuitiva, você pode focar no que realmente importa: atender seus clientes com excelência.
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Compromisso</h3>
+
+Estamos comprometidos em:
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Melhorar continuamente</strong> o sistema</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Manter a segurança</strong> dos seus dados</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Oferecer suporte</strong> de qualidade</li>
+<li style="margin-bottom: 0.5rem;"><strong style="font-weight: bold; color: #1e40af;">Escutar feedback</strong> dos usuários</li>
+
+<h3 style="color: #1e40af; margin-top: 2rem; margin-bottom: 1rem; font-size: 1.25rem; font-weight: bold;">Obrigado!</h3>
+
+Obrigado por escolher o CleanBiz360. Esperamos que o sistema contribua para o sucesso do seu negócio!
+
+<hr style="border: none; border-top: 2px solid #e5e7eb; margin: 2rem 0;">
+
+<em style="font-style: italic;">Manual do Usuário - CleanBiz360 v1.4</em>  
+<em style="font-style: italic;">Última atualização: Dezembro 2024</em>
+
+</body>
+</html>

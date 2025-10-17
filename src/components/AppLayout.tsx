@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../utils/supabaseClient'
-import { Menu, Home, Users, Calendar, DollarSign, LogOut, Briefcase, Sparkles, Moon, Sun } from 'lucide-react'
+import { Menu, Home, Users, Calendar, DollarSign, LogOut, Briefcase, Sparkles, Moon, Sun, Settings } from 'lucide-react'
 
 export default function AppLayout({
   children,
@@ -85,8 +85,8 @@ export default function AppLayout({
     { path: '/financeiro', label: 'Financeiro', icon: DollarSign, gradient: 'from-purple-300 to-indigo-400' },
   ]
 
-  // Se for página de login, renderizar sem layout
-  if (pathname === '/login') {
+  // Se for página de login ou admin, renderizar sem layout
+  if (pathname === '/login' || pathname.startsWith('/admin')) {
     return <>{children}</>
   }
 
