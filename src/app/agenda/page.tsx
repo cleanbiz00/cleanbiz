@@ -642,7 +642,7 @@ export default function AgendaPage() {
             
             <div className="flex items-center gap-3 flex-wrap">
               {/* View Mode Toggle Premium */}
-              <div className="flex bg-white dark:bg-slate-800/20 backdrop-blur-lg rounded-xl p-1 border border-white/30">
+              <div className="flex bg-white/20 dark:bg-slate-800/20 backdrop-blur-lg rounded-xl p-1 border border-white/30">
                 <button
                   onClick={() => setViewMode('calendar')}
                   className={`px-3 md:px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 ${

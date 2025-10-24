@@ -159,7 +159,7 @@ export default function FuncionariosPage() {
           </div>
           <button
             onClick={() => openModal()}
-            className="bg-white dark:bg-slate-800/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
+            className="bg-white/20 dark:bg-slate-800/20 backdrop-blur-lg border border-white/30 text-white px-4 md:px-6 py-3 rounded-xl flex items-center space-x-2 hover:bg-white/30 transition-all duration-300 hover:scale-105 shadow-lg"
           >
             <Plus size={20} />
             <span className="hidden sm:inline">Novo Funcionário</span>
