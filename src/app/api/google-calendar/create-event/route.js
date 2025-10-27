@@ -120,14 +120,54 @@ export async function POST(request) {
                    `👷 Funcionário: ${appointmentData.employeeName}` +
                    (appointmentData.comments ? `\n\n📝 Comentários:\n${appointmentData.comments}` : '');
 
-    // If there are employees, use description WITHOUT price
-    // Otherwise use description WITH price
     const hasEmployees = employeeEmails && employeeEmails.length > 0
     
-    // Create the event object for Google Calendar
+    // FIRST: Create event WITH price for client (if client exists)
+    let clientEventId = null
+    if (clientEmail) {
+      const clientEvent = {
+        summary: `Limpeza - ${appointmentData.clientName}`,
+        description: descriptionWithPrice,
+        start: {
+          dateTime: `${appointmentData.date}T${appointmentData.time}:00-03:00`,
+          timeZone: 'America/Sao_Paulo',
+        },
+        end: {
+          dateTime: `${appointmentData.date}T${endTime}:00-03:00`,
+          timeZone: 'America/Sao_Paulo',
+        },
+        attendees: [{ email: clientEmail }],
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: 'email', minutes: 24 * 60 },
+            { method: 'popup', minutes: 30 },
+          ],
+        },
+      }
+
+      const clientResponse = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clientEvent),
+      });
+
+      const clientResult = await clientResponse.json();
+
+      if (clientResponse.ok) {
+        clientEventId = clientResult.id
+        console.log('Client event created:', clientEventId)
+      }
+    }
+
+    // SECOND: Create event WITHOUT price for employees (if employees exist)
+    // Create the main event object for employees (without price)
     const event = {
       summary: `Limpeza - ${appointmentData.clientName}`,
-      description: hasEmployees ? descriptionWithoutPrice : descriptionWithPrice,
+      description: descriptionWithoutPrice,
       start: {
         dateTime: `${appointmentData.date}T${appointmentData.time}:00-03:00`,
         timeZone: 'America/Sao_Paulo',
@@ -137,7 +177,6 @@ export async function POST(request) {
         timeZone: 'America/Sao_Paulo',
       },
       attendees: [
-        ...(clientEmail ? [{ email: clientEmail }] : []),
         ...(employeeEmails || []).map(email => ({ email }))
       ],
       reminders: {
@@ -149,34 +188,44 @@ export async function POST(request) {
       },
     };
 
-    // Create the event in Google Calendar
-    const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(event),
-    });
+    // Create the event in Google Calendar for employees (if employees exist)
+    let employeeEventId = null
+    if (hasEmployees) {
+      const employeeResponse = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(event),
+      });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('Google Calendar API error:', result);
-      return NextResponse.json({
-        success: false,
-        error: result.error?.message || 'Failed to create calendar event'
-      }, { status: response.status });
+      const employeeResult = await employeeResponse.json();
+      
+      if (employeeResponse.ok) {
+        employeeEventId = employeeResult.id
+        console.log('Employee event created:', employeeEventId)
+      }
     }
 
-    console.log('Google Calendar event created successfully:', result.id);
+    // Return success with the appropriate event ID
+    const returnEventId = hasEmployees ? employeeEventId : clientEventId
     
-    return NextResponse.json({
-      success: true,
-      eventId: result.id,
-      message: 'Google Calendar event created successfully',
-      eventUrl: result.htmlLink
-    });
+    if (returnEventId) {
+      console.log('Google Calendar event(s) created successfully');
+      
+      return NextResponse.json({
+        success: true,
+        eventId: returnEventId,
+        message: 'Google Calendar events created successfully'
+      });
+    } else {
+      console.error('Failed to create calendar events');
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to create calendar events'
+      }, { status: 500 });
+    }
 
   } catch (error) {
     console.error('Google Calendar event creation error:', error);
