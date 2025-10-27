@@ -304,6 +304,16 @@ export default function AppLayout({
         </div>
 
         {children}
+        
+        {/* Footer with Privacy Policy Link */}
+        <footer className="w-full p-4 text-center">
+          <a 
+            href="/privacidade" 
+            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            Política de Privacidade
+          </a>
+        </footer>
       </div>
     </div>
   )
