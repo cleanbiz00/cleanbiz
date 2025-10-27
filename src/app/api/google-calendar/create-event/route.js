@@ -110,7 +110,8 @@ export async function POST(request) {
                    `📍 Endereço: ${appointmentData.clientAddress || 'Não informado'}\n` +
                    `📞 Telefone: ${appointmentData.clientPhone || 'Não informado'}\n\n` +
                    `👷 Funcionário: ${appointmentData.employeeName}\n` +
-                   `💰 Preço: R$ ${appointmentData.price}`,
+                   `💰 Preço: R$ ${appointmentData.price}` +
+                   (appointmentData.comments ? `\n\n📝 Comentários:\n${appointmentData.comments}` : ''),
       start: {
         dateTime: `${appointmentData.date}T${appointmentData.time}:00-03:00`,
         timeZone: 'America/Sao_Paulo',

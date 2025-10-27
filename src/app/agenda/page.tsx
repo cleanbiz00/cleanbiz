@@ -522,7 +522,8 @@ export default function AgendaPage() {
               clientName: getClientName(formData.clientId),
               clientPhone: client?.phone || '',
               clientAddress: client?.address || '',
-              employeeName: getEmployeeName(formData.employeeId)
+              employeeName: getEmployeeName(formData.employeeId),
+              comments: formData.comments || ''
             },
             clientEmail: formData.clientEmail
           }),
@@ -550,7 +551,8 @@ export default function AgendaPage() {
             service: formData.service,
         price: Number(formData.price) || 0,
         client_email: formData.clientEmail || null,
-        google_event_id: googleEventId || null
+        google_event_id: googleEventId || null,
+        comments: formData.comments || null
       }
       
       console.log('📝 Salvando agendamento:', insertData)
@@ -1186,6 +1188,21 @@ export default function AgendaPage() {
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   💡 O email é preenchido automaticamente ao selecionar o cliente, mas você pode editá-lo se necessário
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Comentários (opcional)
+                </label>
+                <textarea
+                  placeholder="Adicione informações importantes sobre este agendamento..."
+                  value={formData.comments || ''}
+                  onChange={(e) => setFormData({...formData, comments: e.target.value})}
+                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={3}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  💡 Estes comentários serão enviados ao cliente e funcionários via email e Google Calendar
                 </p>
               </div>
             </div>
