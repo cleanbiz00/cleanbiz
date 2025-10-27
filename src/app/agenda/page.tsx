@@ -225,8 +225,9 @@ export default function AgendaPage() {
   }, [])
 
   const handleGoogleAuth = async () => {
-    // Force usar o subdomínio correto
-    const baseUrl = 'https://app.cleanbiz360.com'
+    // Detectar ambiente (localhost ou produção)
+    const isLocal = window.location.hostname === 'localhost'
+    const baseUrl = isLocal ? 'http://localhost:3000' : 'https://app.cleanbiz360.com'
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
     const redirectUri = `${baseUrl}/api/google-calendar/auth`
     const scope = 'https://www.googleapis.com/auth/calendar'

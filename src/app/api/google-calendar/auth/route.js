@@ -11,20 +11,25 @@ export async function GET(request) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const state = searchParams.get('state'); // user_id passed as state
+  
+  // Detectar ambiente
+  const origin = request.headers.get('origin') || request.headers.get('host')
+  const isLocal = origin?.includes('localhost') || request.headers.get('host')?.includes('localhost')
+  const baseUrl = isLocal ? 'http://localhost:3000' : (process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com')
 
   if (error) {
     console.error('Google OAuth error:', error);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=oauth_error`);
+    return NextResponse.redirect(`${baseUrl}/agenda?error=oauth_error`);
   }
 
   if (!code) {
     console.error('No authorization code received');
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=no_code`);
+    return NextResponse.redirect(`${baseUrl}/agenda?error=no_code`);
   }
 
   if (!state) {
     console.error('No user_id (state) received');
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=no_user_id`);
+    return NextResponse.redirect(`${baseUrl}/agenda?error=no_user_id`);
   }
 
   try {
@@ -39,7 +44,9 @@ export async function GET(request) {
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
         code: code,
         grant_type: 'authorization_code',
-        redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/api/google-calendar/auth`,
+        redirect_uri: `${baseUrl}/api/google-calendar/auth`,
+        access_type: 'offline',
+        prompt: 'consent'
       }),
     });
 
@@ -107,16 +114,16 @@ export async function GET(request) {
         supabaseUrl: supabaseUrl,
         hasServiceKey: !!supabaseServiceKey
       });
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=db_error`);
+      return NextResponse.redirect(`${baseUrl}/agenda?error=db_error`);
     }
 
     console.log('✅ Tokens salvos no banco de dados com sucesso para user:', state);
     
     // Redirect to agenda with success message
-    const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?google_connected=success`;
+    const redirectUrl = `${baseUrl}/agenda?google_connected=success`;
     return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error('OAuth flow error:', error);
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL || 'https://app.cleanbiz360.com'}/agenda?error=oauth_error`);
+    return NextResponse.redirect(`${baseUrl}/agenda?error=oauth_error`);
   }
 }
