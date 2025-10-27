@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request) {
   try {
-    const { appointmentData, clientEmail, userId } = await request.json();
+    const { appointmentData, clientEmail, employeeEmails, userId } = await request.json();
 
     if (!appointmentData) {
       return NextResponse.json({ error: 'Appointment data is required' }, { status: 400 });
@@ -20,6 +20,7 @@ export async function POST(request) {
 
     console.log('Creating Google Calendar event for appointment:', appointmentData);
     console.log('User ID:', userId);
+    console.log('Attendees:', { clientEmail, employeeEmails });
 
     // Get the user's Google access token from database using auth_user_id
     let { data: userData, error: userError } = await supabase
@@ -120,7 +121,10 @@ export async function POST(request) {
         dateTime: `${appointmentData.date}T${endTime}:00-03:00`,
         timeZone: 'America/Sao_Paulo',
       },
-      attendees: clientEmail ? [{ email: clientEmail }] : [],
+      attendees: [
+        ...(clientEmail ? [{ email: clientEmail }] : []),
+        ...(employeeEmails || []).map(email => ({ email }))
+      ],
       reminders: {
         useDefault: false,
         overrides: [

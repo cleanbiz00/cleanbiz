@@ -138,7 +138,8 @@ export default function AgendaPage() {
         if (data) {
           const formattedEmployees = data.map(e => ({
             id: e.id,
-            name: e.name
+            name: e.name,
+            email: e.email
           }))
           setEmployees(formattedEmployees)
         }
@@ -526,7 +527,10 @@ export default function AgendaPage() {
               employeeName: getEmployeeNames(formData.employeeIds || [formData.employeeId].filter(Boolean)) || getEmployeeName(formData.employeeId),
               comments: formData.comments || ''
             },
-            clientEmail: formData.clientEmail
+            clientEmail: formData.clientEmail,
+            employeeEmails: (formData.employeeIds || [])
+              .map((empId: string) => employees.find(e => e.id === empId)?.email)
+              .filter(Boolean)
           }),
         })
       
