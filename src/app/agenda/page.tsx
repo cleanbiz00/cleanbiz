@@ -535,7 +535,15 @@ export default function AgendaPage() {
           console.log('Google Calendar event created:', calendarResult.eventId)
           googleEventId = calendarResult.eventId
         } else {
-          console.log('Google Calendar not connected or failed:', calendarResult.error)
+          // Se o erro for de token expirado, avisa discretamente
+          if (calendarResult.error?.includes('Failed to refresh')) {
+            console.log('Token expirado - usuário precisa reconectar:', calendarResult.error)
+            // Não mostra alerta - muito intrusivo
+            // Mas vamos mostrar um indicador visual na página
+            setGoogleConnected(false) // Atualiza UI para mostrar botão "Conectar"
+          } else {
+            console.log('Google Calendar not connected or failed:', calendarResult.error)
+          }
         }
       } catch (error) {
         console.error('Error creating Google Calendar event:', error)
@@ -686,6 +694,11 @@ export default function AgendaPage() {
       {/* Integration Status Premium */}
       <div className="mb-6 p-5 bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg">
         <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Status das Integrações:</h3>
+        {!googleConnected && (
+          <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-xs text-yellow-700 dark:text-yellow-300">
+            ⚠️ Google Calendar desconectado. Os agendamentos não serão sincronizados até você reconectar.
+          </div>
+        )}
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center space-x-2">
             <Calendar size={16} className={googleConnected ? 'text-green-600' : 'text-gray-400'} />
