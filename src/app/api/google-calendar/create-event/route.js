@@ -103,16 +103,31 @@ export async function POST(request) {
     const endHour = parseInt(hours) + 4;
     const endTime = `${endHour.toString().padStart(2, '0')}:${minutes}`;
 
-    // Create the event object for Google Calendar
-    const event = {
-      summary: `Limpeza - ${appointmentData.clientName}`,
-      description: `Serviço: ${appointmentData.service}\n\n` +
+    // Create description WITH price (for the owner/creator)
+    const descriptionWithPrice = `Serviço: ${appointmentData.service}\n\n` +
                    `👤 Cliente: ${appointmentData.clientName}\n` +
                    `📍 Endereço: ${appointmentData.clientAddress || 'Não informado'}\n` +
                    `📞 Telefone: ${appointmentData.clientPhone || 'Não informado'}\n\n` +
                    `👷 Funcionário: ${appointmentData.employeeName}\n` +
                    `💰 Preço: R$ ${appointmentData.price}` +
-                   (appointmentData.comments ? `\n\n📝 Comentários:\n${appointmentData.comments}` : ''),
+                   (appointmentData.comments ? `\n\n📝 Comentários:\n${appointmentData.comments}` : '');
+    
+    // Create description WITHOUT price (for employees)
+    const descriptionWithoutPrice = `Serviço: ${appointmentData.service}\n\n` +
+                   `👤 Cliente: ${appointmentData.clientName}\n` +
+                   `📍 Endereço: ${appointmentData.clientAddress || 'Não informado'}\n` +
+                   `📞 Telefone: ${appointmentData.clientPhone || 'Não informado'}\n\n` +
+                   `👷 Funcionário: ${appointmentData.employeeName}` +
+                   (appointmentData.comments ? `\n\n📝 Comentários:\n${appointmentData.comments}` : '');
+
+    // If there are employees, use description WITHOUT price
+    // Otherwise use description WITH price
+    const hasEmployees = employeeEmails && employeeEmails.length > 0
+    
+    // Create the event object for Google Calendar
+    const event = {
+      summary: `Limpeza - ${appointmentData.clientName}`,
+      description: hasEmployees ? descriptionWithoutPrice : descriptionWithPrice,
       start: {
         dateTime: `${appointmentData.date}T${appointmentData.time}:00-03:00`,
         timeZone: 'America/Sao_Paulo',
