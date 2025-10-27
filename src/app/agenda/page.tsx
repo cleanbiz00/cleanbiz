@@ -519,11 +519,11 @@ export default function AgendaPage() {
               price: formData.price,
               status: formData.status,
               clientId: formData.clientId,
-              employeeId: formData.employeeId,
+              employeeId: formData.employeeIds?.[0] || formData.employeeId, // Usar primeiro funcionário ou fallback
               clientName: getClientName(formData.clientId),
               clientPhone: client?.phone || '',
               clientAddress: client?.address || '',
-              employeeName: getEmployeeName(formData.employeeId),
+              employeeName: getEmployeeNames(formData.employeeIds || [formData.employeeId].filter(Boolean)) || getEmployeeName(formData.employeeId),
               comments: formData.comments || ''
             },
             clientEmail: formData.clientEmail
